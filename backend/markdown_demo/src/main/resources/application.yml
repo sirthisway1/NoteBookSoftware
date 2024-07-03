@@ -1,0 +1,15 @@
+# DataSource Config
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**Mapper.xml
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/notebook?useUnicode=true&useSSL=false&character_set_server=utf8mb4&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+
+
