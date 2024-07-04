@@ -1,42 +1,34 @@
 package com.example.markdown_demo.common.lang;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
 
 @Data
-public class Result implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Result<T> {
+    private String statusCode;
+    private String message;
+    private T data;
 
-    private int code; // 200是正常，非200表示异常
-    private String msg;
-    private Object data;
-
-    public static Result succ(Object data) {
-        return succ(200, "操作成功", data);
+    public static <T> Result<T> success(T data) {
+        return new Result<>(ResultType.SUCCESS.getCode(), ResultType.SUCCESS.getMessage(), data);
     }
 
-    public static Result succ(int code, String msg, Object data) {
-        Result r = new Result();
-        r.setCode(code);
-        r.setMsg(msg);
-        r.setData(data);
-        return r;
+    public static <T> Result<T> success(String message, T data) {
+        return new Result<>(ResultType.SUCCESS.getCode(), message, data);
     }
 
-    public static Result fail(String msg) {
-        return fail(400, msg, null);
+    public static <T> Result<T> fail(String statusCode, String message) {
+        return new Result<>(statusCode, message, null);
     }
 
-    public static Result fail(String msg, Object data) {
-        return fail(400, msg, data);
+    public static <T> Result<T> fail(ResultType resultType) {
+        return new Result<>(resultType.getCode(), resultType.getMessage(), null);
     }
 
-    public static Result fail(int code, String msg, Object data) {
-        Result r = new Result();
-        r.setCode(code);
-        r.setMsg(msg);
-        r.setData(data);
-        return r;
+    public static <T> Result<T> of(String statusCode, String message, T data) {
+        return new Result<>(statusCode, message, data);
     }
-
 }

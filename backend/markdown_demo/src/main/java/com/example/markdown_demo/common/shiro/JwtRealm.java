@@ -1,9 +1,9 @@
-package com.example.markdown_demo.shiro;
+package com.example.markdown_demo.common.shiro;
 
-import com.example.markdown_demo.exception.JwtValidationException;
+import com.example.markdown_demo.common.lang.JwtValidationException;
 //import com.example.markdown_demo.service.UserService;
-import com.example.markdown_demo.utils.JwtUtil;
-import com.example.markdown_demo.utils.ResultType;
+import com.example.markdown_demo.common.utils.JwtUtil;
+import com.example.markdown_demo.common.lang.ResultType;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.Resource;
@@ -13,7 +13,6 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**

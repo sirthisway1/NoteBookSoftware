@@ -1,8 +1,8 @@
-package com.example.markdown_demo.shiro;
+package com.example.markdown_demo.common.shiro;
 
-import com.example.markdown_demo.exception.JwtValidationException;
-import com.example.markdown_demo.utils.Result;
-import com.example.markdown_demo.utils.ResultType;
+import com.example.markdown_demo.common.lang.JwtValidationException;
+import com.example.markdown_demo.common.lang.Result;
+import com.example.markdown_demo.common.lang.ResultType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.ServletRequest;

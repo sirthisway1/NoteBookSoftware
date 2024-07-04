@@ -1,4 +1,4 @@
-package com.example.markdown_demo.utils;
+package com.example.markdown_demo.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

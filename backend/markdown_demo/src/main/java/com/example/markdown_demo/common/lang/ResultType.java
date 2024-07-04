@@ -1,4 +1,4 @@
-package com.example.markdown_demo.utils;
+package com.example.markdown_demo.common.lang;
 
 import java.util.HashMap;
 import java.util.Map;

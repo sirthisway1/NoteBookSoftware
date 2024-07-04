@@ -1,4 +1,4 @@
-package com.example.markdown_demo.exception;
+package com.example.markdown_demo.common.lang;
 
 
 public class JwtValidationException extends RuntimeException {

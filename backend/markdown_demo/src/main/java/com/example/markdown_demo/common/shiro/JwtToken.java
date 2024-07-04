@@ -1,4 +1,4 @@
-package com.example.markdown_demo.shiro;
+package com.example.markdown_demo.common.shiro;
 
 import org.apache.shiro.authc.AuthenticationToken;
 

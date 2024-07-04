@@ -6,8 +6,8 @@ package com.example.markdown_demo.config;
  */
 
 
-import com.example.markdown_demo.shiro.JwtFilter;
-import com.example.markdown_demo.shiro.JwtRealm;
+import com.example.markdown_demo.common.shiro.JwtFilter;
+import com.example.markdown_demo.common.shiro.JwtRealm;
 import jakarta.servlet.Filter;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
