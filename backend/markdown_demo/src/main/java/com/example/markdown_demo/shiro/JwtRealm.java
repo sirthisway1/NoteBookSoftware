@@ -1,7 +1,7 @@
 package com.example.markdown_demo.shiro;
 
 import com.example.markdown_demo.exception.JwtValidationException;
-import com.example.markdown_demo.service.UserService;
+//import com.example.markdown_demo.service.UserService;
 import com.example.markdown_demo.utils.JwtUtil;
 import com.example.markdown_demo.utils.ResultType;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,8 +30,8 @@ public class JwtRealm extends AuthorizingRealm {
     @Resource
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private UserService userService;
+    //@Autowired
+    //private UserService userService;
 
     /**
      * 多重写一个support
@@ -56,7 +56,7 @@ public class JwtRealm extends AuthorizingRealm {
             String id = jwtUtil.validateToken(jwt);
             log.info("jwt认证成功，用户id：", id);
             // 标记用户为活跃状态
-            userService.markUserActive(Integer.parseInt(id));
+            //userService.markUserActive(Integer.parseInt(id));
             return new SimpleAuthenticationInfo(jwt, jwt, getName());
         }
         catch (ExpiredJwtException e) {

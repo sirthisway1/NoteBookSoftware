@@ -9,10 +9,10 @@ import org.springframework.stereotype.Controller;
  * </p>
  *
  * @author xmg
- * @since 2024-07-02
+ * @since 2024-07-04
  */
 @Controller
-@RequestMapping("/blog")
-public class BlogController {
+@RequestMapping("/notes")
+public class NotesController {
 
 }

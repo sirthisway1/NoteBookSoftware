@@ -1,6 +1,6 @@
 package com.example.markdown_demo.mapper;
 
-import com.example.markdown_demo.entity.Blog;
+import com.example.markdown_demo.entity.Notes;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author xmg
- * @since 2024-07-02
+ * @since 2024-07-04
  */
-public interface BlogMapper extends BaseMapper<Blog> {
+public interface NotesMapper extends BaseMapper<Notes> {
 
 }

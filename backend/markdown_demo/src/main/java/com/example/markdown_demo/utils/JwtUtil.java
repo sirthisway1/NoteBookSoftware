@@ -41,7 +41,7 @@ public class JwtUtil {
         // you can put any data in the map
         map.put(USER_ID, id);
         // 1. setClaims(map)：将map中的数据存储到Claims中
-        // 2. setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))：设置过期时间
+        // 2. setExpiration(neDate(System.currentTimeMillis() + EXPIRATION_TIME))：设置过期时间
         // 3. signWith(SignatureAlgorithm.HS512, SECRET)：设置加密算法和密钥
         // 4. compact()：生成token
         String token = Jwts.builder()
@@ -78,7 +78,7 @@ public class JwtUtil {
     }
 
     public static void main(String[] args) {
-        String id = "hahaha15";
+        String id = "114514";
 
         String token = generateToken(id);
         System.out.println(token);
