@@ -57,4 +57,19 @@ public enum ResultType {
                 ", message='" + message + '\'' +
                 '}';
     }
+    public Map<String, Object> asMap(String key, Object value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", code);
+        map.put("message", message);
+        map.put(key, value);
+        return map;
+    }
+
+
 }
+
+
+
+
+
+
