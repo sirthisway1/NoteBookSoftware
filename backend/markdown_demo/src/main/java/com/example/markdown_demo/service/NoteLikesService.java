@@ -15,4 +15,6 @@ public interface NoteLikesService {
 
     boolean likeOrUnlikeNote(Integer noteId, Integer userId);
 
+    int countLikesByNoteId(Integer noteId);
+    boolean isNoteLikedByUser(Integer noteId, Integer userId);
 }
