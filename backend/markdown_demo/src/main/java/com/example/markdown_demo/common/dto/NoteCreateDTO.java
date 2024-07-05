@@ -22,4 +22,7 @@ public class NoteCreateDTO {
     private String content;
 
     private List<String> tags;
+
+    @NotNull(message = "Type cannot be null")
+    private Integer type;
 }

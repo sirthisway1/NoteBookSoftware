@@ -20,4 +20,5 @@ public class NoteDetailDTO {
     private Boolean isPrivate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Integer type;
 }
