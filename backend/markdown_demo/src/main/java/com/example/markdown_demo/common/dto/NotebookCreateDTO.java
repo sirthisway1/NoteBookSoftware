@@ -17,7 +17,7 @@ public class NotebookCreateDTO {
     private String name;
 
     @Size(max = 500, message = "Description cannot exceed 500 characters")
-    private String description;
+    private String summary;
 
     // You can add other fields here if needed
 }

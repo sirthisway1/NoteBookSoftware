@@ -15,7 +15,9 @@ public class BusinessException extends RuntimeException {
     public BusinessException(ResultType resultType) {
         this(resultType.getCode(), resultType.getMessage());
     }
-
+    public BusinessException(ResultType resultType,String exMessage) {
+        this(resultType.getCode(), resultType.getMessage() + ":" + exMessage);
+    }
     @Override
     public String toString() {
         return "BusinessException{" +
