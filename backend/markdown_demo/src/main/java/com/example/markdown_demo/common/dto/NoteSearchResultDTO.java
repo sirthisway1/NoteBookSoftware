@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class NoteSearchResultDTO {
 
-    private String id;
+    private int id;
     private String title;
     private String snippet;  // A short excerpt of the content containing the keyword
     private List<String> tags;

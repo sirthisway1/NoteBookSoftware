@@ -6,10 +6,10 @@ import java.util.List;
 
 @Data
 public class NotebookDetailDTO {
-    private String notebookId;
+    private int notebookId;
     private String name;
     private LocalDateTime lastModified;
     private String summary;
-    private List<NoteSearchResultDTO> notes;
+    private List<Integer> noteId;
 
 }
