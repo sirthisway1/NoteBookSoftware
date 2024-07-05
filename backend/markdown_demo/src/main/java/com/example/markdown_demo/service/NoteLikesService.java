@@ -11,6 +11,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author xmg
  * @since 2024-07-04
  */
-public interface NoteLikesService extends IService<NoteLikes> {
+public interface NoteLikesService {
+
+    boolean likeOrUnlikeNote(Integer noteId, Integer userId);
 
 }
