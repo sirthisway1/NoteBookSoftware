@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -73,6 +74,8 @@ public class ShiroConfig {
 
         map.put("/user/login", "anon");
         map.put("/user/register", "anon");
+        map.put("/api/files", "anon");
+
         // 所有请求通过我们自己的JWT Filter
         map.put("/**", "jwt");
         shiroFilter.setFilterChainDefinitionMap(map);

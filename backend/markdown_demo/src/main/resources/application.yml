@@ -1,6 +1,7 @@
 # DataSource Config
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
+
 spring:
   mvc:
     pathmatch:
@@ -11,5 +12,12 @@ spring:
     username: root
     password: 123456
 
+file:
+  upload:
+    path: /staticFile/upload
+
+server:
+  port: 8080
+  host: localhost
 
 
