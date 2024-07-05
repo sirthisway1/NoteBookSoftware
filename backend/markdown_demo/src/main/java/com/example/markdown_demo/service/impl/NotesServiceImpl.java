@@ -1,7 +1,9 @@
 package com.example.markdown_demo.service.impl;
 
 import com.example.markdown_demo.entity.Notes;
+import com.example.markdown_demo.entity.ThoughtNotes;
 import com.example.markdown_demo.mapper.NotesMapper;
+import com.example.markdown_demo.mapper.ThoughtNotesMapper;
 import com.example.markdown_demo.service.NotesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.markdown_demo.common.dto.*;
@@ -20,6 +22,9 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     @Autowired
     private NotesMapper notesMapper;
 
+    @Autowired
+    private ThoughtNotesMapper thoughtNotesMapper;
+
     @Override
     public void createNote(NoteCreateDTO createNoteDTO, Integer userId) {
         Notes note = new Notes();
@@ -27,10 +32,19 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         note.setTitle(createNoteDTO.getTitle());
         note.setContent(createNoteDTO.getContent());
         note.setNotebookId(createNoteDTO.getNotebookId());
-        note.setTags(createNoteDTO.getTags());
-        // 设置其他必要的字段
+        note.setTags(createNoteDTO.getTags()); // 将标签列表转换为逗号分隔的字符串
+        note.setIsPrivate(false); // 默认设置为非私密笔记
 
+        // 保存笔记
         save(note);
+
+        // 如果 type 大于 0，向 m_thought_notes 表中插入一条数据
+        if (createNoteDTO.getType() > 0) {
+            ThoughtNotes thoughtNote = new ThoughtNotes();
+            thoughtNote.setNoteId(note.getId());
+            thoughtNote.setType(createNoteDTO.getType());
+            thoughtNotesMapper.insert(thoughtNote);
+        }
 
     }
 
@@ -61,6 +75,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         if (!note.getUserId().equals(userId)) {
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
+
         NoteDetailDTO dto = new NoteDetailDTO();
         dto.setId(note.getId());
         dto.setTitle(note.getTitle());
@@ -70,6 +85,14 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         dto.setCreatedAt(note.getCreatedAt());
         dto.setUpdatedAt(note.getUpdatedAt());
 
+        // 查询思维笔记类型
+        QueryWrapper<ThoughtNotes> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("note_id", noteId);
+        ThoughtNotes thoughtNote = thoughtNotesMapper.selectOne(queryWrapper);
+        if (thoughtNote != null) {
+            dto.setType(thoughtNote.getType());
+        }
+        else dto.setType(0);
         return dto;
     }
 
