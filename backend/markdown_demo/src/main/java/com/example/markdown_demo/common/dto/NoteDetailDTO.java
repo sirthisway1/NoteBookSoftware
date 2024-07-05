@@ -4,15 +4,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteSearchResultDTO {
+public class NoteDetailDTO {
 
-    private int id;
+    private Integer id;
+    private Integer notebookId;
     private String title;
-    private String snippet;  // A short excerpt of the content containing the keyword
+    private String content;
     private List<String> tags;
+    private Boolean isPrivate;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

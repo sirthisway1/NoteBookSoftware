@@ -9,7 +9,6 @@ public enum ResultType {
     NOT_FOUND("404", "资源不存在"),
     INVALID_REQUEST_BODY("405", "请求体不合法"),
     PATH_NOT_FOUND("406", "查询路径不存在"),
-    RESOURCE_NOT_FOUND("407", "没有找到匹配资源"),
     NO_PERMISSION("408", "没有操作权限"),
 
 
