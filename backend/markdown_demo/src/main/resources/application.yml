@@ -1,6 +1,7 @@
 # DataSource Config
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
+  type-handlers-package: com.example.markdown_demo.common.typehandler
 
 spring:
   mvc:
