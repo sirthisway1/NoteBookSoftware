@@ -65,7 +65,7 @@ public class NotebooksController {
         }
     }
 
-    @GetMapping()
+    @GetMapping("/getAllId")
     public ResponseEntity<Map<String, Object>> getAllNotebookIds(HttpServletRequest request) {
         try {
             Integer userId = getUserIdFromRequest(request);
@@ -78,10 +78,10 @@ public class NotebooksController {
     }
 
     @PutMapping("/{notebookId}")
-    public ResponseEntity<Map<String, Object>> updateNotebook(HttpServletRequest request, @PathVariable Integer id, @RequestBody NotebookUpdateDTO updateDTO) {
+    public ResponseEntity<Map<String, Object>> updateNotebook(HttpServletRequest request, @PathVariable Integer notebookId, @RequestBody NotebookUpdateDTO updateDTO) {
         try {
             Integer userId = getUserIdFromRequest(request);
-            boolean updated = notebooksService.updateNotebook(id, updateDTO, userId);
+            boolean updated = notebooksService.updateNotebook(notebookId, updateDTO, userId);
             if (updated) {
                 return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("message", "笔记本更新成功"));
             } else {
@@ -94,10 +94,10 @@ public class NotebooksController {
     }
 
     @DeleteMapping("/{notebookId}")
-    public ResponseEntity<Map<String, Object>> deleteNotebook(HttpServletRequest request, @PathVariable Integer id) {
+    public ResponseEntity<Map<String, Object>> deleteNotebook(HttpServletRequest request, @PathVariable Integer notebookId) {
         try {
             Integer userId = getUserIdFromRequest(request);
-            boolean deleted = notebooksService.deleteNotebook(id, userId);
+            boolean deleted = notebooksService.deleteNotebook(notebookId    , userId);
             if (deleted) {
                 return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("message", "笔记本删除成功"));
             } else {
