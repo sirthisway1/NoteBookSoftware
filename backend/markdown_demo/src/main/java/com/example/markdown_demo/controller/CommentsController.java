@@ -3,7 +3,9 @@ package com.example.markdown_demo.controller;
 import com.example.markdown_demo.common.dto.CommentCreateDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.ResultType;
+import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.CommentsService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -28,18 +30,25 @@ public class CommentsController {
 
     @Autowired
     private CommentsService commentsService;
-
+    private Integer getUserIdFromRequest(HttpServletRequest request) {
+        String token = request.getHeader("token");
+        if (token == null || token.isEmpty()) {
+            throw new BusinessException(ResultType.UNAUTHORIZED);
+        }
+        return Integer.parseInt(JwtUtil.validateToken(token));
+    }
     /**
      * 发表评论
      *
      * @param noteId 笔记ID
-     * @param userId 用户ID
+
      * @param content 评论内容
      * @return ResponseEntity representing the outcome of the operation
      */
     @PostMapping("/post")
-    public ResponseEntity<?> postComment(@RequestParam Integer noteId, @RequestParam Integer userId, @RequestParam String content) {
+    public ResponseEntity<?> postComment(HttpServletRequest request, @RequestParam Integer noteId, @RequestParam String content) {
         try {
+            Integer userId = getUserIdFromRequest(request); // 从请求中获取用户 ID
             commentsService.postComment(noteId, userId, content);
             return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("Message", "Comment posted successfully"));
         } catch (BusinessException e) {
@@ -48,6 +57,7 @@ public class CommentsController {
                     .body(resultType.asMap("Error", e.getMessage()));
         }
     }
+
     /**
      * 查看针对某篇笔记的所有评论
      *
@@ -85,12 +95,13 @@ public class CommentsController {
      *
      * @param noteId 笔记ID
      * @param commentId 评论ID
-     * @param userId 用户ID
+
      * @return ResponseEntity indicating success or failure
      */
     @DeleteMapping("/delete/{noteId}/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Integer noteId, @PathVariable String commentId, @RequestParam Integer userId) {
+    public ResponseEntity<?> deleteComment(HttpServletRequest request, @PathVariable Integer noteId, @PathVariable String commentId) {
         try {
+            Integer userId = getUserIdFromRequest(request); // 从请求中获取用户 ID
             boolean deleted = commentsService.deleteComment(noteId, commentId, userId);
             if (deleted) {
                 return ResponseEntity.ok(ResultType.SUCCESS.asMap("Message", "Comment deleted successfully"));
@@ -98,8 +109,11 @@ public class CommentsController {
                 return ResponseEntity.badRequest().body(ResultType.NOT_FOUND.asMap("Error", "Failed to delete comment"));
             }
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode()))).body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode())))
+                    .body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
         }
     }
+
 }
+
 

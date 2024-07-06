@@ -41,6 +41,8 @@ import java.time.LocalDateTime;
 public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks> implements NotebooksService {
     @Autowired
     private NotesMapper notesMapper;
+
+    @Autowired
     private  NotebooksMapper notebooksMapper;
 
 
