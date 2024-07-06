@@ -1,8 +1,10 @@
 package com.example.markdown_demo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.example.markdown_demo.common.typehandler.ListToStringTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -13,7 +15,7 @@ import java.util.List;
 
 /**
  * <p>
- *
+ * Notes entity class
  * </p>
  *
  * @author xmg
@@ -22,7 +24,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("m_notes")
+@TableName(value = "m_notes", autoResultMap = true) // autoResultMap is important to enable type handler
 public class Notes implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -38,6 +40,7 @@ public class Notes implements Serializable {
 
     private String content;
 
+    @TableField(typeHandler = ListToStringTypeHandler.class)
     private List<String> tags;
 
     private Boolean isPrivate;

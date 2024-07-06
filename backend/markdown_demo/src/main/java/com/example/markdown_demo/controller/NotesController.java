@@ -61,7 +61,7 @@ public class NotesController {
     }
 
     @PostMapping("/addTags")
-    public Result<Void> addTagsToNote(@RequestParam String noteId, @RequestParam String tags, HttpServletRequest request) {
+    public Result<Void> addTagsToNote(@RequestParam Integer noteId, @RequestParam String tags, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         boolean success = notesService.addTagsToNote(noteId, tags, userId);
         if (success) {
@@ -104,7 +104,7 @@ public class NotesController {
     }
 
     @GetMapping("/searchByTags")
-    public Result<List<Integer>> searchNotesByTags(@RequestParam List<String> tags, HttpServletRequest request) {
+    public Result<List<Integer>> searchNotesByTags(@RequestParam String tags, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         List<Integer> noteIds = notesService.searchNotesByTags(tags, userId);
         return Result.success(noteIds);

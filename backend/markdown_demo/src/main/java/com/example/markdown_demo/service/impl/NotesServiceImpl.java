@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +38,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         note.setIsPrivate(true); // 默认设置为私密笔记
 
         // 保存笔记
-        notesMapper.insertNoteRight(note);
+        this.save(note);
 
         // 如果 type 大于 0，向 m_thought_notes 表中插入一条数据
         if (createNoteDTO.getType() > 0) {
@@ -97,7 +99,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public boolean addTagsToNote(String noteId,String tags, Integer userId) {
+    public boolean addTagsToNote(Integer noteId,String tags, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -106,8 +108,19 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
 
+        // Ensure the current tags list is modifiable
         List<String> currentTags = note.getTags();
-        currentTags.add(tags);
+        if (currentTags == null) {
+            currentTags = new ArrayList<>();
+        } else {
+            currentTags = new ArrayList<>(currentTags);  // Make a modifiable copy
+        }
+
+        // Add the single tag to the current tags list
+        if (!currentTags.contains(tags)) { // Check if the tag already exists
+            currentTags.add(tags);
+        }
+
         note.setTags(currentTags);
 
         return updateById(note);
@@ -123,8 +136,17 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
 
+        // Ensure the current tags list is modifiable
         List<String> currentTags = note.getTags();
+        if (currentTags == null) {
+            currentTags = new ArrayList<>();
+        } else {
+            currentTags = new ArrayList<>(currentTags);  // Make a modifiable copy
+        }
+
+        // Remove the single tag from the current tags list
         currentTags.remove(tags);
+
         note.setTags(currentTags);
 
         return updateById(note);
@@ -166,23 +188,20 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public List<Integer> searchNotesByTags(List<String> tags, Integer userId) {
+    public List<Integer> searchNotesByTags(String tags, Integer userId) {
         QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId)
+                .apply("FIND_IN_SET({0}, tags)", tags)
                 .select("id"); // 只选择 id 字段
-        for (String tag : tags) {
-            queryWrapper.apply("FIND_IN_SET({0}, tags)", tag);
-        }
 
         List<Notes> notes = list(queryWrapper);
         if (notes.isEmpty()) {
-            throw new BusinessException(ResultType.NOT_FOUND);
+            throw new BusinessException(ResultType.NOT_FOUND, "资源不存在");
         }
 
         List<Integer> noteIds = notes.stream()
                 .map(Notes::getId)
                 .collect(Collectors.toList());
-
 
         return noteIds;
     }

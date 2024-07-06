@@ -40,7 +40,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 是否添加成功
      */
-    boolean addTagsToNote(String noteId, String tags, Integer userId);
+    boolean addTagsToNote(Integer noteId, String tags, Integer userId);
 
     /**
      * 删除笔记的标签
@@ -76,5 +76,5 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 匹配的笔记ID列表
      */
-    List<Integer> searchNotesByTags(List<String> tags, Integer userId);
+    List<Integer> searchNotesByTags(String tags, Integer userId);
 }

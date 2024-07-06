@@ -34,7 +34,7 @@ public class NotebooksController {
     private NotebooksService notebooksService;
 
     private Integer getUserIdFromRequest(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+        String token = request.getHeader("token");
         if (token == null || token.isEmpty()) {
             throw new BusinessException(ResultType.UNAUTHORIZED);
         }

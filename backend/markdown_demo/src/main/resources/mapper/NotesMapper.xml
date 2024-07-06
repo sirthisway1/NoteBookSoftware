@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.markdown_demo.mapper.NotesMapper">
-    <insert id="insertNoteRight" parameterType="com.example.markdown_demo.entity.Notes">
-        INSERT INTO m_notes (notebook_id, user_id, title, content, tags, is_private)
-        VALUES (#{notebookId}, #{userId}, #{title}, #{content}, #{tags, typeHandler=com.example.markdown_demo.common.typehandler.ListToStringTypeHandler}, #{isPrivate})
-    </insert>
 </mapper>

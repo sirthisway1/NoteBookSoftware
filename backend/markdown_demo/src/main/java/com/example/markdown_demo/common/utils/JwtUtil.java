@@ -19,9 +19,9 @@ public class JwtUtil {
     // 30 秒
  //   private static long EXPIRATION_TIME = 1000 * 30;
     // 1 hour
-    private static long EXPIRATION_TIME = 3600000 * 1;
-    // 一天
 //    private static long EXPIRATION_TIME = 3600000 * 1;
+     //一天
+   private static long EXPIRATION_TIME = 3600000 * 1;
 //private static long EXPIRATION_TIME = 10000 * 10;
 //    private static String SECRET = "MDk4ZjZiY2Q0NjIxZDM3M2NhZGU0ZTgzMjY34DFDSSSd";// 秘钥
     // 使用Base64编码的密钥
