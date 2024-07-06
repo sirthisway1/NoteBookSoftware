@@ -1,16 +1,19 @@
 package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.NotebookCreateDTO;
+import com.example.markdown_demo.common.dto.NotebookDetailDTO;
+import com.example.markdown_demo.common.dto.NotebookUpdateDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
+import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.NotebooksService;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -21,57 +24,89 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2024-07-04
  */
 
-import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.List;
 
 @RestController
-@RequestMapping("/notebooks")
+@RequestMapping("/api/notebooks")
 public class NotebooksController {
 
-    private final NotebooksService notebooksService;
+    @Autowired
+    private NotebooksService notebooksService;
 
-    public NotebooksController(NotebooksService notebooksService) {
-        this.notebooksService = notebooksService;
+    private Integer getUserIdFromRequest(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token == null || token.isEmpty()) {
+            throw new BusinessException(ResultType.UNAUTHORIZED);
+        }
+        return Integer.parseInt(JwtUtil.validateToken(token));
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<?> getUserNotebooks(HttpServletRequest request) {
+    @PostMapping("/createNotebooks")
+    public ResponseEntity<Map<String, Object>> createNotebook(HttpServletRequest request, @RequestBody NotebookCreateDTO createNotebookDTO) {
         try {
-            String token = request.getHeader("Authorization");
-            if (token == null || !token.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: No token provided");
-            }
-            token = token.substring(7); // Remove "Bearer " prefix
-            Integer userId = Integer.parseInt(JwtUtil.validateToken(token));
-            List<Integer> notebooks = notebooksService.getAllNotebookIds(userId);
-            return ResponseEntity.ok(notebooks);
-        } catch (JwtException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Invalid token");
-        } catch (BusinessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            Integer userId = getUserIdFromRequest(request);
+            notebooksService.createNotebook(createNotebookDTO, userId);
+            return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("message", "笔记本创建成功"));
+        } catch (BusinessException e) {
+            return ResponseEntity.status(Integer.parseInt(e.getStatusCode()))
+                    .body(ResultType.fromCode(e.getStatusCode()).asMap("message", e.getMessage()));
         }
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createNotebook(@RequestBody @Valid NotebookCreateDTO createNotebookDTO,
-                                            HttpServletRequest request) {
+    @GetMapping("/{notebookId}")
+    public ResponseEntity<Map<String, Object>> getNotebookDetail(HttpServletRequest request, @PathVariable Integer notebookId) {
         try {
-            String token = request.getHeader("Authorization");
-            if (token == null || !token.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: No token provided");
+            Integer userId = getUserIdFromRequest(request);
+            NotebookDetailDTO notebookDetail = notebooksService.getNotebookDetail(notebookId, userId);
+            return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("notebookDetail", notebookDetail));
+        } catch (BusinessException e) {
+            return ResponseEntity.status(Integer.parseInt(e.getStatusCode()))
+                    .body(ResultType.fromCode(e.getStatusCode()).asMap("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping()
+    public ResponseEntity<Map<String, Object>> getAllNotebookIds(HttpServletRequest request) {
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            List<Integer> ids = notebooksService.getAllNotebookIds(userId);
+            return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("ids", ids));
+        } catch (BusinessException e) {
+            return ResponseEntity.status(Integer.parseInt(e.getStatusCode()))
+                    .body(ResultType.fromCode(e.getStatusCode()).asMap("message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{notebookId}")
+    public ResponseEntity<Map<String, Object>> updateNotebook(HttpServletRequest request, @PathVariable Integer id, @RequestBody NotebookUpdateDTO updateDTO) {
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            boolean updated = notebooksService.updateNotebook(id, updateDTO, userId);
+            if (updated) {
+                return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("message", "笔记本更新成功"));
+            } else {
+                return ResponseEntity.badRequest().body(ResultType.INTERNAL_SERVER_ERROR.asMap("message", "更新失败"));
             }
-            token = token.substring(7); // Remove "Bearer " prefix
-            Integer userId = Integer.parseInt(JwtUtil.validateToken(token));
-            notebooksService.createNotebook(createNotebookDTO, userId);
-            return ResponseEntity.ok("Notebook created successfully.");
-        } catch (BusinessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } catch (JwtException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Invalid token");
+        } catch (BusinessException e) {
+            return ResponseEntity.status(Integer.parseInt(e.getStatusCode()))
+                    .body(ResultType.fromCode(e.getStatusCode()).asMap("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{notebookId}")
+    public ResponseEntity<Map<String, Object>> deleteNotebook(HttpServletRequest request, @PathVariable Integer id) {
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            boolean deleted = notebooksService.deleteNotebook(id, userId);
+            if (deleted) {
+                return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("message", "笔记本删除成功"));
+            } else {
+                return ResponseEntity.badRequest().body(ResultType.NOT_FOUND.asMap("message", "删除失败，笔记本不存在或已被删除"));
+            }
+        } catch (BusinessException e) {
+            return ResponseEntity.status(Integer.parseInt(e.getStatusCode()))
+                    .body(ResultType.fromCode(e.getStatusCode()).asMap("message", e.getMessage()));
         }
     }
 }
-
 
