@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static com.example.markdown_demo.common.utils.JwtUtil.generateToken;
 
 /**
@@ -50,6 +52,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         if (user == null || !password.equals(user.getPassword())) {
             throw new BusinessException(ResultType.INVALID_CREDENTIALS);
         }
+        LocalDateTime now = LocalDateTime.now();
+        user.setUpdatedAt(now);
+        updateById(user);
         // 生成并返回 token 或者其他登录成功的标识
         return generateToken(user.getId().toString());
     }

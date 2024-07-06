@@ -62,7 +62,6 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
         note.setTitle(updateNoteDTO.getTitle());
         note.setContent(updateNoteDTO.getContent());
-        note.setTags(updateNoteDTO.getTags());
         // 更新其他字段
 
         return updateById(note);
@@ -74,8 +73,9 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
         }
-        if (!note.getUserId().equals(userId)) {
-            throw new BusinessException(ResultType.NO_PERMISSION);
+        // 修改权限判断逻辑
+        if (!note.getUserId().equals(userId) && note.getIsPrivate()) {
+            throw new BusinessException(ResultType.NO_PERMISSION, "无权限访问");
         }
 
         NoteDetailDTO dto = new NoteDetailDTO();

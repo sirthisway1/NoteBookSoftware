@@ -82,19 +82,22 @@ public class NotesController {
         }
     }
 
-    @PostMapping("/setPrivacy")
-    public Result<Void> setNotePrivacy(@RequestParam String noteId, @Valid @RequestBody NotePrivacyRequestDTO privacyRequestDTO, BindingResult bindingResult, HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
-            return Result.fail(ResultType.INVALID_REQUEST_BODY);
+    @PutMapping("/{noteId}/privacy")
+    public Result<Void> setNotePrivacy(@PathVariable String noteId,
+                                       @RequestParam Boolean isPrivate,
+                                       HttpServletRequest request) {
+        if (isPrivate == null) {
+            return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(), "Privacy setting is required");
         }
         Integer userId = getUserIdFromRequest(request);
-        boolean success = notesService.setNotePrivacy(noteId, privacyRequestDTO.getIsPrivate(), userId);
+        boolean success = notesService.setNotePrivacy(noteId, isPrivate, userId);
         if (success) {
             return Result.success(null);
         } else {
-            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),ResultType.INTERNAL_SERVER_ERROR.getMessage());
         }
     }
+
 
     @GetMapping("/searchByKeyword")
     public Result<List<Integer>> searchNotesByKeyword(@RequestParam String keyword, HttpServletRequest request) {
