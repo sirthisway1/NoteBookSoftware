@@ -2,8 +2,10 @@ package com.example.markdown_demo.service.impl;
 
 import com.example.markdown_demo.entity.Notes;
 import com.example.markdown_demo.entity.ThoughtNotes;
+import com.example.markdown_demo.entity.Users;
 import com.example.markdown_demo.mapper.NotesMapper;
 import com.example.markdown_demo.mapper.ThoughtNotesMapper;
+import com.example.markdown_demo.mapper.UsersMapper;
 import com.example.markdown_demo.service.NotesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.markdown_demo.common.dto.*;
@@ -23,6 +25,8 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
     @Autowired
     private NotesMapper notesMapper;
+    @Autowired
+    private UsersMapper usersMapper;
 
     @Autowired
     private ThoughtNotesMapper thoughtNotesMapper;
@@ -95,6 +99,39 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             dto.setType(thoughtNote.getType());
         }
         else dto.setType(0);
+        return dto;
+    }
+    @Override
+    public List<NoteShowDTO> noteShow(Integer userId) {
+        QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        List<Notes> notesList = notesMapper.selectList(queryWrapper);
+        return notesList.stream().map(this::mapToNoteShowDTO).collect(Collectors.toList());
+    }
+
+    private NoteShowDTO mapToNoteShowDTO(Notes note) {
+        NoteShowDTO dto = new NoteShowDTO();
+        dto.setId(note.getId());
+        dto.setTitle(note.getTitle());
+        dto.setUpdatedAt(note.getUpdatedAt());
+        return dto;
+    }
+
+    @Override
+    public List<NoteShowWithUserDTO> noteShowWithUser() {
+        QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_private", false); // Assuming 'false' means the note is not private
+        List<Notes> notesList = notesMapper.selectList(queryWrapper);
+        return notesList.stream().map(this::mapToNoteShowWithUserDTO).collect(Collectors.toList());
+    }
+
+    private NoteShowWithUserDTO mapToNoteShowWithUserDTO(Notes note) {
+        NoteShowWithUserDTO dto = new NoteShowWithUserDTO();
+        dto.setId(note.getId());
+        Users user = usersMapper.selectById(note.getUserId()); // Retrieve the user by ID
+        dto.setUsername(user.getUsername()); // Set the username from the user entity
+        dto.setTitle(note.getTitle());
+        dto.setContent(note.getContent());
         return dto;
     }
 

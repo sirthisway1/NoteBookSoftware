@@ -60,6 +60,22 @@ public class NotesController {
         return Result.success(noteDetail);
     }
 
+    @GetMapping("/NoteShow")
+    public Result<List<NoteShowDTO>> noteShowDTO( HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        List<NoteShowDTO>  noteShowDTO = notesService.noteShow(userId);
+        return Result.success(noteShowDTO);
+    }
+
+    @GetMapping("/NoteShowWithUser")
+    public Result<List<NoteShowWithUserDTO>> noteShowWithUserDTO(HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        List<NoteShowWithUserDTO> noteShowWithUserDTO = notesService.noteShowWithUser();
+        return Result.success(noteShowWithUserDTO);
+    }
+
+
+
     @PostMapping("/addTags")
     public Result<Void> addTagsToNote(@RequestParam Integer noteId, @RequestParam String tags, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);

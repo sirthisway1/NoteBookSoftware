@@ -33,6 +33,10 @@ public interface NotesService extends IService<Notes> {
      */
     NoteDetailDTO getNoteDetail(String noteId, Integer userId);
 
+
+
+    List<NoteShowDTO> noteShow(Integer userId);
+    List<NoteShowWithUserDTO> noteShowWithUser();
     /**
      * 向笔记添加标签
      * @param noteId 笔记ID
