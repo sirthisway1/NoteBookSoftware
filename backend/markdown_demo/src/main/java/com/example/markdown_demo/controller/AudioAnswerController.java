@@ -4,9 +4,6 @@ package com.example.markdown_demo.controller;
 import com.example.markdown_demo.common.dto.AudioRequestDTO;
 import com.example.markdown_demo.service.AudioGenerationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,24 +17,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
+
 @Controller
 @RequestMapping("/api")
 public class AudioAnswerController {
-
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
-    }
-
-    private final String deepBricksUrl = "https://api.deepbricks.ai/v1/chat/completions";
-    private final String apiKey = "sk-e5NKQHTAhRn6bj1qmX4Px7eCbRDnBXMHI9Y6KvZAMneTrBsH";
 
     @Autowired
     private AudioGenerationService audioGenerationService;
     @Autowired
     private RestTemplate restTemplate;
 
+    private final String deepBricksUrl = "https://api.deepbricks.ai/v1/chat/completions";
+    private final String apiKey = "sk-e5NKQHTAhRn6bj1qmX4Px7eCbRDnBXMHI9Y6KvZAMneTrBsH";
 
     @PostMapping(value = "/generate-audio-answer", consumes = "application/json", produces = "audio/wav")
     public void generateAudioAnswer(@RequestBody AudioRequestDTO request, HttpServletResponse response) {
