@@ -12,11 +12,11 @@ import jakarta.validation.constraints.Size;
 @AllArgsConstructor
 public class NotebookCreateDTO {
 
-    @NotBlank(message = "Notebook name cannot be blank")
-    @Size(max = 100, message = "Notebook name cannot exceed 100 characters")
+    @NotBlank(message = "笔记本名称不能为空")
+    @Size(max = 100, message = "笔记本名称不能超过100个字符")
     private String name;
 
-    @Size(max = 500, message = "Description cannot exceed 500 characters")
+    @Size(max = 500, message = "描述不能超过500个字符")
     private String summary;
 
     // You can add other fields here if needed

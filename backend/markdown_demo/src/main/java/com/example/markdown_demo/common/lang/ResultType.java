@@ -8,6 +8,7 @@ public enum ResultType {
 
     INVALID_REQUEST_BODY("400", "请求体不合法"),
     UNAUTHORIZED("401", "token验证失败"),
+    INVALID_TOKEN("401", "无效的令牌"),
     INVALID_CREDENTIALS("401", "用户名或密码错误"),
     NO_PERMISSION("403", "没有操作权限"),
     NOT_FOUND("404", "资源不存在"),

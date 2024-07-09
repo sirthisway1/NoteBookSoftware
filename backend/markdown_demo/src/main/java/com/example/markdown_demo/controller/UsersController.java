@@ -8,6 +8,7 @@ import com.example.markdown_demo.common.dto.RegisterDTO;
 import com.example.markdown_demo.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -21,12 +22,15 @@ public class UsersController {
     private UsersService userService;
 
     @PostMapping("/register")
-    public Result<Void> register(@Valid @RequestBody RegisterDTO registerDTO, BindingResult bindingResult) {
+    public Result<Map<String, String>> register(@Valid @RequestBody RegisterDTO registerDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Result.fail(ResultType.INVALID_REQUEST_BODY);
+            FieldError firstError = bindingResult.getFieldError();
+            if (firstError != null) {
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(),firstError.getDefaultMessage());
+            }
         }
         try {
-            userService.register(registerDTO.getUsername(), registerDTO.getPassword(), registerDTO.getEmail());
+            userService.register(registerDTO);
             return Result.success(null);
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
@@ -38,10 +42,13 @@ public class UsersController {
     @PostMapping("/login")
     public Result<Map<String, String>> login(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Result.fail(ResultType.INVALID_REQUEST_BODY);
+            FieldError firstError = bindingResult.getFieldError();
+            if (firstError != null) {
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(),firstError.getDefaultMessage());
+            }
         }
         try {
-            String token = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
+            String token = userService.login(loginDTO);
             return Result.success(Map.of("token", token));
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());

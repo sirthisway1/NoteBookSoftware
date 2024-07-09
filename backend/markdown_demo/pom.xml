@@ -76,17 +76,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- valid-->
+		<!-- validation -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.2.2.Final</version>
-		</dependency>
 		<!-- hutool-->
 		<dependency>
 			<groupId>cn.hutool</groupId>
@@ -183,14 +178,6 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.14.2</version>
-		</dependency>
-
-
-		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>6.0.17.Final</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
