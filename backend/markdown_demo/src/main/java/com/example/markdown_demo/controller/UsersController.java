@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -21,7 +21,7 @@ public class UsersController {
     private UsersService userService;
 
     @PostMapping("/register")
-    public Result<Void> register(@RequestBody @Valid RegisterDTO registerDTO, BindingResult bindingResult) {
+    public Result<Void> register(@Valid @RequestBody RegisterDTO registerDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Result.fail(ResultType.INVALID_REQUEST_BODY);
         }
