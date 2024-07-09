@@ -48,7 +48,7 @@ public class JwtFilter extends AccessControlFilter {
 //            return true;
         } catch (Exception e) {
             log.error("isAccessAllowed error:", e);
-            responseError(servletResponse, ResultType.UNAUTHORIZED.getCode(), "Authentication failed: " + e.getMessage());
+            responseError(servletResponse, ResultType.UNAUTHORIZED.getCode(), "无效的token");
 //            return false;
         }
         return true;
@@ -72,7 +72,7 @@ public class JwtFilter extends AccessControlFilter {
         String token = request.getHeader("token");
         //如果token为空的话，返回true，交给控制层进行判断；也会达到没有权限的作用
         if (token == null) {
-            responseError(servletResponse, ResultType.UNAUTHORIZED.getCode(), "No token provided");
+            responseError(servletResponse, ResultType.UNAUTHORIZED.getCode(), "未提供token令牌");
             return false;
         }
         JwtToken jwtToken = new JwtToken(token);
@@ -123,7 +123,7 @@ public class JwtFilter extends AccessControlFilter {
         try (ServletOutputStream out = resp.getOutputStream()) {
             Result<String> result = new Result<>();
             result.setStatusCode(statusCode);
-            result.setMessage(message);
+            result.setMessage(ResultType.UNAUTHORIZED.getMessage()+":"+message);
             String json = mapper.writeValueAsString(result);
             out.write(json.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
