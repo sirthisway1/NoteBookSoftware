@@ -6,17 +6,18 @@ import java.util.Map;
 public enum ResultType {
     SUCCESS("200", "成功"),
 
+    INVALID_REQUEST_BODY("400", "请求体不合法"),
+    UNAUTHORIZED("401", "token验证失败"),
+    INVALID_CREDENTIALS("401", "用户名或密码错误"),
+    NO_PERMISSION("403", "没有操作权限"),
     NOT_FOUND("404", "资源不存在"),
-    INVALID_REQUEST_BODY("405", "请求体不合法"),
-    PATH_NOT_FOUND("406", "查询路径不存在"),
-    NO_PERMISSION("408", "没有操作权限"),
+    PATH_NOT_FOUND("404", "查询路径不存在"),
+    USERNAME_ALREADY_EXISTS("409", "用户名已被注册"),
+    EMAIL_ALREADY_EXISTS("409", "邮箱已被注册"),
 
 
-    INTERNAL_SERVER_ERROR("500", "服务器内部错误"),
-    UNAUTHORIZED("501", "token验证失败"),
-    USERNAME_ALREADY_EXISTS("502", "用户名已被注册"),
-    EMAIL_ALREADY_EXISTS("503", "邮箱已被注册"),
-    INVALID_CREDENTIALS("504", "用户名或密码错误");
+    INTERNAL_SERVER_ERROR("500", "服务器内部错误");
+
 
     private final String code;
     private final String message;

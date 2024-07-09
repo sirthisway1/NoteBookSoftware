@@ -25,7 +25,6 @@ public class UsersController {
         if (bindingResult.hasErrors()) {
             return Result.fail(ResultType.INVALID_REQUEST_BODY);
         }
-
         try {
             userService.register(registerDTO.getUsername(), registerDTO.getPassword(), registerDTO.getEmail());
             return Result.success(null);
@@ -40,7 +39,6 @@ public class UsersController {
     public Result<Map<String, String>> login(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Result.fail(ResultType.INVALID_REQUEST_BODY);
-
         }
         try {
             String token = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
