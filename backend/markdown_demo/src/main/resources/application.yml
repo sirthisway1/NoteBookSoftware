@@ -21,4 +21,9 @@ server:
   port: 8080
   host: localhost
 
+deepbricks:
+  api:
+    url: https://api.deepbricks.ai/v1/chat/completions
+    key: sk-e5NKQHTAhRn6bj1qmX4Px7eCbRDnBXMHI9Y6KvZAMneTrBsH
+
 

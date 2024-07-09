@@ -30,6 +30,7 @@ public class CommentsController {
 
     @Autowired
     private CommentsService commentsService;
+
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("token");
         if (token == null || token.isEmpty()) {
