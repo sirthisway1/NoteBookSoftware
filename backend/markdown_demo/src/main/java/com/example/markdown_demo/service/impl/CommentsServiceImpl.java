@@ -146,11 +146,11 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         try {
             boolean deleted = commentsMapper.delete(queryWrapper) > 0;
             if (!deleted) {
-                throw new BusinessException(ResultType.NOT_FOUND.getCode(), "No comment found with the provided IDs or you do not have permission to delete it.");
+                throw new BusinessException(ResultType.NOT_FOUND.getCode(), "在提供的 ID 中找不到评论，或者您无权删除它.");
             }
             return deleted;
         } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "Failed to delete the comment due to: " + e.getMessage());
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "由于以下原因，无法删除评论： " + e.getMessage());
         }
 
 
