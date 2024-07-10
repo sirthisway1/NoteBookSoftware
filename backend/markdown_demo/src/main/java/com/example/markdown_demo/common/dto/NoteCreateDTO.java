@@ -15,12 +15,12 @@ public class NoteCreateDTO {
     @NotNull(message = "笔记本 ID 不能为空")
     private Integer notebookId;
 
-    @NotBlank(message = "标题不能为空")
+    @NotBlank(message = "笔记标题不能为空")
     private String title;
 
     private String content;
     private List<String> tags;
 
-    @NotNull(message = "类型不能为空")
+    @NotNull(message = "笔记类型不能为空")
     private Integer type;
 }

@@ -16,7 +16,7 @@ public class NotebookCreateDTO {
     @Size(max = 100, message = "笔记本名称不能超过100个字符")
     private String name;
 
-    @Size(max = 500, message = "描述不能超过500个字符")
+    @Size(max = 500, message = "笔记本描述不能超过500个字符")
     private String summary;
 
     // You can add other fields here if needed

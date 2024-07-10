@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class NoteUpdateDTO {
 
-    @NotBlank(message = "标题不能为空")
+    @NotBlank(message = "笔记标题不能为空")
     private String title;
 
     private String content;
