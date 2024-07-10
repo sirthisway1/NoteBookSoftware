@@ -1,6 +1,7 @@
 package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.lang.BusinessException;
+import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.NoteLikesService;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -38,22 +41,21 @@ public class NoteLikesController {
 
      * @return ResponseEntity with operation result
      */
+
     @PostMapping("/toggleLike")
-    public ResponseEntity<?> likeOrUnlikeNote(HttpServletRequest request, @RequestParam Integer noteId) {
+    public Result<Map<String, Object>> toggleLike(HttpServletRequest request, @RequestParam Integer noteId) {
         try {
-            Integer userId = getUserIdFromRequest(request); // 从请求中获取用户 ID
+            Integer userId = getUserIdFromRequest(request);
             boolean isLiked = noteLikesService.likeOrUnlikeNote(noteId, userId);
             if (isLiked) {
-                return ResponseEntity.ok(ResultType.SUCCESS.asMap("Message", "Note liked successfully"));
+                return Result.success("点赞成功", ResultType.SUCCESS.asMap("Message", "Note liked successfully"));
             } else {
-                return ResponseEntity.ok(ResultType.SUCCESS.asMap("Message", "Like removed successfully"));
+                return Result.success("取消点赞成功", ResultType.SUCCESS.asMap("Message", "Like removed successfully"));
             }
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode())))
-                    .body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
-
 
     /**
      * 统计笔记的点赞数量
@@ -61,13 +63,12 @@ public class NoteLikesController {
      * @return ResponseEntity with the count of likes
      */
     @GetMapping("/count/{noteId}")
-    public ResponseEntity<?> countLikesByNoteId(@PathVariable Integer noteId) {
+    public Result<Map<String, Object>> countLikesByNoteId(@PathVariable Integer noteId) {
         try {
             int count = noteLikesService.countLikesByNoteId(noteId);
-            return ResponseEntity.ok(ResultType.SUCCESS.asMap("Count", count));
+            return Result.success(ResultType.SUCCESS.asMap("Count", count));
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode())))
-                    .body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
 
@@ -78,16 +79,14 @@ public class NoteLikesController {
      * @return ResponseEntity indicating if the note is liked by the user
      */
     @GetMapping("/isLiked/{noteId}")
-    public ResponseEntity<?> isNoteLikedByUser(HttpServletRequest request, @PathVariable Integer noteId) {
+    public Result<Map<String, Object>> isNoteLikedByUser(HttpServletRequest request, @PathVariable Integer noteId) {
         try {
-            Integer userId = getUserIdFromRequest(request); // 从请求中获取用户 ID
+            Integer userId = getUserIdFromRequest(request);
             boolean isLiked = noteLikesService.isNoteLikedByUser(noteId, userId);
-            return ResponseEntity.ok(ResultType.SUCCESS.asMap("Liked", isLiked));
+            return Result.success(ResultType.SUCCESS.asMap("Liked", isLiked));
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode())))
-                    .body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
-
 }
 
