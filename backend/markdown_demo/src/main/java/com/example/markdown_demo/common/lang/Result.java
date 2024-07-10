@@ -15,6 +15,9 @@ public class Result<T> {
     public static <T> Result<T> success(T data) {
         return new Result<>(ResultType.SUCCESS.getCode(), ResultType.SUCCESS.getMessage(), data);
     }
+    public static <T> Result<T> success(String message) {
+        return new Result<>(ResultType.SUCCESS.getCode(), message,null);
+    }
 
     public static <T> Result<T> success(String message, T data) {
         return new Result<>(ResultType.SUCCESS.getCode(), message, data);

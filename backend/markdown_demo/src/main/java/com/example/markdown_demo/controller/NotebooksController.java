@@ -4,12 +4,16 @@ import com.example.markdown_demo.common.dto.NotebookCreateDTO;
 import com.example.markdown_demo.common.dto.NotebookDetailDTO;
 import com.example.markdown_demo.common.dto.NotebookUpdateDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
+import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.NotebooksService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,14 +43,22 @@ public class NotebooksController {
     }
 
     @PostMapping("/createNotebooks")
-    public ResponseEntity<Map<String, Object>> createNotebook(HttpServletRequest request, @RequestBody NotebookCreateDTO createNotebookDTO) {
+    public Result<Map<String, Object>> createNotebook(HttpServletRequest request
+            , @Valid  @RequestBody NotebookCreateDTO createNotebookDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            FieldError firstError = bindingResult.getFieldError();
+            if (firstError != null) {
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(),firstError.getDefaultMessage());
+            }
+        }
         try {
             Integer userId = getUserIdFromRequest(request);
             notebooksService.createNotebook(createNotebookDTO, userId);
-            return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("message", "笔记本创建成功"));
+            return Result.success("笔记本创建成功");
         } catch (BusinessException e) {
-            return ResponseEntity.status(Integer.parseInt(e.getStatusCode()))
-                    .body(ResultType.fromCode(e.getStatusCode()).asMap("message", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
+        } catch (Exception e) {
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
         }
     }
 
