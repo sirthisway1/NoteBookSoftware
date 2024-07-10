@@ -39,15 +39,15 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
      * 发表评论
      *
      * @param noteId 笔记ID
-     * @param userId 用户ID
+
      * @param content 评论内容
      * @throws BusinessException 如果操作失败
      */
     @Override
     @Transactional
     public void postComment(Integer noteId, Integer userId, String content) throws BusinessException {
-        if (noteId == null || userId == null || content == null || content.trim().isEmpty()) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "Note ID, User ID, and content must not be null or empty.");
+        if (noteId == null || content == null || content.trim().isEmpty()) {
+            throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "笔记id，评论不能为空");
         }
 
         // 创建并设置评论实体
@@ -61,7 +61,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         try {
             commentsMapper.insert(comment);
         } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "Failed to post comment due to: " + e.getMessage());
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "创建评论失败： " + e.getMessage());
         }
     }
 
@@ -78,7 +78,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
     @Transactional(readOnly = true) // 使用只读事务来提高查询性能
     public List<CommentCreateDTO> viewComments(Integer noteId) throws BusinessException {
         if (noteId == null) {
-            throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "Note ID must not be null.");
+            throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "笔记id不能为空");
         }
 
         // 使用 MyBatis Plus 的查询封装
@@ -108,7 +108,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
     @Override
     public int countCommentsByNoteId(Integer noteId) throws BusinessException {
         if (noteId == null) {
-            throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "Note ID must not be null.");
+            throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "笔记id不能为空");
         }
 
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
@@ -117,7 +117,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         try {
             return Math.toIntExact(commentsMapper.selectCount(queryWrapper));
         } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "Failed to count comments due to: " + e.getMessage());
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "查询评论数失败" + e.getMessage());
         }
     }
 
@@ -134,8 +134,8 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
      */
     @Override
     public boolean deleteComment(Integer noteId, String commentId, Integer userId) throws BusinessException {
-        if (noteId == null || commentId == null || userId == null) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "Note ID, Comment ID, and User ID must not be null.");
+        if (noteId == null || commentId == null ) {
+            throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "笔记id，评论id不能为空");
         }
 
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
@@ -146,11 +146,11 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         try {
             boolean deleted = commentsMapper.delete(queryWrapper) > 0;
             if (!deleted) {
-                throw new BusinessException(ResultType.NOT_FOUND.getCode(), "No comment found with the provided IDs or you do not have permission to delete it.");
+                throw new BusinessException(ResultType.NOT_FOUND.getCode(), "在提供的 ID 中找不到评论，或者您无权删除它.");
             }
             return deleted;
         } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "Failed to delete the comment due to: " + e.getMessage());
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "由于以下原因，无法删除评论： " + e.getMessage());
         }
 
 

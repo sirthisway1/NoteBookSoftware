@@ -50,7 +50,7 @@ public class NoteLikesServiceImpl extends ServiceImpl<NoteLikesMapper, NoteLikes
         }
 
         QueryWrapper<NoteLikes> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("笔记号", noteId);
+        queryWrapper.eq("note_id", noteId);
         try {
             return Math.toIntExact(noteLikesMapper.selectCount(queryWrapper));
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class NoteLikesServiceImpl extends ServiceImpl<NoteLikesMapper, NoteLikes
         }
 
         QueryWrapper<NoteLikes> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("笔记号", noteId).eq("账号", userId);
+        queryWrapper.eq("note_id", noteId).eq("user_id", userId);
         try {
             NoteLikes existingLike = noteLikesMapper.selectOne(queryWrapper);
             return existingLike != null;
