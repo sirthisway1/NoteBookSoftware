@@ -3,6 +3,7 @@ package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.AudioRequestDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
+import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.AudioGenerationService;
@@ -30,12 +31,13 @@ public class AudioAnswerController {
     private RestTemplate restTemplate;
 
     @GetMapping(value = "/generate-text-answer", produces = "application/json")
-    public ResponseEntity<String> generateTextAnswer(@RequestParam String text) {
+    public Result<String> generateTextAnswer(@RequestParam String text) {
         try {
             String response = audioGenerationService.generateTextResponse(text);
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"" + e.getMessage() + "\"}");
+            // Assuming the Result.fail method can take an exception and extract the message
+            return Result.fail(e.getMessage(),"错误");
         }
     }
 
@@ -47,14 +49,17 @@ public class AudioAnswerController {
             response.getOutputStream().write(audioBytes);
             response.flushBuffer();
         } catch (Exception e) {
+            // Since this method is void, we need to handle the error by setting the status and writing the error message
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             try {
                 response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
             } catch (IOException ex) {
-                // 在已经有异常处理时，此处的异常处理是对 IOException 的进一步处理
+                // In case of another exception while handling the first one, we set the status to INTERNAL_SERVER_ERROR
                 response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                // Optionally, log the exception or handle it further if needed
             }
         }
     }
+
 }
