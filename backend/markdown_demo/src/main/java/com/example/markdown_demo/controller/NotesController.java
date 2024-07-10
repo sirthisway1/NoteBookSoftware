@@ -1,7 +1,6 @@
 package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.*;
-import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
@@ -32,26 +31,25 @@ public class NotesController {
         if (bindingResult.hasErrors()) {
             FieldError firstError = bindingResult.getFieldError();
             if (firstError != null) {
-                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(),firstError.getDefaultMessage());
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(), firstError.getDefaultMessage());
             }
         }
         Integer userId = getUserIdFromRequest(request);
         notesService.createNote(createNoteDTO, userId);
-        return Result.success(null);
+        return Result.success("笔记创建成功");
     }
 
     @PutMapping("/update/{noteId}")
     public Result<Void> updateNote(@PathVariable String noteId, @Valid @RequestBody NoteUpdateDTO updateNoteDTO, BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            return Result.fail(ResultType.INVALID_REQUEST_BODY);
+            FieldError firstError = bindingResult.getFieldError();
+            if (firstError != null) {
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(), firstError.getDefaultMessage());
+            }
         }
         Integer userId = getUserIdFromRequest(request);
-        boolean success = notesService.updateNote(noteId, updateNoteDTO, userId);
-        if (success) {
-            return Result.success(null);
-        } else {
-            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
-        }
+        notesService.updateNote(noteId, updateNoteDTO, userId);
+        return Result.success("笔记更新成功");
     }
 
     @GetMapping("/detail/{noteId}")

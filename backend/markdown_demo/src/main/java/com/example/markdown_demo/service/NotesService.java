@@ -23,7 +23,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 是否修改成功
      */
-    boolean updateNote(String noteId, NoteUpdateDTO updateNoteDTO, Integer userId);
+    void updateNote(String noteId, NoteUpdateDTO updateNoteDTO, Integer userId);
 
     /**
      * 查看笔记

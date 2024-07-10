@@ -55,7 +55,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public boolean updateNote(String noteId, NoteUpdateDTO updateNoteDTO, Integer userId) {
+    public void updateNote(String noteId, NoteUpdateDTO updateNoteDTO, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -68,7 +68,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         note.setContent(updateNoteDTO.getContent());
         // 更新其他字段
 
-        return updateById(note);
+        updateById(note);
     }
 
     @Override

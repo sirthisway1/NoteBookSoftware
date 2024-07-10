@@ -25,5 +25,12 @@ public class GlobalExceptionHandler {
         log.error("JWT验证异常: ", e);
         return Result.fail(ResultType.UNAUTHORIZED.getCode(), e.getMessage());
     }
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BusinessException.class)
+    public Result handleBusinessException(BusinessException e) {
+        log.error("业务异常: ", e);
+        return Result.fail(e.getStatusCode(), e.getMessage());
+    }
+
 
 }

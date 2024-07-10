@@ -26,17 +26,11 @@ public class UsersController {
         if (bindingResult.hasErrors()) {
             FieldError firstError = bindingResult.getFieldError();
             if (firstError != null) {
-                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(),firstError.getDefaultMessage());
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(), firstError.getDefaultMessage());
             }
         }
-        try {
-            userService.register(registerDTO);
-            return Result.success(null);
-        } catch (BusinessException e) {
-            return Result.fail(e.getStatusCode(), e.getMessage());
-        } catch (Exception e) {
-            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
-        }
+        userService.register(registerDTO);
+        return Result.success(null);
     }
 
     @PostMapping("/login")
@@ -44,16 +38,12 @@ public class UsersController {
         if (bindingResult.hasErrors()) {
             FieldError firstError = bindingResult.getFieldError();
             if (firstError != null) {
-                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(),firstError.getDefaultMessage());
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(), firstError.getDefaultMessage());
             }
         }
-        try {
-            String token = userService.login(loginDTO);
-            return Result.success(Map.of("token", token));
-        } catch (BusinessException e) {
-            return Result.fail(e.getStatusCode(), e.getMessage());
-        } catch (Exception e) {
-            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
-        }
+
+        String token = userService.login(loginDTO);
+        return Result.success(Map.of("token", token));
+
     }
 }
