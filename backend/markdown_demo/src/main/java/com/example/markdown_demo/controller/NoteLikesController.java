@@ -45,9 +45,9 @@ public class NoteLikesController {
             Integer userId = getUserIdFromRequest(request);
             boolean isLiked = noteLikesService.likeOrUnlikeNote(noteId, userId);
             if (isLiked) {
-                return Result.success("点赞成功", ResultType.SUCCESS.asMap("Message", "Note liked successfully"));
+                return Result.success("点赞成功");
             } else {
-                return Result.success("取消点赞成功", ResultType.SUCCESS.asMap("Message", "Like removed successfully"));
+                return Result.success("取消点赞成功");
             }
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
