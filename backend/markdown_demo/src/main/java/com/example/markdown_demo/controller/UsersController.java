@@ -1,6 +1,5 @@
 package com.example.markdown_demo.controller;
 
-import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.dto.LoginDTO;
