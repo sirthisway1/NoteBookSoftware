@@ -27,9 +27,6 @@ public class NoteLikesController {
     private NoteLikesService noteLikesService;
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("token");
-        if (token == null || token.isEmpty()) {
-            throw new BusinessException(ResultType.UNAUTHORIZED);
-        }
         return Integer.parseInt(JwtUtil.validateToken(token));
     }
     /**
