@@ -49,7 +49,7 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
 
     @Override
     public void createNotebook(NotebookCreateDTO createNotebookDTO, Integer userId) {
-        validateNotebookData(createNotebookDTO); // 提取数据验证逻辑到单独的方法
+        validateNotebookData(createNotebookDTO);
         Notebooks notebook = new Notebooks();
         notebook.setName(createNotebookDTO.getName());
         notebook.setSummary(createNotebookDTO.getSummary());
@@ -68,6 +68,7 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
         }
     }
 
+
     @Override
     public List<Integer> getAllNotebookIds(Integer userId) {
         if (userId == null) {
@@ -77,6 +78,7 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
         return notebooks.stream().map(Notebooks::getId).collect(Collectors.toList());
     }
 
+
     @Override
     public NotebookDetailDTO getNotebookDetail(Integer notebookId, Integer userId) {
         Notebooks notebook = validateNotebookAccess(notebookId, userId);
@@ -84,6 +86,7 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
                 .stream().map(Notes::getId).collect(Collectors.toList());
         return mapToNotebookDetailDTO(notebook, noteIds);
     }
+
 
     private Notebooks validateNotebookAccess(Integer notebookId, Integer userId) {
         if (notebookId == null) {
@@ -95,6 +98,7 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
         }
         return notebook;
     }
+
 
     private NotebookDetailDTO mapToNotebookDetailDTO(Notebooks notebook, List<Integer> noteIds) {
         NotebookDetailDTO detailDTO = new NotebookDetailDTO();
@@ -133,6 +137,7 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
         }
         return true;
     }
+
 }
 
 
