@@ -46,15 +46,15 @@ public class NoteLikesServiceImpl extends ServiceImpl<NoteLikesMapper, NoteLikes
     @Override
     public int countLikesByNoteId(Integer noteId) {
         if (noteId == null) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "Note ID must not be null.");
+            throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "笔记号不能为空");
         }
 
         QueryWrapper<NoteLikes> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("note_id", noteId);
+        queryWrapper.eq("笔记号", noteId);
         try {
             return Math.toIntExact(noteLikesMapper.selectCount(queryWrapper));
         } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "Failed to count likes due to: " + e.getMessage());
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "获取数量失败， " + e.getMessage());
         }
     }
 
@@ -62,16 +62,16 @@ public class NoteLikesServiceImpl extends ServiceImpl<NoteLikesMapper, NoteLikes
     @Override
     public boolean isNoteLikedByUser(Integer noteId, Integer userId) {
         if (noteId == null || userId == null) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "Note ID and User ID must not be null.");
+            throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "笔记号或账号不能为空");
         }
 
         QueryWrapper<NoteLikes> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("note_id", noteId).eq("user_id", userId);
+        queryWrapper.eq("笔记号", noteId).eq("账号", userId);
         try {
             NoteLikes existingLike = noteLikesMapper.selectOne(queryWrapper);
             return existingLike != null;
         } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "Failed to check if the note is liked due to: " + e.getMessage());
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "无法查看是否点赞， " + e.getMessage());
         }
     }
 

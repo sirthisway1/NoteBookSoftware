@@ -63,7 +63,7 @@ public class NoteLikesController {
     public Result<Map<String, Object>> countLikesByNoteId(@PathVariable Integer noteId) {
         try {
             int count = noteLikesService.countLikesByNoteId(noteId);
-            return Result.success(ResultType.SUCCESS.asMap("Count", count));
+            return Result.success(ResultType.SUCCESS.asMap("数量：", count));
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
         }
@@ -80,7 +80,7 @@ public class NoteLikesController {
         try {
             Integer userId = getUserIdFromRequest(request);
             boolean isLiked = noteLikesService.isNoteLikedByUser(noteId, userId);
-            return Result.success(ResultType.SUCCESS.asMap("Liked", isLiked));
+            return Result.success(ResultType.SUCCESS.asMap("已点赞", isLiked));
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
         }
