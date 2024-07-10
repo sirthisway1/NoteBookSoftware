@@ -49,31 +49,16 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
 
     @Override
     public void createNotebook(NotebookCreateDTO createNotebookDTO, Integer userId) {
-        validateNotebookData(createNotebookDTO);
         Notebooks notebook = new Notebooks();
         notebook.setName(createNotebookDTO.getName());
         notebook.setSummary(createNotebookDTO.getSummary());
         notebook.setUserId(userId);
-        if (!this.save(notebook)) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "无法保存笔记本");
-        }
-    }
-
-    private void validateNotebookData(NotebookCreateDTO createNotebookDTO) {
-        if (createNotebookDTO.getName() == null || createNotebookDTO.getName().trim().isEmpty() || createNotebookDTO.getName().length() > 100) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "笔记本名称不合法");
-        }
-        if (createNotebookDTO.getSummary() != null && createNotebookDTO.getSummary().length() > 500) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "描述不能超过500字符");
-        }
+        save(notebook);
     }
 
 
     @Override
     public List<Integer> getAllNotebookIds(Integer userId) {
-        if (userId == null) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "用户ID不能为空");
-        }
         List<Notebooks> notebooks = this.list(new QueryWrapper<Notebooks>().eq("user_id", userId));
         return notebooks.stream().map(Notebooks::getId).collect(Collectors.toList());
     }
@@ -92,9 +77,12 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
         if (notebookId == null) {
             throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "笔记本ID不能为空");
         }
-        Notebooks notebook = notebooksMapper.selectOne(new QueryWrapper<Notebooks>().eq("id", notebookId).eq("user_id", userId));
+        Notebooks notebook = notebooksMapper.selectOne(new QueryWrapper<Notebooks>().eq("id", notebookId));
         if (notebook == null) {
-            throw new BusinessException(ResultType.NOT_FOUND, "找不到对应的笔记本或无权访问");
+            throw new BusinessException(ResultType.NOT_FOUND, "找不到对应的笔记本");
+        }
+        if (!notebook.getUserId().equals(userId)) {
+            throw new BusinessException(ResultType.NO_PERMISSION, "无权访问该笔记本");
         }
         return notebook;
     }
@@ -111,31 +99,19 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
     }
 
     @Override
-    public boolean updateNotebook(Integer Id, NotebookUpdateDTO NotebookUpdateDTO, Integer userId) {
-        if (Id == null || userId == null) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "笔记本ID和用户ID不能为空");
-        }
+    public void updateNotebook(Integer notebookId, NotebookUpdateDTO NotebookUpdateDTO, Integer userId) {
+        Notebooks notebook = validateNotebookAccess(notebookId, userId);
         Notebooks updateNote = new Notebooks();
         updateNote.setName(NotebookUpdateDTO.getName());
         updateNote.setSummary(NotebookUpdateDTO.getSummary());
         updateNote.setUpdatedAt(LocalDateTime.now());
-        int result = notebooksMapper.update(updateNote, new UpdateWrapper<Notebooks>().eq("id", Id).eq("user_id", userId));
-        if (result <= 0) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "更新失败，影响行数为0");
-        }
-        return true;
+        notebooksMapper.update(updateNote, new UpdateWrapper<Notebooks>().eq("id", notebookId).eq("user_id", userId));
     }
 
     @Override
-    public boolean deleteNotebook(Integer Id, Integer userId) {
-        if (Id == null || userId == null) {
-            throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "笔记本ID和用户ID不能为空");
-        }
-        int result = notebooksMapper.delete(new QueryWrapper<Notebooks>().eq("id", Id).eq("user_id", userId));
-        if (result <= 0) {
-            throw new BusinessException(ResultType.NOT_FOUND, "删除失败，笔记本不存在或已被删除");
-        }
-        return true;
+    public void deleteNotebook(Integer notebookId, Integer userId) {
+        Notebooks notebook = validateNotebookAccess(notebookId, userId);
+        notebooksMapper.delete(new QueryWrapper<Notebooks>().eq("id", notebookId).eq("user_id", userId));
     }
 
 }

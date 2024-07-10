@@ -3,7 +3,6 @@ package com.example.markdown_demo.controller;
 import com.example.markdown_demo.common.dto.NotebookCreateDTO;
 import com.example.markdown_demo.common.dto.NotebookDetailDTO;
 import com.example.markdown_demo.common.dto.NotebookUpdateDTO;
-import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
@@ -84,24 +83,16 @@ public class NotebooksController {
             }
         }
             Integer userId = getUserIdFromRequest(request);
-            boolean updated = notebooksService.updateNotebook(notebookId, updateDTO, userId);
-            if (updated) {
-                return Result.success("笔记本更新成功");
-            } else {
-                return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"笔记本更新失败");
-            }
+            notebooksService.updateNotebook(notebookId, updateDTO, userId);
+            return Result.success("笔记本更新成功");
     }
 
     @DeleteMapping("/{notebookId}")
     public Result<Map<String, Object>> deleteNotebook(HttpServletRequest request, @PathVariable Integer notebookId) {
 
         Integer userId = getUserIdFromRequest(request);
-        boolean deleted = notebooksService.deleteNotebook(notebookId, userId);
-        if (deleted) {
-            return Result.success("笔记本删除成功");
-        } else {
-            return Result.fail(ResultType.NOT_FOUND.getCode(), "删除失败，笔记本不存在或已被删除");
-        }
+        notebooksService.deleteNotebook(notebookId, userId);
+        return Result.success("笔记本删除成功");
     }
 }
 

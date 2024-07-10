@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +78,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         }
         // 修改权限判断逻辑
         if (!note.getUserId().equals(userId) && note.getIsPrivate()) {
-            throw new BusinessException(ResultType.NO_PERMISSION, "无权限访问");
+            throw new BusinessException(ResultType.NO_PERMISSION);
         }
 
         NoteDetailDTO dto = new NoteDetailDTO();
@@ -233,7 +232,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
         List<Notes> notes = list(queryWrapper);
         if (notes.isEmpty()) {
-            throw new BusinessException(ResultType.NOT_FOUND, "资源不存在");
+            throw new BusinessException(ResultType.NOT_FOUND);
         }
 
         List<Integer> noteIds = notes.stream()
