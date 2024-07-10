@@ -1,5 +1,7 @@
 package com.example.markdown_demo.service;
 
+import com.example.markdown_demo.common.dto.LoginDTO;
+import com.example.markdown_demo.common.dto.RegisterDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -15,21 +17,16 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface UsersService extends IService<Users> {
     /**
      * 用户注册
-     *
-     * @param username 用户名
-     * @param password 密码
-     * @param email    邮箱
-     * @throws BusinessException 如果用户名或邮箱已存在
+     * @param registerDTO 包含用户注册信息的DTO对象，包括用户名、密码和邮箱地址。
+     * @throws BusinessException 如果注册过程中用户名或邮箱已存在于系统中，则抛出此异常。
      */
-    void register(String username, String password, String email) throws BusinessException;
+    void register(RegisterDTO registerDTO) throws BusinessException;
 
     /**
      * 用户登录
-     *
-     * @param username 用户名
-     * @param password 密码
-     * @return 登录成功后的 token
-     * @throws BusinessException 如果登录凭证无效
+     * @param loginDTO 包含用户登录信息的DTO对象，包括用户名和密码。
+     * @return 返回生成的令牌，令牌用于在后续请求中验证用户身份。
+     * @throws BusinessException 如果提供的登录凭证无效或不匹配，将抛出此异常。
      */
-    String login(String username, String password) throws BusinessException;
+    String login(LoginDTO loginDTO) throws BusinessException;
 }

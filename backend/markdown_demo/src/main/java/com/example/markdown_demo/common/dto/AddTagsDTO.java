@@ -4,14 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddTagsDTO {
-
-    @NotEmpty(message = "Tags list cannot be empty")
+    @NotBlank(message = "Tags cannot be blank")
     private List<String> tags;
 }

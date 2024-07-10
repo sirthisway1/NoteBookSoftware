@@ -7,7 +7,7 @@ public enum ResultType {
     SUCCESS("200", "成功"),
 
     INVALID_REQUEST_BODY("400", "请求体不合法"),
-    UNAUTHORIZED("401", "token验证失败"),
+    INVALID_TOKEN("401", "无效的令牌"),
     INVALID_CREDENTIALS("401", "用户名或密码错误"),
     NO_PERMISSION("403", "没有操作权限"),
     NOT_FOUND("404", "资源不存在"),
@@ -16,8 +16,8 @@ public enum ResultType {
     EMAIL_ALREADY_EXISTS("409", "邮箱已被注册"),
 
 
-    INTERNAL_SERVER_ERROR("500", "服务器内部错误");
-
+    INTERNAL_SERVER_ERROR("500", "服务器内部错误"),
+    UNAUTHORIZED("501", "token验证失败");
 
     private final String code;
     private final String message;

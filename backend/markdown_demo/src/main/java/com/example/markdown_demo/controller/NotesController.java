@@ -8,10 +8,11 @@ import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.NotesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -24,7 +25,7 @@ public class NotesController {
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("token");
         if (token == null || token.isEmpty()) {
-            throw new BusinessException(ResultType.UNAUTHORIZED);
+            throw new BusinessException(ResultType.INVALID_TOKEN);
         }
         return Integer.parseInt(JwtUtil.validateToken(token));
     }
@@ -32,7 +33,10 @@ public class NotesController {
     @PostMapping("/create")
     public Result<Void> createNote(@Valid @RequestBody NoteCreateDTO createNoteDTO, BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            return Result.fail(ResultType.INVALID_REQUEST_BODY);
+            FieldError firstError = bindingResult.getFieldError();
+            if (firstError != null) {
+                return Result.fail(ResultType.INVALID_REQUEST_BODY.getCode(),firstError.getDefaultMessage());
+            }
         }
         Integer userId = getUserIdFromRequest(request);
         notesService.createNote(createNoteDTO, userId);
