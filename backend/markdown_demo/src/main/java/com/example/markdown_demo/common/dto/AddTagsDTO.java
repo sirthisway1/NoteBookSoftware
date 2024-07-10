@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddTagsDTO {
-    @NotBlank(message = "Tags cannot be blank")
+    @NotBlank(message = "Tags不能为空")
     private List<String> tags;
 }

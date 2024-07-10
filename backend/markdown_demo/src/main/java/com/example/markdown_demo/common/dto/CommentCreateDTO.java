@@ -11,6 +11,6 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class CommentCreateDTO {
 
-    @NotBlank(message = "Comment content cannot be blank")
+    @NotBlank(message = "评论不能为空")
     private String content;
 }

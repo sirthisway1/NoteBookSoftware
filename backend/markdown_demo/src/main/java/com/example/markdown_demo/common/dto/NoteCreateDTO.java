@@ -12,17 +12,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoteCreateDTO {
-
-    @NotNull(message = "Notebook ID cannot be null")
+    @NotNull(message = "笔记本 ID 不能为空")
     private Integer notebookId;
 
-    @NotBlank(message = "Title cannot be blank")
+    @NotBlank(message = "标题不能为空")
     private String title;
 
     private String content;
-
     private List<String> tags;
 
-    @NotNull(message = "Type cannot be null")
+    @NotNull(message = "类型不能为空")
     private Integer type;
 }
