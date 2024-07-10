@@ -24,9 +24,6 @@ public class NotesController {
 
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("token");
-        if (token == null || token.isEmpty()) {
-            throw new BusinessException(ResultType.INVALID_TOKEN);
-        }
         return Integer.parseInt(JwtUtil.validateToken(token));
     }
 
