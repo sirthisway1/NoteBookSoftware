@@ -7,10 +7,7 @@ import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.NoteLikesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 
 import java.util.Map;
 
@@ -22,12 +19,13 @@ import java.util.Map;
  * @author xmg
  * @since 2024-07-04
  */
-@Controller
-@RequestMapping("/noteLikes")
+@RestController
+@RequestMapping("/api/noteLikes")
 public class NoteLikesController {
 
     @Autowired
     private NoteLikesService noteLikesService;
+
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("token");
         return Integer.parseInt(JwtUtil.validateToken(token));
