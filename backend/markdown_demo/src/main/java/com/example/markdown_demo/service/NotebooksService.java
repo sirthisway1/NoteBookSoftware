@@ -48,7 +48,7 @@ public interface NotebooksService extends IService<Notebooks> {
      * @param userId 用户ID
      * @return 是否修改成功
      */
-    boolean updateNotebook(Integer Id, NotebookUpdateDTO updateNotebookDTO, Integer userId);
+    void updateNotebook(Integer Id, NotebookUpdateDTO updateNotebookDTO, Integer userId);
 
     /**
      * 删除笔记本
@@ -56,5 +56,5 @@ public interface NotebooksService extends IService<Notebooks> {
      * @param userId 用户ID
      * @return 是否删除成功
      */
-    boolean deleteNotebook(Integer Id, Integer userId);
+    void deleteNotebook(Integer Id, Integer userId);
 }
