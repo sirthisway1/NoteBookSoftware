@@ -2,6 +2,7 @@ package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.CommentCreateDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
+import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.CommentsService;
@@ -44,18 +45,15 @@ public class CommentsController {
      * @return ResponseEntity representing the outcome of the operation
      */
     @PostMapping("/post")
-    public ResponseEntity<?> postComment(HttpServletRequest request, @RequestParam Integer noteId, @RequestParam String content) {
+    public Result<Map<String, String>> postComment(HttpServletRequest request, @RequestParam Integer noteId, @RequestParam String content) {
         try {
-            Integer userId = getUserIdFromRequest(request); // 从请求中获取用户 ID
+            Integer userId = getUserIdFromRequest(request);
             commentsService.postComment(noteId, userId, content);
-            return ResponseEntity.ok().body(ResultType.SUCCESS.asMap("Message", "Comment posted successfully"));
+            return Result.success("评论发表成功");
         } catch (BusinessException e) {
-            ResultType resultType = ResultType.fromCode(e.getStatusCode());
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode())))
-                    .body(resultType.asMap("Error", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
-
     /**
      * 查看针对某篇笔记的所有评论
      *
@@ -63,12 +61,12 @@ public class CommentsController {
      * @return ResponseEntity containing the comments
      */
     @GetMapping("/view/{noteId}")
-    public ResponseEntity<?> viewComments(@PathVariable Integer noteId) {
+    public Result<Map<String,Object>> viewComments(@PathVariable Integer noteId) {
         try {
             List<CommentCreateDTO> comments = commentsService.viewComments(noteId);
-            return ResponseEntity.ok(ResultType.SUCCESS.asMap("Comments", comments));
+            return Result.success(ResultType.SUCCESS.asMap("Comments", comments));
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode()))).body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
 
@@ -78,14 +76,14 @@ public class CommentsController {
      * @param noteId 笔记ID
      * @return ResponseEntity with the count of comments
      */
+
     @GetMapping("/count/{noteId}")
-    public HttpEntity<Map<String, Object>> countCommentsByNoteId(@PathVariable Integer noteId) {
+    public Result<Map<String, Object>> countCommentsByNoteId(@PathVariable Integer noteId) {
         try {
             int count = commentsService.countCommentsByNoteId(noteId);
-            return ResponseEntity.ok(ResultType.SUCCESS.asMap("Count", count));
+            return Result.success(ResultType.SUCCESS.asMap("Count", count));
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode())))
-                    .body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
     /**
@@ -97,21 +95,19 @@ public class CommentsController {
      * @return ResponseEntity indicating success or failure
      */
     @DeleteMapping("/delete/{noteId}/{commentId}")
-    public ResponseEntity<?> deleteComment(HttpServletRequest request, @PathVariable Integer noteId, @PathVariable String commentId) {
+    public Result<Map<String, Object>> deleteComment(HttpServletRequest request, @PathVariable Integer noteId, @PathVariable String commentId) {
         try {
-            Integer userId = getUserIdFromRequest(request); // 从请求中获取用户 ID
+            Integer userId = getUserIdFromRequest(request);
             boolean deleted = commentsService.deleteComment(noteId, commentId, userId);
             if (deleted) {
-                return ResponseEntity.ok(ResultType.SUCCESS.asMap("Message", "Comment deleted successfully"));
+                return Result.success("评论删除成功");
             } else {
-                return ResponseEntity.badRequest().body(ResultType.NOT_FOUND.asMap("Error", "Failed to delete comment"));
+                return Result.fail(ResultType.NOT_FOUND.getCode(),"删除评论失败");
             }
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.valueOf(Integer.parseInt(e.getStatusCode())))
-                    .body(ResultType.fromCode(e.getStatusCode()).asMap("Error", e.getMessage()));
+            return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
-
 }
 
 

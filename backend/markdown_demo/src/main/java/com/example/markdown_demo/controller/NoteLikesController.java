@@ -41,7 +41,7 @@ public class NoteLikesController {
 
     @PostMapping("/toggleLike")
     public Result<Map<String, Object>> toggleLike(HttpServletRequest request, @RequestParam Integer noteId) {
-        try {
+
             Integer userId = getUserIdFromRequest(request);
             boolean isLiked = noteLikesService.likeOrUnlikeNote(noteId, userId);
             if (isLiked) {
@@ -49,9 +49,7 @@ public class NoteLikesController {
             } else {
                 return Result.success("取消点赞成功");
             }
-        } catch (BusinessException e) {
-            return Result.fail(e.getStatusCode(), e.getMessage());
-        }
+
     }
 
     /**
