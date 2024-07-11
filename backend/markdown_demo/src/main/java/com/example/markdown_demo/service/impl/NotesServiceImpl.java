@@ -207,41 +207,31 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public List<Integer> searchNotesByKeyword(String keyword, Integer userId) {
+    public List<NoteShowDTO> searchNotesByKeyword(String keyword, Integer userId) {
+
+
         QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId)
-                .and(w -> w.like("title", keyword).or().like("content", keyword))
-                .select("id"); // 只选择 id 字段
+                .and(w -> w.like("title", keyword).or().like("content", keyword));
+        List<Notes> notesList = notesMapper.selectList(queryWrapper);
 
-        List<Notes> notes = list(queryWrapper);
-        if (notes.isEmpty()) {
+        if (notesList.isEmpty()) {
             throw new BusinessException(ResultType.NOT_FOUND);
         }
-
-        List<Integer> noteIds = notes.stream()
-                .map(Notes::getId)
-                .collect(Collectors.toList());
-
-        return noteIds;
+        return notesList.stream().map(this::mapToNoteShowDTO).collect(Collectors.toList());
     }
 
     @Override
-    public List<Integer> searchNotesByTags(String tags, Integer userId) {
+    public List<NoteShowDTO> searchNotesByTags(String tags, Integer userId) {
         QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId)
-                .apply("FIND_IN_SET({0}, tags)", tags)
-                .select("id"); // 只选择 id 字段
+                .apply("FIND_IN_SET({0}, tags)", tags);
 
-        List<Notes> notes = list(queryWrapper);
-        if (notes.isEmpty()) {
+        List<Notes> notesList = notesMapper.selectList(queryWrapper);
+        if (notesList.isEmpty()) {
             throw new BusinessException(ResultType.NOT_FOUND);
         }
-
-        List<Integer> noteIds = notes.stream()
-                .map(Notes::getId)
-                .collect(Collectors.toList());
-
-        return noteIds;
+        return notesList.stream().map(this::mapToNoteShowDTO).collect(Collectors.toList());
     }
 
 

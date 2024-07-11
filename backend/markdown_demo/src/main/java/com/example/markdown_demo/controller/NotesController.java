@@ -115,16 +115,16 @@ public class NotesController {
 
 
     @GetMapping("/searchByKeyword")
-    public Result<List<Integer>> searchNotesByKeyword(@RequestParam String keyword, HttpServletRequest request) {
+    public Result<List<NoteShowDTO>> searchNotesByKeyword(@RequestParam String keyword, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
-        List<Integer> noteIds = notesService.searchNotesByKeyword(keyword, userId);
-        return Result.success(noteIds);
+        List<NoteShowDTO> notes = notesService.searchNotesByKeyword(keyword, userId);
+        return Result.success(notes);
     }
 
     @GetMapping("/searchByTags")
-    public Result<List<Integer>> searchNotesByTags(@RequestParam String tags, HttpServletRequest request) {
+    public Result<List<NoteShowDTO>> searchNotesByTags(@RequestParam String tags, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
-        List<Integer> noteIds = notesService.searchNotesByTags(tags, userId);
-        return Result.success(noteIds);
+        List<NoteShowDTO> notes = notesService.searchNotesByTags(tags, userId);
+        return Result.success(notes);
     }
 }

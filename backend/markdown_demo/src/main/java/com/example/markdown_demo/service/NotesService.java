@@ -72,7 +72,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 匹配的笔记ID列表
      */
-    List<Integer> searchNotesByKeyword(String keyword, Integer userId);
+    List<NoteShowDTO> searchNotesByKeyword(String keyword, Integer userId);
 
     /**
      * 根据标签搜索笔记
@@ -80,5 +80,5 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 匹配的笔记ID列表
      */
-    List<Integer> searchNotesByTags(String tags, Integer userId);
+    List<NoteShowDTO> searchNotesByTags(String tags, Integer userId);
 }
