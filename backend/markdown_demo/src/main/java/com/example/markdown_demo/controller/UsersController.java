@@ -29,7 +29,7 @@ public class UsersController {
             }
         }
         userService.register(registerDTO);
-        return Result.success(null);
+        return Result.success(ResultType.SUCCESS.getMessage());
     }
 
     @PostMapping("/login")

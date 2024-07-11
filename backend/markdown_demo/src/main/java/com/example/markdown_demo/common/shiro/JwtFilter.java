@@ -122,7 +122,7 @@ public class JwtFilter extends AccessControlFilter {
 
         try (ServletOutputStream out = resp.getOutputStream()) {
             Result<String> result = new Result<>();
-            result.setStatusCode(statusCode);
+            result.setCode(statusCode);
             result.setMessage(ResultType.UNAUTHORIZED.getMessage()+":"+message);
             String json = mapper.writeValueAsString(result);
             out.write(json.getBytes(StandardCharsets.UTF_8));
