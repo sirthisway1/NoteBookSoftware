@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 
 
 @RestController
@@ -35,16 +36,17 @@ public class AudioAnswerController {
         try {
             byte[] audioBytes = audioGenerationService.generateAudio(request);
             response.setContentType("audio/wav");
-            response.getOutputStream().write(audioBytes);
-            response.flushBuffer();
+            response.setStatus(HttpStatus.OK.value());
+            try (OutputStream out = response.getOutputStream()) {
+                out.write(audioBytes);
+                out.flush();
+            }
         } catch (Exception e) {
-            // Since this method is void, we need to handle the error by setting the status and writing the error message
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             try {
                 response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
             } catch (IOException ex) {
-                // In case of another exception while handling the first one, we set the status to INTERNAL_SERVER_ERROR
                 response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
                 // Optionally, log the exception or handle it further if needed
             }
