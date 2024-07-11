@@ -14,5 +14,8 @@ public class NoteShowDTO {
 
     private Integer id;
     private String title;
+    private String createdAt;
     private String updatedAt;
+    private List<String> tags;
+
 }
