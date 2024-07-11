@@ -2,33 +2,22 @@ package com.example.markdown_demo.controller;
 
 
 import com.example.markdown_demo.common.dto.AudioRequestDTO;
-import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
-import com.example.markdown_demo.common.lang.ResultType;
-import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.service.AudioGenerationService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 
-@Controller
+@RestController
 @RequestMapping("/api")
 public class AudioAnswerController {
 
     @Autowired
     private AudioGenerationService audioGenerationService;
-    @Autowired
-    private RestTemplate restTemplate;
 
     @GetMapping(value = "/generate-text-answer", produces = "application/json")
     public Result<String> generateTextAnswer(@RequestParam String text) {
