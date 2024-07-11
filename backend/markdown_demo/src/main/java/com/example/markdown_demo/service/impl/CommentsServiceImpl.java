@@ -34,6 +34,9 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
     @Autowired
     private CommentsMapper commentsMapper; // 正确的命名和类型
 
+    private boolean noteExists(Integer noteId) {
+        return this.getById(noteId) != null;
+    }
 
     /**
      * 发表评论
@@ -49,7 +52,9 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         if (noteId == null || content == null || content.trim().isEmpty()) {
             throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "笔记id，评论不能为空");
         }
-
+        if (noteExists(noteId)) {
+            throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
+        }
         // 创建并设置评论实体
         Comments comment = new Comments()
                 .setNoteId(noteId)
@@ -74,13 +79,22 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
      * @return 评论详情列表
      * @throws BusinessException 如果操作失败
      */
+
+
     @Override
     @Transactional(readOnly = true) // 使用只读事务来提高查询性能
+
+
     public List<CommentCreateDTO> viewComments(Integer noteId) throws BusinessException {
+
+
+
         if (noteId == null) {
             throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "笔记id不能为空");
         }
-
+        if (noteExists(noteId)) {
+            throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
+        }
         // 使用 MyBatis Plus 的查询封装
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("note_id", noteId);
@@ -98,6 +112,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
                 .collect(Collectors.toList());
     }
 
+
     /**
      * 查询特定笔记的评论数量
      *
@@ -110,7 +125,9 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         if (noteId == null) {
             throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "笔记id不能为空");
         }
-
+        if (noteExists(noteId)) {
+            throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
+        }
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("note_id", noteId);
 
@@ -137,7 +154,9 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         if (noteId == null || commentId == null ) {
             throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "笔记id，评论id不能为空");
         }
-
+        if (noteExists(noteId)) {
+            throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
+        }
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", commentId)
                 .eq("note_id", noteId)

@@ -60,6 +60,8 @@ public class CommentsController {
      * @return ResponseEntity containing the comments
      */
     @GetMapping("/view/{noteId}")
+
+
     public Result<Map<String,Object>> viewComments(@PathVariable Integer noteId) {
         try {
             List<CommentCreateDTO> comments = commentsService.viewComments(noteId);
