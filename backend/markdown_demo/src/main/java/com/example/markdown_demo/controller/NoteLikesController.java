@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,7 +76,8 @@ public class NoteLikesController {
         try {
             Integer userId = getUserIdFromRequest(request);
             boolean isLiked = noteLikesService.isNoteLikedByUser(noteId, userId);
-            return Result.success(ResultType.SUCCESS.asMap("已点赞", isLiked));
+            Map<String, Object> map = Collections.singletonMap("isLiked", isLiked);
+            return Result.success(map);
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
         }
