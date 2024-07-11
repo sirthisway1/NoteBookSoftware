@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,11 +57,14 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
             throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
         }
         // 创建并设置评论实体
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // 或者您需要的任何其他格式
+        String createdAtStr = LocalDateTime.now().format(formatter);
+
         Comments comment = new Comments()
                 .setNoteId(noteId)
                 .setUserId(userId)
                 .setContent(content)
-                .setCreatedAt(LocalDateTime.now());
+                .setCreatedAt(createdAtStr);
 
         // 尝试保存评论到数据库
         try {

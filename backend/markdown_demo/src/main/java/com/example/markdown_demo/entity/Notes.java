@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.markdown_demo.common.typehandler.ListToStringTypeHandler;
+import com.example.markdown_demo.common.typehandler.LocalDateTimeToStringTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -45,7 +46,9 @@ public class Notes implements Serializable {
 
     private Boolean isPrivate;
 
-    private LocalDateTime createdAt;
+    @TableField(typeHandler = LocalDateTimeToStringTypeHandler.class)
+    private String createdAt;
 
-    private LocalDateTime updatedAt;
+    @TableField(typeHandler = LocalDateTimeToStringTypeHandler.class)
+    private String updatedAt;
 }

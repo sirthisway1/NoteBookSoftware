@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -127,7 +128,10 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
         Notebooks updateNote = new Notebooks();
         updateNote.setName(NotebookUpdateDTO.getName());
         updateNote.setSummary(NotebookUpdateDTO.getSummary());
-        updateNote.setUpdatedAt(LocalDateTime.now());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // 或者您需要的任何其他格式
+        String updatedAtStr = LocalDateTime.now().format(formatter);
+        updateNote.setUpdatedAt(updatedAtStr);
         notebooksMapper.update(updateNote, new UpdateWrapper<Notebooks>().eq("id", notebookId).eq("user_id", userId));
     }
 

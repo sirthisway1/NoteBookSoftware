@@ -8,7 +8,7 @@ import java.util.List;
 public class NotebookDetailDTO {
     private int notebookId;
     private String name;
-    private LocalDateTime lastModified;
+    private String lastModified;
     private String summary;
     private List<Integer> noteId;
 

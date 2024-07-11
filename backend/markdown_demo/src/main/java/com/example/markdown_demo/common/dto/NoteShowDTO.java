@@ -14,5 +14,5 @@ public class NoteShowDTO {
 
     private Integer id;
     private String title;
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 }

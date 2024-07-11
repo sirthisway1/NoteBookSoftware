@@ -18,7 +18,7 @@ public class NoteDetailDTO {
     private String content;
     private List<String> tags;
     private Boolean isPrivate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
     private Integer type;
 }

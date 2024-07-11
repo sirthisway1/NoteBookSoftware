@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static com.example.markdown_demo.common.utils.JwtUtil.generateToken;
 
@@ -54,7 +55,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         if (user == null || !loginDTO.getPassword().equals(user.getPassword())) {
             throw new BusinessException(ResultType.INVALID_CREDENTIALS);
         }
-        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // 或者您需要的任何其他格式
+        String now = LocalDateTime.now().format(formatter);
         user.setUpdatedAt(now);
         updateById(user);
         // 生成并返回 token 或者其他登录成功的标识

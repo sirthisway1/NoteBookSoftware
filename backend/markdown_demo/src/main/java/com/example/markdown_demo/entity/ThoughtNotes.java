@@ -1,8 +1,12 @@
 package com.example.markdown_demo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.example.markdown_demo.common.typehandler.LocalDateTimeToStringTypeHandler;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -14,7 +18,8 @@ import java.time.LocalDateTime;
  * @author xmg
  * @since 2024-07-05
  */
-@TableName("m_thought_notes")
+@Data
+@TableName(value="m_thought_notes", autoResultMap = true)
 public class ThoughtNotes implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,49 +34,12 @@ public class ThoughtNotes implements Serializable {
      */
     private Integer type;
 
-    private LocalDateTime createdAt;
+    @TableField(typeHandler = LocalDateTimeToStringTypeHandler.class)
+    private String createdAt;
 
-    private LocalDateTime updatedAt;
+    @TableField(typeHandler = LocalDateTimeToStringTypeHandler.class)
+    private String updatedAt;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getNoteId() {
-        return noteId;
-    }
-
-    public void setNoteId(Integer noteId) {
-        this.noteId = noteId;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
     @Override
     public String toString() {

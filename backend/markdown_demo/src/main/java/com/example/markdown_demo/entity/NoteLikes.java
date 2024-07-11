@@ -1,8 +1,10 @@
 package com.example.markdown_demo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.example.markdown_demo.common.typehandler.LocalDateTimeToStringTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -21,7 +23,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("m_note_likes")
+@TableName(value = "m_note_likes", autoResultMap = true)
 public class NoteLikes implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,6 +34,6 @@ public class NoteLikes implements Serializable {
     private Integer noteId;
 
     private Integer userId;
-
-    private LocalDateTime createdAt;
+    @TableField(typeHandler = LocalDateTimeToStringTypeHandler.class)
+    private String createdAt;
 }
