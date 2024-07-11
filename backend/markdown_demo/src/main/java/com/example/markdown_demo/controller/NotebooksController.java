@@ -77,7 +77,7 @@ public class NotebooksController {
 
         Integer userId = getUserIdFromRequest(request);
         List<NotebookDetailDTO> ids = notebooksService.getAllNotebooks(userId);
-        return Result.success(Map.of("ids", ids));
+        return Result.success(Map.of("notebooks", ids));
     }
 
     @PutMapping("/{notebookId}")
