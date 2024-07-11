@@ -16,7 +16,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/notebook?useUnicode=true&useSSL=false&character_set_server=utf8mb4&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456
+    password: qq13015171755
 
 
 file:
@@ -24,7 +24,7 @@ file:
     path: /staticFile/upload
 
 server:
-  port: 8080
+  port: 8090
   host: localhost
 
 deepbricks:

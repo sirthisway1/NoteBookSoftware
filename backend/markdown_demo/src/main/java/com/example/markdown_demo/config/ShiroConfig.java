@@ -72,8 +72,8 @@ public class ShiroConfig {
         shiroFilter.setFilters(filterMap);
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
 
-        map.put("/user/login", "anon");
-        map.put("/user/register", "anon");
+        map.put("/api/login", "anon");
+        map.put("/api/register", "anon");
         map.put("/api/files", "anon");
 
         // 所有请求通过我们自己的JWT Filter
