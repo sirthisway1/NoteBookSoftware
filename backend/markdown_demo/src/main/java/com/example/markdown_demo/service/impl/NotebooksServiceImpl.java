@@ -63,7 +63,30 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
         return notebooks.stream().map(Notebooks::getId).collect(Collectors.toList());
     }
 
+    @Override
+    public List<NotebookDetailDTO> getAllNotebooks(Integer userId) {
+        List<Notebooks> notebooks = this.list(new QueryWrapper<Notebooks>().eq("user_id", userId));
 
+        return notebooks.stream()
+                .map(notebook -> {
+                    NotebookDetailDTO notebookDetailDTO = new NotebookDetailDTO();
+                    notebookDetailDTO.setNotebookId(notebook.getId());
+                    notebookDetailDTO.setName(notebook.getName());
+                    notebookDetailDTO.setLastModified(notebook.getUpdatedAt());
+                    notebookDetailDTO.setSummary(notebook.getSummary());
+
+                    // Fetch note IDs for the current notebook
+                    List<Integer> noteIds = notesMapper.selectList(new QueryWrapper<Notes>().select("id").eq("notebook_id", notebook.getId()))
+                            .stream()
+                            .map(Notes::getId)
+                            .collect(Collectors.toList());
+
+                    notebookDetailDTO.setNoteId(noteIds);
+
+                    return notebookDetailDTO;
+                })
+                .collect(Collectors.toList());
+    }
     @Override
     public NotebookDetailDTO getNotebookDetail(Integer notebookId, Integer userId) {
         Notebooks notebook = validateNotebookAccess(notebookId, userId);

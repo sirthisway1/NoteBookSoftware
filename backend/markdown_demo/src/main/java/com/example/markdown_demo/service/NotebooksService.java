@@ -32,6 +32,7 @@ public interface NotebooksService extends IService<Notebooks> {
      * @return 笔记本ID列表
      */
     List<Integer> getAllNotebookIds(Integer userId);
+    List<NotebookDetailDTO> getAllNotebooks(Integer userId);
 
     /**
      * 获取特定笔记本详细信息

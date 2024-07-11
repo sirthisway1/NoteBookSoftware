@@ -72,6 +72,14 @@ public class NotebooksController {
         return Result.success(Map.of("ids", ids));
     }
 
+    @GetMapping("/getAllNotebooks")
+    public Result<Map<String, Object>> getAllNotebooks(HttpServletRequest request) {
+
+        Integer userId = getUserIdFromRequest(request);
+        List<NotebookDetailDTO> ids = notebooksService.getAllNotebooks(userId);
+        return Result.success(Map.of("ids", ids));
+    }
+
     @PutMapping("/{notebookId}")
     public Result<Map<String, Object>> updateNotebook(HttpServletRequest request
             , @PathVariable Integer notebookId, @Valid @RequestBody NotebookUpdateDTO updateDTO,BindingResult bindingResult) {
