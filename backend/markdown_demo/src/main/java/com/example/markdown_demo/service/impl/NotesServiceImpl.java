@@ -83,7 +83,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         }
 
         NoteDetailDTO dto = new NoteDetailDTO();
-        dto.setId(note.getId());
+        dto.setNoteId(note.getId());
         dto.setTitle(note.getTitle());
         dto.setContent(note.getContent());
         dto.setTags(note.getTags());
@@ -111,7 +111,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
     private NoteShowDTO mapToNoteShowDTO(Notes note) {
         NoteShowDTO dto = new NoteShowDTO();
-        dto.setId(note.getId());
+        dto.setNoteId(note.getId());
         dto.setTitle(note.getTitle());
         dto.setUpdatedAt(note.getUpdatedAt());
         dto.setCreatedAt(note.getCreatedAt());
@@ -143,7 +143,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
     private NoteShowWithUserDTO mapToNoteShowWithUserDTO(Notes note) {
         NoteShowWithUserDTO dto = new NoteShowWithUserDTO();
-        dto.setId(note.getId());
+        dto.setNoteId(note.getId());
         Users user = usersMapper.selectById(note.getUserId()); // Retrieve the user by ID
         dto.setUsername(user.getUsername()); // Set the username from the user entity
         dto.setTitle(note.getTitle());

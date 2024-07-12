@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class NoteDetailDTO {
 
-    private Integer id;
+    private Integer noteId;
     private Integer notebookId;
     private String title;
     private String content;

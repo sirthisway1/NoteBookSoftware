@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class NoteShowWithUserDTO {
 
-    private Integer id;
+    private Integer noteId;
     private String username;
     private String title;
     private String content;
