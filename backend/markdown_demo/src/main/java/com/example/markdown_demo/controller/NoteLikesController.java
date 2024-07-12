@@ -59,7 +59,7 @@ public class NoteLikesController {
     public Result<Map<String, Object>> countLikesByNoteId(@PathVariable Integer noteId) {
         try {
             int count = noteLikesService.countLikesByNoteId(noteId);
-            return Result.success(ResultType.SUCCESS.asMap("数量：", count));
+            return Result.success(ResultType.SUCCESS.asMap("count", count));
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
         }
