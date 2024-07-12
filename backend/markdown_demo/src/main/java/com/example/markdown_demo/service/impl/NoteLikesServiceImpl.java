@@ -1,6 +1,7 @@
 package com.example.markdown_demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.markdown_demo.common.dto.LikeDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.entity.NoteLikes;
@@ -24,23 +25,34 @@ public class NoteLikesServiceImpl extends ServiceImpl<NoteLikesMapper, NoteLikes
     private NoteLikesMapper noteLikesMapper;
 
     @Override
-    public boolean likeOrUnlikeNote(Integer noteId, Integer userId) {
+    public LikeDTO likeOrUnlikeNote(Integer noteId, Integer userId) {
         QueryWrapper<NoteLikes> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("note_id", noteId).eq("user_id", userId);
         NoteLikes existingLike = noteLikesMapper.selectOne(queryWrapper);
+        boolean isLiked;
+
         if (existingLike == null) {
             // 点赞
             NoteLikes noteLike = new NoteLikes();
             noteLike.setNoteId(noteId);
             noteLike.setUserId(userId);
             noteLikesMapper.insert(noteLike);
-            return true;
+            isLiked = true; // 操作为点赞
         } else {
             // 取消点赞
             noteLikesMapper.delete(queryWrapper);
-            return false;
+            isLiked = false; // 操作为取消点赞
         }
+
+        // 查询并返回当前的点赞总数
+        QueryWrapper<NoteLikes> countQuery = new QueryWrapper<>();
+        countQuery.eq("note_id", noteId);
+        int likeCount = Math.toIntExact(noteLikesMapper.selectCount(countQuery));
+
+        return new LikeDTO(isLiked, likeCount);
     }
+
+
 
 
     @Override
