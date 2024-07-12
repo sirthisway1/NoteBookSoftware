@@ -123,17 +123,32 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
     }
 
     @Override
-    public void updateNotebook(Integer notebookId, NotebookUpdateDTO NotebookUpdateDTO, Integer userId) {
+    public void updateNotebook(Integer notebookId, NotebookUpdateDTO notebookUpdateDTO, Integer userId) {
+        // 验证用户对笔记本的访问权限
         Notebooks notebook = validateNotebookAccess(notebookId, userId);
-        Notebooks updateNote = new Notebooks();
-        updateNote.setName(NotebookUpdateDTO.getName());
-        updateNote.setSummary(NotebookUpdateDTO.getSummary());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // 或者您需要的任何其他格式
+        // 准备更新对象
+        Notebooks updateNote = new Notebooks();
+        if (notebookUpdateDTO.getName() != null) {
+            updateNote.setName(notebookUpdateDTO.getName());
+        }
+        if (notebookUpdateDTO.getSummary() != null) {
+            updateNote.setSummary(notebookUpdateDTO.getSummary());
+        }
+
+        // 设置更新时间
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String updatedAtStr = LocalDateTime.now().format(formatter);
         updateNote.setUpdatedAt(updatedAtStr);
-        notebooksMapper.update(updateNote, new UpdateWrapper<Notebooks>().eq("id", notebookId).eq("user_id", userId));
+
+        // 构建更新条件
+        UpdateWrapper<Notebooks> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", notebookId).eq("user_id", userId);
+
+        // 执行更新操作
+        notebooksMapper.update(updateNote, updateWrapper);
     }
+
 
     @Override
     public void deleteNotebook(Integer notebookId, Integer userId) {
