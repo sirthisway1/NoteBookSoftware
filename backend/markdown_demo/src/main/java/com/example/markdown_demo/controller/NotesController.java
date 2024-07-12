@@ -40,7 +40,7 @@ public class NotesController {
     }
 
     @PutMapping("/update/{noteId}")
-    public Result<Void> updateNote(@PathVariable String noteId, @Valid @RequestBody NoteUpdateDTO updateNoteDTO, BindingResult bindingResult, HttpServletRequest request) {
+    public Result<Void> updateNote(@PathVariable Integer noteId, @Valid @RequestBody NoteUpdateDTO updateNoteDTO, BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             FieldError firstError = bindingResult.getFieldError();
             if (firstError != null) {
@@ -53,7 +53,7 @@ public class NotesController {
     }
 
     @GetMapping("/detail/{noteId}")
-    public Result<NoteDetailDTO> getNoteDetail(@PathVariable String noteId, HttpServletRequest request) {
+    public Result<NoteDetailDTO> getNoteDetail(@PathVariable Integer noteId, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         NoteDetailDTO noteDetail = notesService.getNoteDetail(noteId, userId);
         return Result.success(noteDetail);
@@ -87,7 +87,7 @@ public class NotesController {
     }
 
     @PostMapping("/removeTags")
-    public Result<Void> removeTagsFromNote(@RequestParam String noteId, @RequestParam String tags, HttpServletRequest request) {
+    public Result<Void> removeTagsFromNote(@RequestParam Integer noteId, @RequestParam String tags, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         boolean success = notesService.removeTagsFromNote(noteId, tags, userId);
         if (success) {
@@ -98,7 +98,7 @@ public class NotesController {
     }
 
     @PutMapping("/{noteId}/privacy")
-    public Result<Void> setNotePrivacy(@PathVariable String noteId,
+    public Result<Void> setNotePrivacy(@PathVariable Integer noteId,
                                        @RequestParam Boolean isPrivate,
                                        HttpServletRequest request) {
         if (isPrivate == null) {

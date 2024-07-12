@@ -54,7 +54,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public void updateNote(String noteId, NoteUpdateDTO updateNoteDTO, Integer userId) {
+    public void updateNote(Integer noteId, NoteUpdateDTO updateNoteDTO, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -71,7 +71,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public NoteDetailDTO getNoteDetail(String noteId, Integer userId) {
+    public NoteDetailDTO getNoteDetail(Integer noteId, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -166,7 +166,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public boolean removeTagsFromNote(String noteId, String tags, Integer userId) {
+    public boolean removeTagsFromNote(Integer noteId, String tags, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -192,7 +192,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public boolean setNotePrivacy(String noteId, boolean isPrivate, Integer userId) {
+    public boolean setNotePrivacy(Integer noteId, boolean isPrivate, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);

@@ -23,7 +23,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 是否修改成功
      */
-    void updateNote(String noteId, NoteUpdateDTO updateNoteDTO, Integer userId);
+    void updateNote(Integer noteId, NoteUpdateDTO updateNoteDTO, Integer userId);
 
     /**
      * 查看笔记
@@ -31,7 +31,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 笔记详情
      */
-    NoteDetailDTO getNoteDetail(String noteId, Integer userId);
+    NoteDetailDTO getNoteDetail(Integer noteId, Integer userId);
 
 
 
@@ -53,7 +53,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 是否删除成功
      */
-    boolean removeTagsFromNote(String noteId, String tags, Integer userId);
+    boolean removeTagsFromNote(Integer noteId, String tags, Integer userId);
 
 
     /**
@@ -63,7 +63,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 更新后的笔记详情
      */
-    boolean setNotePrivacy(String noteId, boolean isPrivate, Integer userId);
+    boolean setNotePrivacy(Integer noteId, boolean isPrivate, Integer userId);
     // ... 其他方法保持不变 ...
 
     /**
