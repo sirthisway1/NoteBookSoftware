@@ -9,6 +9,7 @@ import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.entity.Comments;
 import com.example.markdown_demo.entity.Users;
 import com.example.markdown_demo.mapper.CommentsMapper;
+import com.example.markdown_demo.mapper.NotesMapper;
 import com.example.markdown_demo.mapper.UsersMapper;
 import com.example.markdown_demo.service.CommentsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -34,13 +35,16 @@ import java.util.stream.Collectors;
 @Service
 public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> implements CommentsService {
 
-
+    @Autowired
+    private NotesMapper notesMapper;
     @Autowired
     private CommentsMapper commentsMapper; // 正确的命名和类型
+
     @Autowired
     private UsersMapper usersMapper;
+
     private boolean noteExists(Integer noteId) {
-        return this.getById(noteId) != null;
+        return notesMapper.selectById(noteId) != null;
     }
 
     /**
@@ -57,7 +61,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         if (noteId == null || content == null || content.trim().isEmpty()) {
             throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "笔记id，评论不能为空");
         }
-        if (noteExists(noteId)) {
+        if (!noteExists(noteId)) {
             throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
         }
         // 创建并设置评论实体
@@ -97,7 +101,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         if (noteId == null) {
             throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "笔记id不能为空");
         }
-        if (noteExists(noteId)) {
+        if (!noteExists(noteId)) {
             throw new BusinessException(ResultType.NOT_FOUND.getCode(), "笔记不存在");
         }
 
