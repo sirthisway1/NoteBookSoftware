@@ -177,7 +177,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         if (noteId == null || commentId == null ) {
             throw new BusinessException(ResultType.INVALID_REQUEST_BODY.getCode(), "笔记id，评论id不能为空");
         }
-        if (noteExists(noteId)) {
+        if (!noteExists(noteId)) {
             throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
         }
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
