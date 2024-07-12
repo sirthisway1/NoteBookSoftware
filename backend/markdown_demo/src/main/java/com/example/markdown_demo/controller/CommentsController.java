@@ -58,15 +58,14 @@ public class CommentsController {
      * 查看针对某篇笔记的所有评论
      *
      * @param noteId 笔记ID
-     * @return ResponseEntity containing the comments
+
      */
     @GetMapping("/view/{noteId}")
-
-
-    public Result<Map<String,Object>> viewComments(@PathVariable Integer noteId) {
+    public Result<List<CommentViewDTO>> viewComments(@PathVariable Integer noteId) {
         try {
             List<CommentViewDTO> comments = commentsService.viewComments(noteId);
-            return Result.success(ResultType.SUCCESS.asMap("Comments", comments));
+            // 直接将评论列表作为 data 传递
+            return Result.success("Fetched comments successfully", comments);
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
         }
