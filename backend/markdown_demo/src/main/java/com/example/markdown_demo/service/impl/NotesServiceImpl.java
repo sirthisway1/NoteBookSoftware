@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -120,10 +121,24 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
     @Override
     public List<NoteShowWithUserDTO> noteShowWithUser() {
-        QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("is_private", false); // Assuming 'false' means the note is not private
-        List<Notes> notesList = notesMapper.selectList(queryWrapper);
-        return notesList.stream().map(this::mapToNoteShowWithUserDTO).collect(Collectors.toList());
+        Set<Integer> noteIdsInThoughtNotes = thoughtNotesMapper.selectList(new QueryWrapper<ThoughtNotes>()
+                        .select("note_id")) // Only select the note_id column
+                .stream()
+                .map(ThoughtNotes::getNoteId)
+                .collect(Collectors.toSet());
+
+        // Step 2: Query Notes table for non-private notes and exclude those with noteId in the set
+        QueryWrapper<Notes> notesQueryWrapper = new QueryWrapper<>();
+        notesQueryWrapper.eq("is_private", false);
+        notesQueryWrapper.notIn("id", noteIdsInThoughtNotes); // Exclude noteIds that are in ThoughtNotes
+        List<Notes> notesList = notesMapper.selectList(notesQueryWrapper);
+
+        // Map Notes to NoteShowWithUserDTO
+        List<NoteShowWithUserDTO> result = notesList.stream()
+                .map(this::mapToNoteShowWithUserDTO)
+                .collect(Collectors.toList());
+
+        return result;
     }
 
     private NoteShowWithUserDTO mapToNoteShowWithUserDTO(Notes note) {
