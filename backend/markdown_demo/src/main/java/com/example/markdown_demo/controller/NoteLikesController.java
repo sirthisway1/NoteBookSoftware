@@ -53,7 +53,7 @@ public class NoteLikesController {
 
 
     /**
-     * 统计笔记的点赞数量    
+     * 统计笔记的点赞数量
      * @param noteId 笔记ID
      * @return ResponseEntity with the count of likes
      */
