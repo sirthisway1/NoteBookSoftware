@@ -97,7 +97,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         if (noteId == null) {
             throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "笔记id不能为空");
         }
-        if (!noteExists(noteId)) {
+        if (noteExists(noteId)) {
             throw new BusinessException(ResultType.NOT_FOUND.getCode(), "笔记不存在");
         }
 
