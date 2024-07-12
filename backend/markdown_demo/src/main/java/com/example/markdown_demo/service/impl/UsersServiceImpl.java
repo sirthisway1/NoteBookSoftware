@@ -8,12 +8,13 @@ import com.example.markdown_demo.entity.Users;
 import com.example.markdown_demo.mapper.UsersMapper;
 import com.example.markdown_demo.service.UsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.example.markdown_demo.common.dto.UserInfoDTO;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import static com.example.markdown_demo.common.utils.JwtUtil.generateToken;
 
 /**
@@ -26,6 +27,20 @@ import static com.example.markdown_demo.common.utils.JwtUtil.generateToken;
  */
 @Service
 public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements UsersService {
+
+    @Autowired
+    private UsersMapper usersMapper;
+
+    @Override
+    public UserInfoDTO getUserInfo(Integer userId) {
+        Users user = usersMapper.selectById(userId);
+        if (user == null) {
+            return null;
+        }
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        BeanUtils.copyProperties(user, userInfoDTO);
+        return userInfoDTO;
+    }
 
     @Transactional
     public void register(RegisterDTO registerDTO) {

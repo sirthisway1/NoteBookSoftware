@@ -2,6 +2,7 @@ package com.example.markdown_demo.service;
 
 import com.example.markdown_demo.common.dto.LoginDTO;
 import com.example.markdown_demo.common.dto.RegisterDTO;
+import com.example.markdown_demo.common.dto.UserInfoDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -15,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2024-07-04
  */
 public interface UsersService extends IService<Users> {
+    UserInfoDTO getUserInfo(Integer userId)throws BusinessException;
     /**
      * 用户注册
      * @param registerDTO 包含用户注册信息的DTO对象，包括用户名、密码和邮箱地址。
