@@ -182,8 +182,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         }
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", commentId)
-                .eq("note_id", noteId)
-                .eq("user_id", userId);
+                .and(wrapper -> wrapper.eq("note_id", noteId).or().eq("user_id", userId));
 
         try {
             boolean deleted = commentsMapper.delete(queryWrapper) > 0;
