@@ -26,7 +26,7 @@ import java.util.Map;
  * @since 2024-07-04
  */
 @RestController
-@RequestMapping("/comments")
+@RequestMapping("/api/comments")
 public class CommentsController {
 
     @Autowired
