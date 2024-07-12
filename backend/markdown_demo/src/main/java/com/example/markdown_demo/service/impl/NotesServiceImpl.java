@@ -133,6 +133,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         dto.setUsername(user.getUsername()); // Set the username from the user entity
         dto.setTitle(note.getTitle());
         dto.setContent(note.getContent());
+        dto.setUpdatedAt(note.getUpdatedAt());
         return dto;
     }
 
