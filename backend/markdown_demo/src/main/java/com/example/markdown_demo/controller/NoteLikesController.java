@@ -1,5 +1,6 @@
 package com.example.markdown_demo.controller;
 
+import com.example.markdown_demo.common.dto.LikeDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
@@ -38,20 +39,21 @@ public class NoteLikesController {
 
      * @return ResponseEntity with operation result
      */
-
     @PostMapping("/toggleLike")
-    public Result<Map<String, Object>> toggleLike(HttpServletRequest request, @RequestParam Integer noteId) {
+    public Result<LikeDTO> toggleLike(HttpServletRequest request, @RequestParam Integer noteId) {
+        // 从请求中获取用户ID
+        Integer userId = getUserIdFromRequest(request);
 
-            Integer userId = getUserIdFromRequest(request);
-            boolean isLiked = noteLikesService.likeOrUnlikeNote(noteId, userId);
-            Map<String, Object> map = new HashMap<>();
-            map.put("isLiked", isLiked);
-            return Result.success(map);
+        // 调用服务层方法获取点赞操作的结果和点赞总数
+        LikeDTO likeResult = noteLikesService.likeOrUnlikeNote(noteId, userId);
 
+        // 直接将 LikeDTO 作为 data 返回
+        return Result.success("Like status toggled successfully", likeResult);
     }
 
+
     /**
-     * 统计笔记的点赞数量
+     * 统计笔记的点赞数量    
      * @param noteId 笔记ID
      * @return ResponseEntity with the count of likes
      */

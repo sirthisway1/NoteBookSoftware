@@ -1,5 +1,6 @@
 package com.example.markdown_demo.service;
 
+import com.example.markdown_demo.common.dto.LikeDTO;
 import com.example.markdown_demo.entity.NoteLikes;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,7 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface NoteLikesService {
 
-    boolean likeOrUnlikeNote(Integer noteId, Integer userId);
+    LikeDTO likeOrUnlikeNote(Integer noteId, Integer userId);
 
     int countLikesByNoteId(Integer noteId);
     boolean isNoteLikedByUser(Integer noteId, Integer userId);
