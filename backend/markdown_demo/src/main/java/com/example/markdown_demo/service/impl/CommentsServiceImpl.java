@@ -2,11 +2,14 @@ package com.example.markdown_demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.markdown_demo.common.dto.CommentCreateDTO;
+import com.example.markdown_demo.common.dto.CommentViewDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
 import com.example.markdown_demo.entity.Comments;
+import com.example.markdown_demo.entity.Users;
 import com.example.markdown_demo.mapper.CommentsMapper;
+import com.example.markdown_demo.mapper.UsersMapper;
 import com.example.markdown_demo.service.CommentsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +37,8 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
 
     @Autowired
     private CommentsMapper commentsMapper; // 正确的命名和类型
-
+    @Autowired
+    private UsersMapper usersMapper;
     private boolean noteExists(Integer noteId) {
         return this.getById(noteId) != null;
     }
@@ -85,24 +89,21 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
      */
 
 
+
+
     @Override
-    @Transactional(readOnly = true) // 使用只读事务来提高查询性能
-
-
-    public List<CommentCreateDTO> viewComments(Integer noteId) throws BusinessException {
-
-
-
+    @Transactional(readOnly = true)
+    public List<CommentViewDTO> viewComments(Integer noteId) throws BusinessException {
         if (noteId == null) {
             throw new BusinessException(ResultType.PATH_NOT_FOUND.getCode(), "笔记id不能为空");
         }
-        if (noteExists(noteId)) {
-            throw new BusinessException(ResultType.NOT_FOUND, "笔记不存在");
+        if (!noteExists(noteId)) {
+            throw new BusinessException(ResultType.NOT_FOUND.getCode(), "笔记不存在");
         }
+
         // 使用 MyBatis Plus 的查询封装
         QueryWrapper<Comments> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("note_id", noteId);
-
         List<Comments> commentsList;
         try {
             commentsList = commentsMapper.selectList(queryWrapper);
@@ -110,11 +111,25 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), "Failed to retrieve comments due to: " + e.getMessage());
         }
 
-        // 将实体列表转换成 DTO 列表
+        // 将实体列表转换成 DTO 列表，并获取 username
         return commentsList.stream()
-                .map(comment -> new CommentCreateDTO(comment.getContent()))
+                .map(comment -> {
+                    // 通过用户 ID 获取用户名
+                    String username = getUsernameByUserId(comment.getUserId());
+                    return new CommentViewDTO(comment.getContent(), username, comment.getCreatedAt(), comment.getId());
+                })
                 .collect(Collectors.toList());
+
+
     }
+    public String getUsernameByUserId(Integer userId) {
+        Users user = usersMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+        return user.getUsername();
+    }
+
 
 
     /**

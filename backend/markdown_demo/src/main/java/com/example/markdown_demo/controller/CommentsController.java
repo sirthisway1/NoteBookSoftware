@@ -1,6 +1,7 @@
 package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.CommentCreateDTO;
+import com.example.markdown_demo.common.dto.CommentViewDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
@@ -64,7 +65,7 @@ public class CommentsController {
 
     public Result<Map<String,Object>> viewComments(@PathVariable Integer noteId) {
         try {
-            List<CommentCreateDTO> comments = commentsService.viewComments(noteId);
+            List<CommentViewDTO> comments = commentsService.viewComments(noteId);
             return Result.success(ResultType.SUCCESS.asMap("Comments", comments));
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());

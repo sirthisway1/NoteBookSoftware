@@ -1,6 +1,7 @@
 package com.example.markdown_demo.service;
 
 import com.example.markdown_demo.common.dto.CommentCreateDTO;
+import com.example.markdown_demo.common.dto.CommentViewDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.entity.Comments;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -36,7 +37,7 @@ public interface CommentsService extends IService<Comments> {
      * @return 评论详情列表
      * @throws BusinessException 如果操作失败
      */
-    List<CommentCreateDTO> viewComments(Integer noteId) throws BusinessException;
+    List<CommentViewDTO> viewComments(Integer noteId) throws BusinessException;
 
     /**
      * 查询特定笔记的评论数量
