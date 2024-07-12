@@ -41,16 +41,14 @@ public class NoteLikesController {
      */
     @PostMapping("/toggleLike")
     public Result<LikeDTO> toggleLike(HttpServletRequest request, @RequestParam Integer noteId) {
-        // 从请求中获取用户ID
-        Integer userId = getUserIdFromRequest(request);
-
-        // 调用服务层方法获取点赞操作的结果和点赞总数
-        LikeDTO likeResult = noteLikesService.likeOrUnlikeNote(noteId, userId);
-
-        // 直接将 LikeDTO 作为 data 返回
-        return Result.success("Like status toggled successfully", likeResult);
+        Integer userId = getUserIdFromRequest(request); // 从请求中获取用户ID
+        try {
+            LikeDTO likeResult = noteLikesService.likeOrUnlikeNote(noteId, userId); // 调用服务层方法获取点赞操作的结果和点赞总数
+            return Result.success("Like status toggled successfully", likeResult); // 使用Result类的success方法，返回成功的消息和数据
+        } catch (BusinessException e) {
+            return Result.fail(e.getStatusCode(), e.getMessage()); // 错误处理，返回失败的状态码和消息
+        }
     }
-
 
     /**
      * 统计笔记的点赞数量
