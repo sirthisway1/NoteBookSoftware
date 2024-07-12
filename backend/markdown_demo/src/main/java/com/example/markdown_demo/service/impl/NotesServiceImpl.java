@@ -127,10 +127,12 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
                 .map(ThoughtNotes::getNoteId)
                 .collect(Collectors.toSet());
 
-        // Step 2: Query Notes table for non-private notes and exclude those with noteId in the set
+        // Step 2: Query Notes table for non-private notes and exclude those with noteId in the set if the set is not empty
         QueryWrapper<Notes> notesQueryWrapper = new QueryWrapper<>();
         notesQueryWrapper.eq("is_private", false);
-        notesQueryWrapper.notIn("id", noteIdsInThoughtNotes); // Exclude noteIds that are in ThoughtNotes
+        if (!noteIdsInThoughtNotes.isEmpty()) {
+            notesQueryWrapper.notIn("id", noteIdsInThoughtNotes); // Exclude noteIds that are in ThoughtNotes only if the set is not empty
+        }
         List<Notes> notesList = notesMapper.selectList(notesQueryWrapper);
 
         // Map Notes to NoteShowWithUserDTO
