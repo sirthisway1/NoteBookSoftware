@@ -56,10 +56,13 @@ public class FileServiceImpl implements FileService {
         }
 
         String uploadPath = "http://" + downloadIp + ":" + port + "/api/files/download/" + fileFullName; // 文件上传后的访问网址
+        return createResponseForUpload(uploadPath);
+    }
 
+    private Map<String, Object> createResponseForUpload(String uploadPath) {
         Map<String, Object> resMap = new HashMap<>();
         // wangEditor上传图片成功后， 需要返回的参数
-        resMap.put("errno", 0);
+        resMap.put("errno", 0); // wangEditor需要的响应格式
         resMap.put("data", CollUtil.newArrayList(Dict.create().set("url", uploadPath)));
         return resMap;
     }
