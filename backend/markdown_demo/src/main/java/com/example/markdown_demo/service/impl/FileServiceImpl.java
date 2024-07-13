@@ -13,11 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.markdown_demo.service.FileService;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class FileServiceImpl implements FileService {
+
 
     @Value("${file.upload.path}")
     private String fileUploadDir;
@@ -35,16 +38,23 @@ public class FileServiceImpl implements FileService {
         String uniFileFlag = IdUtil.fastSimpleUUID();          // 随机生成文件名
         String fileFullName = uniFileFlag + StrUtil.DOT + extName;
         String fileUploadPath = getFileUploadPath(fileFullName);
+
         try {
             File uploadFile = new File(fileUploadPath);
             File parentFile = uploadFile.getParentFile();
-            if (!parentFile.exists()) { // 如果父级目录不存在，就是files目录不存在，就创建files目录
-                parentFile.mkdirs();
+            if (!parentFile.exists()) {
+                boolean dirsCreated = parentFile.mkdirs();
+                if (!dirsCreated) {
+                    throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: 创建目录失败");
+                }
             }
             file.transferTo(uploadFile);
+        } catch (IOException e) {
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: IO异常");
         } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR,"文件上传失败");
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: 未知错误");
         }
+
         String uploadPath = "http://" + downloadIp + ":" + port + "/api/files/download/" + fileFullName; // 文件上传后的访问网址
 
         Map<String, Object> resMap = new HashMap<>();
@@ -55,6 +65,18 @@ public class FileServiceImpl implements FileService {
     }
 
     private String getFileUploadPath(String fileName) {
-        return fileUploadDir + File.separator + fileName;
+        try {
+            // 获取项目根目录路径
+            String projectRootPath = Paths.get("").toAbsolutePath().toString();
+            // 构建上传目录路径（src/main/resources/staticFile/upload）
+            String uploadDirPath = projectRootPath + "/src/main/resources" + fileUploadDir;
+            File uploadDir = new File(uploadDirPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            return new File(uploadDir, fileName).getAbsolutePath();
+        } catch (Exception e) {
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "获取上传路径失败");
+        }
     }
 }
