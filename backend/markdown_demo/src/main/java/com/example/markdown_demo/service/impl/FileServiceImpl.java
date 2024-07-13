@@ -53,7 +53,7 @@ public class FileServiceImpl implements FileService {
                     }
                 }
                 file.transferTo(uploadFile);
-                String uploadPath = "http://" + downloadIp + ":" + port + "/api/files/download/" + fileFullName; // 文件上传后的访问网址
+                String uploadPath = "http://" + downloadIp + ":" + port + "/WangFiles/" + fileFullName; // 文件上传后的访问网址
                 filePaths.add(uploadPath);
             } catch (IOException e) {
                 throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: IO异常");
