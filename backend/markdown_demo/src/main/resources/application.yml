@@ -6,7 +6,7 @@ mybatis-plus:
 spring:
   web:
     resources:
-      static-locations: classpath:templates/
+      static-locations: classpath:staticFile/
   codec:
     max-in-memory-size: 10MB
   mvc:
