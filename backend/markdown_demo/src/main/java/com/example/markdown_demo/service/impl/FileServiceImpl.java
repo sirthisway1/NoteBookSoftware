@@ -32,7 +32,7 @@ public class FileServiceImpl implements FileService {
     private String downloadIp;
 
     @Override
-    public Map<String, Object> uploadFile(MultipartFile file) {
+    public Map<String, Object> uploadFile(MultipartFile[] files) {
         String originalFilename = file.getOriginalFilename();  // 文件完整名称
         String extName = FileUtil.extName(originalFilename);   // 文件后缀名
         String uniFileFlag = IdUtil.fastSimpleUUID();          // 随机生成文件名
