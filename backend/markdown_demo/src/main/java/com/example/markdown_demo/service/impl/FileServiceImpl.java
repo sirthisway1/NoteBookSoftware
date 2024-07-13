@@ -83,8 +83,17 @@ public class FileServiceImpl implements FileService {
     private Map<String, Object> createResponseForUpload(List<String> filePaths) {
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("errno", 0);
-        resMap.put("data", filePaths);
+
+        List<Map<String, String>> dataList = new ArrayList<>();
+        for (String filePath : filePaths) {
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("url", filePath);
+            dataList.add(dataMap);
+        }
+
+        resMap.put("data", dataList);
         return resMap;
     }
+
 
 }
