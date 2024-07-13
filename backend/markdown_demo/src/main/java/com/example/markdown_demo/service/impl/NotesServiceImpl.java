@@ -163,7 +163,6 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         if (!note.getUserId().equals(userId)) {
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
-
         // Ensure the current tags list is modifiable
         List<String> currentTags = note.getTags();
         if (currentTags == null) {
@@ -171,14 +170,11 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         } else {
             currentTags = new ArrayList<>(currentTags);  // Make a modifiable copy
         }
-
         // Add the single tag to the current tags list
         if (!currentTags.contains(tags)) { // Check if the tag already exists
             currentTags.add(tags);
         }
-
         note.setTags(currentTags);
-
         return updateById(note);
     }
 
