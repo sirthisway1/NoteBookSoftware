@@ -43,7 +43,6 @@ public class FileServiceImpl implements FileService {
             }
             file.transferTo(uploadFile);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR,"文件上传失败");
         }
         String uploadPath = "http://" + downloadIp + ":" + port + "/api/files/download/" + fileFullName; // 文件上传后的访问网址
