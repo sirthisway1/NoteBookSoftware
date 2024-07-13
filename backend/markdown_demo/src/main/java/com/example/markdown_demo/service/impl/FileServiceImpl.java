@@ -15,7 +15,9 @@ import com.example.markdown_demo.service.FileService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,38 +35,33 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Map<String, Object> uploadFile(MultipartFile[] files) {
-        String originalFilename = file.getOriginalFilename();  // 文件完整名称
-        String extName = FileUtil.extName(originalFilename);   // 文件后缀名
-        String uniFileFlag = IdUtil.fastSimpleUUID();          // 随机生成文件名
-        String fileFullName = uniFileFlag + StrUtil.DOT + extName;
-        String fileUploadPath = getFileUploadPath(fileFullName);
+        List<String> filePaths = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String originalFilename = file.getOriginalFilename();  // 文件完整名称
+            String extName = FileUtil.extName(originalFilename);   // 文件后缀名
+            String uniFileFlag = IdUtil.fastSimpleUUID();          // 随机生成文件名
+            String fileFullName = uniFileFlag + StrUtil.DOT + extName;
+            String fileUploadPath = getFileUploadPath(fileFullName);
 
-        try {
-            File uploadFile = new File(fileUploadPath);
-            File parentFile = uploadFile.getParentFile();
-            if (!parentFile.exists()) {
-                boolean dirsCreated = parentFile.mkdirs();
-                if (!dirsCreated) {
-                    throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: 创建目录失败");
+            try {
+                File uploadFile = new File(fileUploadPath);
+                File parentFile = uploadFile.getParentFile();
+                if (!parentFile.exists()) {
+                    boolean dirsCreated = parentFile.mkdirs();
+                    if (!dirsCreated) {
+                        throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: 创建目录失败");
+                    }
                 }
+                file.transferTo(uploadFile);
+                String uploadPath = "http://" + downloadIp + ":" + port + "/api/files/download/" + fileFullName; // 文件上传后的访问网址
+                filePaths.add(uploadPath);
+            } catch (IOException e) {
+                throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: IO异常");
+            } catch (Exception e) {
+                throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: 未知错误");
             }
-            file.transferTo(uploadFile);
-        } catch (IOException e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: IO异常");
-        } catch (Exception e) {
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "文件上传失败: 未知错误");
         }
-
-        String uploadPath = "http://" + downloadIp + ":" + port + "/api/files/download/" + fileFullName; // 文件上传后的访问网址
-        return createResponseForUpload(uploadPath);
-    }
-
-    private Map<String, Object> createResponseForUpload(String uploadPath) {
-        Map<String, Object> resMap = new HashMap<>();
-        // wangEditor上传图片成功后， 需要返回的参数
-        resMap.put("errno", 0); // wangEditor需要的响应格式
-        resMap.put("data", CollUtil.newArrayList(Dict.create().set("url", uploadPath)));
-        return resMap;
+        return createResponseForUpload(filePaths);
     }
 
     private String getFileUploadPath(String fileName) {
@@ -82,4 +79,12 @@ public class FileServiceImpl implements FileService {
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "获取上传路径失败");
         }
     }
+
+    private Map<String, Object> createResponseForUpload(List<String> filePaths) {
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("errno", 0);
+        resMap.put("data", filePaths);
+        return resMap;
+    }
+
 }

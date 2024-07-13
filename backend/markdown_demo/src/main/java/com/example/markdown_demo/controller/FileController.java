@@ -22,21 +22,18 @@ public class FileController {
         return fileService.uploadFile(files);
     }
 
-    @PostMapping("/uploadFile")
-    public Result<Object> uploadFile(@RequestParam("file") MultipartFile file) {
-
-        Map<String, Object> uploadResult = fileService.uploadFile(file);
-        if (uploadResult != null && Integer.parseInt(uploadResult.get("errno").toString()) == 0) {
-            // 成功上传，从uploadResult中获取上传文件的URL
-            return Result.success("上传成功", uploadResult);
-        } else {
-            // 文件上传失败或返回的错误号不为0
-            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
-        }
-
-
-
-    }
+//    @PostMapping("/uploadFile")
+//    public Result<Object> uploadFile(@RequestParam("file") MultipartFile file) {
+//
+//        Map<String, Object> uploadResult = fileService.uploadFile(file);
+//        if (uploadResult != null && Integer.parseInt(uploadResult.get("errno").toString()) == 0) {
+//            // 成功上传，从uploadResult中获取上传文件的URL
+//            return Result.success("上传成功", uploadResult);
+//        } else {
+//            // 文件上传失败或返回的错误号不为0
+//            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
 }
 
