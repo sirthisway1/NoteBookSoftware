@@ -67,9 +67,7 @@ public class FileServiceImpl implements FileService {
     private String getFileUploadPath(String fileName) {
         try {
             // 获取项目根目录路径
-            String projectRootPath = Paths.get("").toAbsolutePath().toString();
-            // 构建上传目录路径（src/main/resources/staticFile/upload）
-            String uploadDirPath = projectRootPath + "/src/main/resources" + fileUploadDir;
+            String uploadDirPath = "D:/WangFiles/";
             File uploadDir = new File(uploadDirPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();

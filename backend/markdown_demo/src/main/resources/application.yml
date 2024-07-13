@@ -4,9 +4,6 @@ mybatis-plus:
   type-handlers-package: com.example.markdown_demo.common.typehandler
 
 spring:
-  web:
-    resources:
-      static-locations: classpath:staticFile/
   codec:
     max-in-memory-size: 10MB
   mvc:
