@@ -67,7 +67,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         user.setUsername(registerDTO.getUsername());
         user.setPassword(registerDTO.getPassword());
         user.setEmail(registerDTO.getEmail());
-
+        String defaultAvatarUrl = "http://localhost:8090/uploads/default-avatar.png"; // 提供默认头像的URL
+        user.setAvatar(defaultAvatarUrl);
         // 使用 MyBatis-Plus 提供的方法保存用户
         save(user);
     }
