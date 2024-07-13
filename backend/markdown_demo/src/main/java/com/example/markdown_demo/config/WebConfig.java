@@ -9,7 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 映射URL路径 /files/** 到文件系统路径 uploads/
-        registry.addResourceHandler("/api/files/download/**")
+        registry.addResourceHandler("/WangFiles/**")
                 .addResourceLocations("classpath:/staticFile/upload/");
     }
 }
