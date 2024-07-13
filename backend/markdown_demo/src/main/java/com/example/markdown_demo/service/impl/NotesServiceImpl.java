@@ -155,7 +155,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public boolean addTagsToNote(Integer noteId,String tags, Integer userId) {
+    public boolean addTagsToNote(Integer noteId, String tag, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -163,23 +163,26 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         if (!note.getUserId().equals(userId)) {
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
-        // Ensure the current tags list is modifiable
+
+        // 确保当前标签列表是可修改的
         List<String> currentTags = note.getTags();
         if (currentTags == null) {
             currentTags = new ArrayList<>();
         } else {
-            currentTags = new ArrayList<>(currentTags);  // Make a modifiable copy
+            currentTags = new ArrayList<>(currentTags);  // 创建一个可修改的副本
         }
-        // Add the single tag to the current tags list
-        if (!currentTags.contains(tags)) { // Check if the tag already exists
-            currentTags.add(tags);
+
+        // 添加单个标签到当前标签列表
+        if (!currentTags.contains(tag)) { // 检查标签是否已存在
+            currentTags.add(tag);
         }
+
         note.setTags(currentTags);
         return updateById(note);
     }
 
     @Override
-    public boolean removeTagsFromNote(Integer noteId, String tags, Integer userId) {
+    public boolean removeTagsFromNote(Integer noteId, String tag, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -188,16 +191,16 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
 
-        // Ensure the current tags list is modifiable
+        // 确保当前标签列表是可修改的
         List<String> currentTags = note.getTags();
         if (currentTags == null) {
             currentTags = new ArrayList<>();
         } else {
-            currentTags = new ArrayList<>(currentTags);  // Make a modifiable copy
+            currentTags = new ArrayList<>(currentTags);  // 创建一个可修改的副本
         }
 
-        // Remove the single tag from the current tags list
-        currentTags.remove(tags);
+        // 从当前标签列表中移除单个标签
+        currentTags.remove(tag);
 
         note.setTags(currentTags);
 
