@@ -6,6 +6,7 @@ import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.entity.Users;
 import com.example.markdown_demo.mapper.UsersMapper;
+import com.example.markdown_demo.service.FileService;
 import com.example.markdown_demo.service.UsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -14,7 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.markdown_demo.common.dto.UserInfoDTO;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
+
 import static com.example.markdown_demo.common.utils.JwtUtil.generateToken;
 
 /**
@@ -30,7 +36,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Autowired
     private UsersMapper usersMapper;
-
+    @Autowired
+    private FileService fileService;
     @Override
     public UserInfoDTO getUserInfo(Integer userId) {
         // 从数据库中获取用户
@@ -82,4 +89,23 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return generateToken(user.getId().toString());
     }
 
+
+    @Override
+    public void updateUserAvatar(Integer userId, MultipartFile avatarFile) throws BusinessException {
+        // 调用文件服务上传头像，获取URL
+        Map<String, Object> uploadResult = fileService.uploadFile(new MultipartFile[] {avatarFile});
+        List<Map<String, String>> dataList = (List<Map<String, String>>) uploadResult.get("data");
+        if (dataList.isEmpty()) {
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "上传头像失败");
+        }
+        String avatarUrl = dataList.get(0).get("url");
+
+        // 更新数据库中的用户记录
+        Users user = usersMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "用户不存在");
+        }
+        user.setAvatar(avatarUrl);
+        usersMapper.updateById(user);
+    }
 }

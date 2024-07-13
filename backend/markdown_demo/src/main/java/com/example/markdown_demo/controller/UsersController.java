@@ -15,6 +15,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 
 @RestController
@@ -67,5 +69,16 @@ public class UsersController {
 
 
 
+    }
+
+    @PostMapping("/user/avatar")
+    public Result<String> updateAvatar(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            userService.updateUserAvatar(userId, file);
+            return Result.success("头像更新成功");
+        } catch (BusinessException e) {
+            return Result.fail(e.getStatusCode(), e.getMessage());
+        }
     }
 }
