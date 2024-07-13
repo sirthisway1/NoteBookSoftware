@@ -33,14 +33,17 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Override
     public UserInfoDTO getUserInfo(Integer userId) {
+        // 从数据库中获取用户
         Users user = usersMapper.selectById(userId);
         if (user == null) {
-            return null;
+            throw new BusinessException(ResultType.NOT_FOUND);  // 抛出业务异常
         }
         UserInfoDTO userInfoDTO = new UserInfoDTO();
+        // 使用 Spring 的 BeanUtils 来复制属性
         BeanUtils.copyProperties(user, userInfoDTO);
         return userInfoDTO;
     }
+
 
     @Transactional
     public void register(RegisterDTO registerDTO) {
