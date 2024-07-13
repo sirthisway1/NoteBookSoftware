@@ -1,6 +1,7 @@
 package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.UserInfoDTO;
+import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.dto.LoginDTO;
@@ -56,11 +57,15 @@ public class UsersController {
 
     @GetMapping("/user")
     public Result<UserInfoDTO> getUserInfo(HttpServletRequest request) {
-        Integer userId = getUserIdFromRequest(request);
-        UserInfoDTO userInfo = userService.getUserInfo(userId);
-        if (userInfo == null) {
-            return Result.fail(ResultType.NOT_FOUND.getCode(), "用户不存在");
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            UserInfoDTO userInfo = userService.getUserInfo(userId);
+            return Result.success(userInfo);
+        }catch (BusinessException e) {
+            return Result.fail(ResultType.NOT_FOUND.getCode(), e.getMessage());
         }
-        return Result.success(userInfo);
+
+
+
     }
 }
