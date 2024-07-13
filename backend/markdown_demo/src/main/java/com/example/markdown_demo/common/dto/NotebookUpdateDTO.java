@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotebookUpdateDTO {
- 
+
     @Size(max = 100, message = "笔记本名称不能超过100个字符")
     private String name;
 
