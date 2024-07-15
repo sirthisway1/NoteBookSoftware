@@ -2,7 +2,10 @@
 <template>
     <div class="container">
       <div class="sidebar">
-        <div class="sidebar-item" id="username">{{ username }}</div>
+        <div class="sidebar-user">
+          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <div class="sidebar-username" id="username">{{ username }}</div>
+        </div>
         <div class="sidebar-item" @click="goToStart">开始</div>
         <div class="sidebar-item" @click="goToNotebook">笔记本</div>
         <div class="sidebar-item community-button" @click="goToCommunity">
@@ -10,6 +13,7 @@
           </div>
           <span>发现社区</span>
         </div>
+        <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
         <!-- <div class="sidebar-item" @click="goToTags">标签管理</div> -->
       </div>
       <div class="main-content">
@@ -17,15 +21,20 @@
           <h1>发现社区</h1>
         </div>
         <div class="note-container">
-          <div class="note" v-for="note in filteredNotes" :key="note.noteId" @click="goToNoteDetail(note.noteId)">
+          <div class="note" v-for="note in filteredNotes" :key="note.noteId" @click="goToNoteDetail(note.noteId,note.username)">
+            
             <div class="note-header">
-              <div class="note-user">用户名: {{ note.username }}</div>
+              <img :src="note.avatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar2">
+              <div class="note-user"> {{ note.username }}</div>
+              
+              <!-- <div class="note-noieId">笔记id: {{ note.noteId }}</div> -->
               <div class="note-title">{{ note.title }}</div>
             </div>
             <div class="note-info">
-              <div class="note-time">创建时间: {{ formatDate(note.createdAt) }}</div>
+              <div class="note-time">最后一次更新时间: {{ formatDate(note.updatedAt) }}</div>
+              
             </div>
-            <div class="note-content">{{ truncateContent(note.content) }}</div>
+            <div class="note-content">{{ stripHTML(truncateContent(note.content))  }}</div>
           </div>
         </div>
     </div>
@@ -40,13 +49,15 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      username: '这里填写用户名',
+      useravatar:'',
+      username: '',
       notes: [], // 存储所有公共笔记
     };
   },
+  
   computed: {
     filteredNotes() {
-      return this.notes.filter((note) => note.type !== 1 && !note.isPrivate);
+      return this.notes.filter((note) => !note.isPrivate);
     },
   },
   methods: {
@@ -59,16 +70,29 @@ export default {
     goToCommunity() {
       this.$router.push({ name: 'Community' });
     },
+    goToUserCenter() {
+      this.$router.push({ name: 'UserCenter' });
+    },
     goToTags() {
       this.$router.push({ name: 'Tags' });
     },
-    goToNoteDetail(noteId) {
-      this.$router.push({ name: 'CommunityDetail', params: { noteId: noteId } });
+    goToNoteDetail(noteId,username) {
+      this.$router.push({ name: 'CommunityDetail', params: { noteId: noteId ,username: username} });
     },
 
     async fetchNotes() {
+
+      const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          this.$router.push('/login');
+          return;
+        }
+
       try {
-        const response = await axios.get('/api/community-notes');
+        const response = await axios.get('/api/notes/NoteShowWithUser',{
+          headers: { token: token }
+        });
         this.notes = response.data.data;
       } catch (error) {
         console.error("Error fetching notes:", error);
@@ -81,6 +105,28 @@ export default {
       }
       return content.substring(0, maxLength) + '...';
     },
+
+    //获取当前用户
+    async fetchCurrentUser() {
+      const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          this.$router.push('/login');
+          return;
+        }
+
+      try {
+        const response = await axios.get('/api/user',{headers: { token: token }});
+        if (response.data && response.data.code === "200") {
+          this.currentUser = response.data.data;
+          this.username = this.currentUser.username;
+          this.useravatar = this.currentUser.avatar;
+          console.log('用户名：',this.username);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    },
     formatDate(dateString) {
       const date = new Date(dateString);
       return date.toLocaleString('zh-CN', { 
@@ -90,10 +136,15 @@ export default {
         hour: '2-digit', 
         minute: '2-digit' 
       });
+    },
+    stripHTML(value) {
+      let doc = new DOMParser().parseFromString(value, 'text/html');
+      return doc.body.textContent || "";
     }
   },
   async mounted() {
     await this.fetchNotes();
+    await this.fetchCurrentUser();
   },
 };
 </script>
@@ -135,6 +186,39 @@ export default {
   background-color: #f0f0f0;
 }
 
+/* 用户名以及头像 */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  position: relative; /* 添加这行 */
+  left: 40px;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  flex-shrink: 0; /* 防止头像被压缩 */
+  position: relative; /* 添加这行 */
+  top: 0px; /* 调整这个值来控制上移的距离 */
+}
+
+
+
+.sidebar-username {
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: left;
+  display: flex;
+  align-items: center; /* 垂直居中文本 */
+  min-height: 40px; /* 与头像高度一致 */
+}
+/* 用户名以及头像 */
+
 .community-button {
   background-color: #4CAF50;
   color: white;
@@ -159,11 +243,20 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: #f5f7fa;
 }
 
 .community {
-  padding: 20px;
+  padding: 30px;
   flex-shrink: 0;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.community h1 {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 20px;
 }
 
 .note-container {
@@ -175,41 +268,93 @@ export default {
 .note {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 80%;
-  height: 220px; /* 固定高度 */
-  max-width: 800px; /* 设置最大宽度 */
+  margin-bottom: 30px;
+  border: none;
+  border-radius: 12px;
+  width: 90%;
+  height: auto;
+  max-width: 800px;
   overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-left: auto;
   margin-right: auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #ffffff;
+}
+
+.note:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .note-header {
-  background-color: #87d37c;
-  padding: 10px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  background-color: #4CAF50;
+  padding: 15px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  display: flex;
+  align-items: center;
 }
 
-.note-content {
-  background-color: #ffffff;
-  padding: 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-grow: 1;
+.sidebar-avatar2 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+  border: 2px solid #ffffff;
+}
+
+.note-user {
+  font-weight: bold;
+  color: #ffffff;
+  margin-right: 15px;
+}
+
+.note-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-left: auto;
 }
 
 .note-info {
-  padding: 5px 10px;
+  padding: 10px 20px;
   background-color: #f0f0f0;
-  font-size: 0.8em;
+  font-size: 0.9em;
   color: #666;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .note-time {
   font-style: italic;
+}
+
+.note-content {
+  background-color: #ffffff;
+  padding: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  color: #333;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .note {
+    width: 95%;
+  }
+
+  .note-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .note-title {
+    margin-left: 0;
+    margin-top: 10px;
+  }
 }
 </style>

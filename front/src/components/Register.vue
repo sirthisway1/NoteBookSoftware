@@ -65,21 +65,17 @@ export default {
           username: this.username,
           password: this.password
         });
-
+        console.log("111111111");
         const data = response.data;
-        if (data.code === 200) {
+        if (data.code === "200") {
           alert('注册成功');
           this.$router.push('/login');
-        } else if (data.code === 502) {
-          alert('用户名已存在');
-        } else if (data.code === 503) {
-          alert('邮箱已存在');
-        } else {
-          alert('注册失败');
-        }
+        } 
       } catch (error) {
         console.error('注册失败:', error);
-        alert('注册失败');
+        if (error.response) {
+            alert('注册失败: ' + error.response.data.message);
+        }
       }
     },
     goBack() {

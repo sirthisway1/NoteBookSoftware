@@ -2,13 +2,17 @@
 <template>
   <div class="container">
     <div class="sidebar">
-      <div class="sidebar-item" id="username">{{ username }}</div>
+      <div class="sidebar-user">
+          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <div class="sidebar-username" id="username">{{ username }}</div>
+      </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
       <div class="sidebar-item notebook-button" @click="goToNotebook">
         <div class="icon-placeholder"><img src="/vue图片/图片2.png" alt="开始图标" class="icon-image"></div>
       <span>笔记本</span>
       </div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
+      <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
       <!-- <div class="sidebar-item" @click="goToCommunity">标签管理</div> -->
     </div>
     <div class="main-content">
@@ -45,11 +49,11 @@
 <script>
 import axios from 'axios';
 
-//假数据，测试用
 export default {
 data() {
   return {
-    username: '这里填写用户名',
+    useravatar:'',
+    username: '',
     notebookIds: [], //存储获取的笔记本ID
     notebooks: [], // 存储获取的笔记本详细信息
     currentPage: 1,
@@ -80,52 +84,91 @@ methods: {
   goToCommunity() {
     this.$router.push({ name: 'Community' });
   },
+  goToUserCenter() {
+      this.$router.push({ name: 'UserCenter' });
+    },
   goToNotebookDetails(notebook) {
     const notebookPath = `/notebook/${notebook.notebookId}`;
     this.$router.push({ path: notebookPath });
+
+    // this.$router.push({
+    //     name: 'NotebookDetail',
+    //     params: {
+    //       notebookId: notebook.notebookId,
+          
+    //     }
+    //   });
   },
+  //编辑笔记本名称
   async editNotebookName(notebookId) {
+
+    const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          return;
+        }
+
     const newTitle = prompt("请输入新的笔记本名称：");
     if (newTitle) {
       try {
-        const response = await axios.put(`/api/notebooks/${notebookId}`, { title: newTitle });
-        if (response.data.code === 200) {
+        const response = await axios.put(`/api/notebooks/${notebookId}`, { name: newTitle },{headers: { token: token }});
+        if (response.data.code === "200") {
           alert("笔记本名称修改成功");
           this.notebooks = this.notebooks.map(notebook => 
             notebook.notebookId === notebookId ? { ...notebook, name: newTitle } : notebook
           );
         } else {
-          alert(response.data.message);
+          console.error("修改失败");
         }
       } catch (error) {
         console.error('Error editing notebook name:', error);
+        if (error.response) {
+            alert('笔记本名称修改: ' + error.response.data.message);
+        }
       }
     }
   },
-
+  //编辑笔记本简介
   async editNotebookSummary(notebookId) {
+
+    const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          return;
+        }
+
     const newSummary = prompt("请输入新的笔记本简介：");
     if (newSummary) {
       try {
-        const response = await axios.put(`/api/notebooks/${notebookId}`, { summary: newSummary });
-        if (response.data.code === 200) {
+        const response = await axios.put(`/api/notebooks/${notebookId}`, { summary: newSummary },{headers: { token: token }});
+        if (response.data.code === "200") {
           alert("笔记本简介修改成功");
           this.notebooks = this.notebooks.map(notebook => 
             notebook.notebookId === notebookId ? { ...notebook, summary: newSummary } : notebook
           );
         } else {
-          alert(response.data.message);
+          console.error("修改失败");
         }
       } catch (error) {
         console.error('Error editing notebook summary:', error);
+        if (error.response) {
+            alert('笔记本名称修改: ' + error.response.data.message);
+        }
       }
     }
   },
+  //删除笔记本
   async deleteNotebook(notebookId) {
+    const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          return;
+        }
+
     if (confirm("确定要删除这个笔记本吗？")) {
       try {
-        const response = await axios.delete(`/api/notebooks/${notebookId}`);
-        if (response.data.code === 200) {
+        const response = await axios.delete(`/api/notebooks/${notebookId}`,{headers: { token: token }});
+        if (response.data.code === "200") {
           alert("笔记本删除成功");
           this.notebooks = this.notebooks.filter(notebook => notebook.notebookId !== notebookId);
           this.updateTotalPages();
@@ -137,43 +180,60 @@ methods: {
       }
     }
   },
-  async fetchNotebooks() {
-console.log('Fetching notebooks...');
-try {
-  const response = await axios.get('/api/notebooks/getAllId');
-  console.log('Response:', response.data);
-  if (response.data.code === 200 && response.data.data.notebookIds) {
-    this.notebookIds = response.data.data.notebookIds;
-    console.log('Notebook IDs:', this.notebookIds);
-  } else {
-    console.error('Unexpected response structure:', response.data);
-  }
-} catch (error) {
-  console.error('Error fetching notebooks:', error);
-}
-},
-  async fetchNotebookDetails(notebookId) {
-    console.log(`Fetching details for notebook ID: ${notebookId}`);
+  //获取所有笔记本ID
+  async fetchNotebooksId() {
+    const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          return;
+        }
+
+    console.log('Fetching notebooks...');
     try {
-      const response = await axios.get(`/api/notebooks/${notebookId}`);
-      console.log('Response:', response.data);
-      if (response.data.code === 200) {
-        const notebookDetails = {
-      notebookId: response.data.data.notebookId, // 注意这里可能需要使用 'id' 而不是 'notebookId'
-      name: response.data.data.name,
-      summary: response.data.data.summary,
-      lastModified: response.data.data.lastModified
-    };
-    console.log(`Notebook details ${notebookId}:`, notebookDetails);
-    return notebookDetails;
+      const response = await axios.get('/api/notebooks/getAllId',{
+          headers: { token: token }
+        });
+      // console.log('Response:', response.data);
+      if (response.data.code === "200" && response.data.data.ids) {
+        this.notebookIds = response.data.data.ids;
+        console.log('Notebook IDs:', this.notebookIds);
       } else {
-        console.error(`Failed to fetch notebook details for ID ${notebookId}:`, response.data.message);
-        return null;
+        console.error('Unexpected response structure:', response.data);
       }
     } catch (error) {
-      console.error(`Error fetching notebook details for ID ${notebookId}:`, error);
-      return null;
+      console.error('Error fetching notebooks:', error);
     }
+    },
+  //获得单个笔记本详细信息
+  async fetchNotebookDetails(notebookId) {
+    const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          return;
+        }
+    console.log(`Fetching details for notebook ID: ${notebookId}`);
+    try {
+      const response = await axios.get(`/api/notebooks/${notebookId}`,{
+          headers: { token: token }
+        });
+      console.log('Response:', response.data);
+      if (response.data.code === "200") {
+          const notebookDetails = {
+          notebookId: response.data.data.notebookDetail.notebookId, 
+          name: response.data.data.notebookDetail.name,
+          summary: response.data.data.notebookDetail.summary,
+          lastModified: response.data.data.notebookDetail.lastModified
+        };
+        console.log(`Notebook details ${notebookId}:`, notebookDetails);
+        return notebookDetails;
+      } else {
+          console.error(`Failed to fetch notebook details for ID ${notebookId}:`, response.data.message);
+          return null;
+        }
+      } catch (error) {
+        console.error(`Error fetching notebook details for ID ${notebookId}:`, error);
+        return null;
+      }
   },
   prevPage() {
     if (this.currentPage > 1) {
@@ -196,26 +256,48 @@ try {
     const notebook = this.notebooks.find(nb => nb.notebookId === notebookId);
     notebook.showDropdown = !notebook.showDropdown;
   },
+  //获取当前用户
+  async fetchCurrentUser() {
+      const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          this.$router.push('/login');
+          return;
+        }
+
+      try {
+        const response = await axios.get('/api/user',{headers: { token: token }});
+        if (response.data && response.data.code === "200") {
+          this.currentUser = response.data.data;
+          this.username = this.currentUser.username;
+          this.useravatar = this.currentUser.avatar;
+          console.log('用户名：',this.username);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    },
 },
 async mounted() {
-const token = localStorage.getItem('token');
-if (!token) {
-  // 重定向到登录页面或显示错误信息
-  return;
-}
-
-await this.fetchNotebooks();
-if (this.notebookIds && this.notebookIds.length > 0) {
-  for (const notebookId of this.notebookIds) {
-    const details = await this.fetchNotebookDetails(notebookId);
-    if (details) {
-      this.notebooks.push(details);
-    }
+  await this.fetchCurrentUser();
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // 重定向到登录页面或显示错误信息
+    return; 
   }
-  this.updateTotalPages();
-} else {
-  console.log('No notebook IDs found');
-}
+
+  await this.fetchNotebooksId();
+  if (this.notebookIds && this.notebookIds.length > 0) {
+    for (const notebookId of this.notebookIds) {
+      const details = await this.fetchNotebookDetails(notebookId);
+      if (details) {
+        this.notebooks.push(details);
+      }
+    }
+    this.updateTotalPages();
+  } else {
+    console.log('No notebook IDs found');
+  }
 },
 
 
@@ -256,6 +338,40 @@ transition: background-color 0.3s;
 .sidebar-item:hover {
 background-color: #f0f0f0;
 }
+
+/* 用户名以及头像 */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  position: relative; /* 添加这行 */
+  left: 40px;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  flex-shrink: 0; /* 防止头像被压缩 */
+  position: relative; /* 添加这行 */
+  top: 0px; /* 调整这个值来控制上移的距离 */
+}
+
+
+.sidebar-username {
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: left;
+  display: flex;
+  align-items: center; /* 垂直居中文本 */
+  min-height: 40px; /* 与头像高度一致 */
+  
+}
+/* 用户名以及头像 */
+
 .icon-placeholder {
   width: 60px; /* 设置圆形宽度 */
   height: 60px; /* 设置圆形高度 */
@@ -296,16 +412,18 @@ background-color: #45a049;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  overflow: hidden; /* 防止内容滚动 */
+  padding: 30px;
+  background-color: #f5f7fa;
+  overflow: hidden;
 }
 
 .notebooks {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 25px;
   flex-grow: 1;
+  height: calc(100% - 70px); /* 减去分页的高度 */
 }
 
 .notebook-wrapper {
@@ -315,76 +433,92 @@ background-color: #45a049;
 }
 
 .notebook {
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 80%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  position: relative;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.notebook:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .notebook-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
 .notebook-name {
   flex: 1;
-  font-size: 1.5em;
+  font-size: 1.4em;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 .separator {
   width: 100%;
   border: none;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid #e0e0e0;
+  margin: 10px 0;
 }
 
 .notebook-description {
   flex: 1;
-  font-size: 1em;
-  text-align: left;
-  padding-left: 10px;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
+  font-size: 0.9em;
+  line-height: 1.4;
+  color: #666;
+  padding-left: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .dropbtn {
-  background-color: #696969;
+  background-color: #4CAF50;
   color: white;
-  padding: 10px;
+  padding: 8px;
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 0.9em;
+  transition: background-color 0.3s;
+}
+
+.dropbtn:hover {
+  background-color: #45a049;
 }
 
 .dropdown-content {
-  display: block;
+  display: none;
   position: absolute;
   right: 0;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  border-radius: 5px;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 .dropdown-item {
   padding: 12px 16px;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .dropdown-item:hover {
@@ -395,12 +529,22 @@ background-color: #45a049;
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  height: 50px; /* 固定分页的高度 */
 }
 
 .pagination button {
   margin: 0 5px;
-  padding: 10px;
+  padding: 10px 15px;
   cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.pagination button:hover {
+  background-color: #45a049;
 }
 </style>
 

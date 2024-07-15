@@ -61,7 +61,7 @@ public class AudioAnswerController {
         }
     }
     @PostMapping("/uploadAudio")
-    public Result<?> uploadAudio(@RequestPart("file") MultipartFile file){
+    public Result<?> uploadAudio(@RequestParam("file")  MultipartFile file){
         // 处理上传的音频文件
         try {
             // 这里调用Service来处理文件，例如保存到服务器或进行语音识别等

@@ -61,19 +61,17 @@ export default {
         });
 
         const data = response.data;
-        if (data.code === 200) {
+        if (data.code === "200") {
           alert('登录成功');
           // 处理登录成功后的逻辑，保存token
           localStorage.setItem('token', data.data.token);
           this.$router.push({ name: 'Start' }); // 登录成功后跳转到 Start 页面
-        } else if (data.code === 504) {
-          alert('用户名或密码错误');
-        } else {
-          alert('登录失败');
-        }
+        } 
       } catch (error) {
-        console.error('登录请求失败:', error);
-        alert('登录请求失败，请检查网络连接');
+        console.error('登录失败:', error);
+        if (error.response) {
+            alert('登录失败: ' + error.response.data.message);
+        }
       }
     },
     register() {

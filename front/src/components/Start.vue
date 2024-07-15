@@ -2,7 +2,10 @@
 <template>
     <div class="container">
       <div class="sidebar">
-        <div class="sidebar-username" id="username">{{ username }}</div>
+        <div class="sidebar-user">
+          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <div class="sidebar-username" id="username">{{ username }}</div>
+        </div>
         <div class="sidebar-item start-button" @click="goToStart">
           <div class="icon-placeholder"><img src="/vue图片/图片1.png" alt="开始图标" class="icon-image">
           </div>
@@ -10,6 +13,7 @@
         </div>
         <div class="sidebar-item" @click="goToNotebook">笔记本</div>
         <div class="sidebar-item" @click="goToCommunity">发现社区</div>
+        <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
         <!-- <div class="sidebar-item" @click="goToCommunity">标签管理</div> -->
       </div>
       <div class="main-content">
@@ -19,10 +23,9 @@
               <div class="button">新建笔记</div>
               <div class="dropdown">
                 <div class="dropdown-item" @click="showCreateNoteModal(0)">新建日常笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(1)">时间管理四象限模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(2)">SWOT模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(3)">5W1H模板思维笔记</div>
-                
+                <div class="dropdown-item" @click="showCreateNoteModal(1)">SWOT模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(2)">5W1H模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(3)">时间管理四象限模板思维笔记</div>
               </div>
             </div>
           </div>
@@ -33,7 +36,8 @@
         <div class="search-bar">
           <input type="text" v-model="searchInput" :placeholder="searchMode === 'keyword' ? '关键字搜索' : '标签搜索'">
           
-          <button @click="search" class="search-button">搜索</button>
+          <button @click="search" class="search-button">搜索全部笔记</button>
+          <button @click="searchTwo" class="search-button">搜索</button>
           <div class="toggle-button" @click="toggleSearchMode">
             {{ searchMode === 'keyword' ? '切换到标签搜索' : '切换到关键字搜索' }}
           </div>
@@ -42,8 +46,8 @@
           <div class="note-list">
             <div v-for="note in filteredNotes" :key="note.noteId" class="note-item">
               <h3>{{ note.title }}</h3>
-              <p>最后修改日期: {{ formatDate(note.updateAt) }}</p>
-              <p>创建日期: {{ formatDate(note.createdAt) }}</p>
+              <p>最后修改日期: {{ formatDate(note.updatedAt) }}</p>
+              <!-- <p>创建日期: {{ formatDate(note.createdAt) }}</p> -->
               <p>标签：
                 <span v-for="(tag, index) in note.tags" :key="index" class="tag">
                   {{ tag }}{{ index < note.tags.length - 1 ? ', ' : '' }}
@@ -51,15 +55,19 @@
               </p>
             </div>
           </div>
+          <div class="pagination">
+            <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
+            <span>{{ currentPage }} / {{ totalPages }}</span>
+          <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+        </div>
         </div>
       </div>
-      <div class="side-buttons">
-        <!-- <div class="side-button">查看收藏列表</div> -->
-        <div class="side-button" @click="goToPrivate" >查看私密列表</div>
-      </div>
-  
-      <!-- 新建笔记本的模态框 -->
-      <div class="modal" v-if="isModalVisible">
+
+    <div class="side-panel">
+      <div class="side-button" @click="goToPrivate">查看私密列表</div>
+    </div>
+    <!-- 新建笔记本的模态框 -->
+    <div class="modal" v-if="isModalVisible">
         <div class="modal-content">
           <div class="modal-header">
             <h2>新建笔记本</h2>
@@ -80,9 +88,9 @@
             </div>
           </div>
         </div>
-      </div>
-      <!-- 包含模态框组件 -->
-      <CreateNoteModal :visible="isCreateNoteModalVisible" :theNoteType="noteType" @close="hideCreateNoteModal" />
+    </div>
+    <!-- 包含模态框组件 -->
+    <CreateNoteModal :visible="isCreateNoteModalVisible" :theNoteType="noteType" @close="hideCreateNoteModal" />
     </div>
 </template>
   
@@ -96,6 +104,7 @@ export default {
   },
   data() {
     return {
+      useravatar:'',
       username: '',
       isModalVisible: false,
       isCreateNoteModalVisible: false,
@@ -105,8 +114,19 @@ export default {
       searchInput: '',
       searchMode: 'keyword',
       filteredNotes: [],
-      noteType:0,
+      currentPage: 1,
+      notesPerPage: 6,
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.filteredNotes.length / this.notesPerPage);
+    },
+    paginatedNotes() {
+      const start = (this.currentPage - 1) * this.notesPerPage;
+      const end = start + this.notesPerPage;
+      return this.filteredNotes.slice(start, end);
+    }
   },
   methods: {
     goToStart() {
@@ -117,6 +137,9 @@ export default {
     },
     goToCommunity() {
       this.$router.push({ name: 'Community' });
+    },
+    goToUserCenter() {
+      this.$router.push({ name: 'UserCenter' });
     },
     goToPrivate() {
       this.$router.push({ name: 'PrivateNotes' });
@@ -131,39 +154,63 @@ export default {
         const token = localStorage.getItem('token');
         if (!token) {
           alert('请先登录');
+          this.$router.push('/login');
           return;
         }
 
         let url = '/api/notes';
-        if (this.searchInput.trim() !== '') {
-          if (this.searchMode === 'keyword') {
-            url += `?keyword=${encodeURIComponent(this.searchInput)}`;
-          } else {
-            const tags = this.searchInput.split(',').map(tag => tag.trim()).filter(tag => tag);
-            url += `?tags=${encodeURIComponent(tags.join(','))}`;
-          }
-        }
-
-        const response = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await axios.get(url+"/NoteShow", {
+          headers: { token: token }
         });
 
-        if (response.data.code === 200) {
+        if (response.data.code === "200") {
           this.filteredNotes = response.data.data;
-        } else if (response.data.code === 407) {
-          alert('没有找到匹配的笔记');
-          this.filteredNotes = [];
-        } else {
-          alert('搜索失败');
-          this.filteredNotes = [];
-        }
+        } 
       } catch (error) {
         console.error('搜索笔记时出错:', error);
-        alert('搜索失败');
-        this.filteredNotes = [];
+        if (error.response) {
+            alert('未搜索到全部笔记: ' + error.response.data.message);
+        }
       }
     },
+    async searchTwo(){
+      let url = '/api/notes';
+      let params = {};
 
+      const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          this.$router.push('/login');
+          return;
+        }
+
+      if (this.searchInput.trim() !== '') {
+        if (this.searchMode === 'keyword') {
+          url += '/searchByKeyword';
+          params.keyword = this.searchInput.trim();
+        } else {
+          url += '/searchByTags';
+          const tags = this.searchInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+          params.tags = tags.join(',');
+        }
+      }
+
+      // 使用 axios 发送请求
+      axios.get(url, { params: params,headers: { token: token }})
+        .then(response => {
+          if (response.data.code === "200") {
+            // 处理成功响应
+            this.filteredNotes = response.data.data;
+          } 
+        })
+        .catch(error => {
+          console.error('请求出错:', error);
+          if (error.response) {
+            alert('未搜索到: ' + error.response.data.message);
+        }
+        });
+    },
+    //传入type参数
     showCreateNoteModal(type) {
       this.isCreateNoteModalVisible = true;
       this.noteType = type;
@@ -189,20 +236,40 @@ export default {
           name: this.newNotebookName,
           summary: this.newNotebookDescription,
         }, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { token: token }
         });
 
-        if (response.data.code === 200) {
+        if (response.data.code === "200") {
           alert('笔记本创建成功');
           this.hideNewNotebookModal();
-        } else if (response.data.code === 501) {
-          alert('token验证失败');
-        } else {
-          alert('创建笔记本失败');
-        }
+        } 
       } catch (error) {
         console.error('创建笔记本时出错:', error);
-        alert('创建笔记本失败');
+        if (error.response) {
+            alert('笔记本创建失败: ' + error.response.data.message);
+        }
+      }
+
+    },
+    //获取当前用户
+    async fetchCurrentUser() {
+      const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          this.$router.push('/login');
+          return;
+        }
+
+      try {
+        const response = await axios.get('/api/user',{headers: { token: token }});
+        if (response.data && response.data.code === "200") {
+          this.currentUser = response.data.data;
+          this.username = this.currentUser.username;
+          this.useravatar = this.currentUser.avatar;
+          console.log('用户名：',this.username);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
       }
     },
     formatDate(dateString) {
@@ -214,10 +281,23 @@ export default {
         hour: '2-digit', 
         minute: '2-digit' 
       });
-    }
+    },
+
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
   },
   mounted() {
+    this.fetchCurrentUser();
     this.search(); // 组件挂载时获取笔记列表
+    
   }
 };
 </script>
@@ -265,16 +345,37 @@ export default {
   background-color: #f0f0f0;
 }
 
-.sidebar-username {
-  height: auto;
+/* 用户名以及头像 */
+.sidebar-user {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 15px 0;
-  font-weight: bold;
+  padding: 15px;
   margin-bottom: 20px;
+  position: relative; /* 添加这行 */
+  left: 40px;
 }
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  flex-shrink: 0; /* 防止头像被压缩 */
+  position: relative; /* 添加这行 */
+  top: 0px; /* 调整这个值来控制上移的距离 */
+}
+
+.sidebar-username {
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: left;
+  display: flex;
+  align-items: center; /* 垂直居中文本 */
+  min-height: 40px; /* 与头像高度一致 */
+  
+}
+/* 用户名以及头像 */
 
 .icon-placeholder {
     width: 60px; /* 设置圆形宽度 */
@@ -314,13 +415,13 @@ export default {
 
 
 .main-content {
-  margin-left: 200px; /* 与sidebar宽度相同 */
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding-left: 20px;
+  margin-left: 200px;
+  padding: 20px;
+    background-color: #f5f7fa;
   overflow-y: auto;
-  height: 100vh;
 }
   
 .top-content {
@@ -333,15 +434,15 @@ export default {
   
   .top-left, .top-right {
     position: relative; /* 相对定位 */
-    background-color: #87d37c;
+    background-color: #a2ff93;
   }
   .button-container {
     position: relative; /* 相对定位 */
-    background-color: #87d37c;
+    background-color: #a2ff93;
   }
   
   .button {
-    background-color: #87d37c;
+    background-color: #a2ff93;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -352,15 +453,15 @@ export default {
     cursor: pointer;
     transition: var(--transition);
   }
-
   
+ 
   .dropdown {
     display: none; /* 默认隐藏 */
     position: absolute; /* 绝对定位 */
     top: 100%; /* 紧挨着按钮下面 */
     left: 0;
     width: 100%; /* 与按钮同宽 */
-    background-color: #e0e0e0;
+    background-color: #4bffbd;
     border-radius: 5px;
     flex-direction: column;
     z-index: 1; /* 确保下拉框在前面 */
@@ -372,22 +473,25 @@ export default {
     align-items: center;
     justify-content: center;
     width: 150px; /* 与按钮同宽 */
-    height: 60px; /* 与按钮同高 */
-    border-top: 1px solid #ccc;
+    height: 50px; /* 与按钮同高 */
+    border-top: 1px solid #ffffff;
     cursor: pointer;
   }
   
+  
   .button-container:hover .dropdown {
-
+    background-color: #dcfff2;
     display: flex; /* 鼠标悬停时显示下拉框 */
   }
   
+  /* 搜索框样式 */
   .search-bar {
     height: 50px;
     display: flex;
     align-items: center;
     padding: 0 20px;
     position: relative;
+    top:-10px
   }
   
   .search-bar input {
@@ -395,16 +499,18 @@ export default {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-top: 25px;
+    margin-top: 0px;
+    top:-10px
   }
   
   .search-button {
   margin-left: 10px;
-  padding: 5px 10px;
+  padding: 3px 10px;
   background-color: #4CAF50;
   color: white;
   border: none;
   cursor: pointer;
+
 }
   
 .search-button:hover {
@@ -414,38 +520,44 @@ export default {
   .toggle-button {
   margin-left: 10px;
   padding: 5px 10px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background-color: #9affb8;
+  border: 1px solid #9affb8;
   border-radius: 4px;
   cursor: pointer;
 }
 
   .toggle-button:hover {
-  background-color: #e0e0e0;
+  background-color: #4bffae;
 }
 
+  /* 搜索框样式 */
+
 .bottom-content {
-    margin-top: 20px;
-    padding: 0 20px;
-    flex-grow: 1; /* 让 bottom-content 占据剩余空间 */
-    display: flex;
-    position: relative;
-  }
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
   
-  .note-list {
-    flex-grow: 1; /* 让 note-list 占据剩余空间 */
-    background-color: #d3d3d3;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding:20px;
-    align-items: center;
-    
-    margin-bottom: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
+.note-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
   
+.side-panel {
+  width: 200px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
   .side-buttons {
     width: 150px; /* 调整按钮宽度 */
     display: flex;
@@ -456,20 +568,18 @@ export default {
   }
   
   .side-button {
-    background-color: #8b4513;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px; /* 调整按钮内边距 */
-    margin: 5px 0; /* 调整按钮间距 */
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 1em; /* 调整按钮字体大小 */
-    height: 50px; /* 调整按钮高度 */
-  }
-  
+  background-color: #8b4513;
+  color: white;
+  padding: 15px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+.side-button:hover {
+  background-color: #a0522d;
+}
   .modal {
     display: flex;
     position: fixed;
@@ -561,29 +671,65 @@ export default {
   }
 
   .note-item {
-    background-color: white;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: var(--transition);
-    width: calc(33.333% - 20px);
-  }
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
 
-  .note-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  }
+.note-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 8px 8px 8px rgba(0,0,0,0.2);
+}
 
-  .note-item h3 {
-    margin: 0 0 10px 0;
-    color: var(--primary-color);
-  }
+.note-item h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1.2em;
+}
 
-  .note-item p {
-    margin: 0;
-    font-size: 0.9em;
-    color: #666;
-  }
+.note-item p {
+  margin: 5px 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #e0e0e0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  margin-right: 5px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 0 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.pagination button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
 </style>
   
