@@ -1,5 +1,6 @@
 package com.example.markdown_demo.service.impl;
 
+import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.entity.Notes;
 import com.example.markdown_demo.entity.ThoughtNotes;
 import com.example.markdown_demo.entity.Users;
@@ -155,32 +156,32 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         return dto;
     }
 
+    // 修改 Notes 类的 addTagsToNote 方法
     @Override
-    public boolean addTagsToNote(Integer noteId, String tag, Integer userId) {
+    public Result<Void> addTagsToNote(Integer noteId, String tags, Integer userId) {
         Notes note = getById(noteId);
         if (note == null) {
-            throw new BusinessException(ResultType.NOT_FOUND);
+            return Result.fail(ResultType.NOT_FOUND);
         }
         if (!note.getUserId().equals(userId)) {
-            throw new BusinessException(ResultType.NO_PERMISSION);
+            return Result.fail(ResultType.NO_PERMISSION);
         }
-
-        // 确保当前标签列表是可修改的
-        List<String> currentTags = note.getTags();
-        if (currentTags == null) {
-            currentTags = new ArrayList<>();
-        } else {
-            currentTags = new ArrayList<>(currentTags);  // 创建一个可修改的副本
+        List<String> currentTags = note.getTags() != null ? new ArrayList<>(note.getTags()) : new ArrayList<>();
+        if (currentTags.contains(tags)) {
+            // 如果标签已存在，返回错误信息
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
         }
-
-        // 添加单个标签到当前标签列表
-        if (!currentTags.contains(tag)) { // 检查标签是否已存在
-            currentTags.add(tag);
-        }
-
+        currentTags.add(tags);
         note.setTags(currentTags);
-        return updateById(note);
+        boolean updated = updateById(note);
+        if (updated) {
+            return Result.success("标签添加成功");
+        } else {
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
 
     @Override
     public boolean removeTagsFromNote(Integer noteId, String tag, Integer userId) {

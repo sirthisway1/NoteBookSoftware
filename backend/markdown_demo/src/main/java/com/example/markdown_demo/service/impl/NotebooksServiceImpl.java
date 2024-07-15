@@ -153,7 +153,7 @@ public class NotebooksServiceImpl extends ServiceImpl<NotebooksMapper, Notebooks
     @Override
     public void deleteNotebook(Integer notebookId, Integer userId) {
         Notebooks notebook = validateNotebookAccess(notebookId, userId);
-        notebooksMapper.delete(new QueryWrapper<Notebooks>().eq("id", notebookId).eq("user_id", userId));
+            notebooksMapper.delete(new QueryWrapper<Notebooks>().eq("id", notebookId).eq("user_id", userId));
     }
 
 }

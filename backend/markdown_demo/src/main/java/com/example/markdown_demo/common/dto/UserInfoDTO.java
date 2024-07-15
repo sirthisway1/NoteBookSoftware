@@ -8,4 +8,5 @@ public class UserInfoDTO {
     private String email;
     private String bio;       // 添加个人简介字段
     private String avatar;    // 添加头像URL字段
+    private String password;
 }

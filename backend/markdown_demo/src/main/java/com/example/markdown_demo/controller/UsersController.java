@@ -75,10 +75,34 @@ public class UsersController {
     public Result<String> updateAvatar(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         try {
             Integer userId = getUserIdFromRequest(request);
+
+            // 获取文件名并检查其后缀
+            String filename = file.getOriginalFilename();
+            if (filename == null || (!filename.endsWith(".png") && !filename.endsWith(".jpg") && !filename.endsWith(".jpeg"))) {
+                return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(), "只支持 PNG 或 JPG 文件格式");
+            }
+
             userService.updateUserAvatar(userId, file);
             return Result.success("头像更新成功");
         } catch (BusinessException e) {
             return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
+
+
+
+
+    @PutMapping("/user/update")
+    public Result<?> updateUserInfo(HttpServletRequest request, @RequestBody UserInfoDTO userInfoDTO) {
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            userService.updateUserInfo(userId, userInfoDTO);
+            return Result.success("用户信息更新成功");
+        } catch (BusinessException e) {
+            return Result.fail(e.getStatusCode(), e.getMessage());
+        } catch (Exception e) {
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(), "内部服务器错误");
+        }
+    }
+
 }

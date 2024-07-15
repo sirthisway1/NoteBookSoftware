@@ -1,5 +1,6 @@
 package com.example.markdown_demo.service;
 
+import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.entity.Notes;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.markdown_demo.common.dto.*;
@@ -44,8 +45,7 @@ public interface NotesService extends IService<Notes> {
      * @param userId 用户ID
      * @return 是否添加成功
      */
-    boolean addTagsToNote(Integer noteId, String tags, Integer userId);
-
+    public Result<Void> addTagsToNote(Integer noteId, String tags, Integer userId);
     /**
      * 删除笔记的标签
      * @param noteId 笔记ID
