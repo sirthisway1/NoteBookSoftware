@@ -76,11 +76,11 @@ public class UsersController {
         try {
             Integer userId = getUserIdFromRequest(request);
 
-            // 获取文件名并检查其后缀
-            String filename = file.getOriginalFilename();
-            if (filename == null || (!filename.endsWith(".png") && !filename.endsWith(".jpg") && !filename.endsWith(".jpeg"))) {
-                return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(), "只支持 PNG 或 JPG 文件格式");
-            }
+//            // 获取文件名并检查其后缀
+//            String filename = file.getOriginalFilename();
+//            if (filename == null || (!filename.endsWith(".png") && !filename.endsWith(".jpg") && !filename.endsWith(".jpeg"))) {
+//                return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(), "只支持 PNG 或 JPG 文件格式");
+//            }
 
             userService.updateUserAvatar(userId, file);
             return Result.success("头像更新成功");
