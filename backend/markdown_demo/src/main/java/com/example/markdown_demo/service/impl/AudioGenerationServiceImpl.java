@@ -48,7 +48,7 @@ public class AudioGenerationServiceImpl implements AudioGenerationService {
     public byte[] generateAudio(AudioRequestDTO request) throws Exception {
         // 创建ExchangeStrategies以调整缓冲区大小
         ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // 10MB
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024)) // 10MB
                 .build();
 
         // 创建WebClient实例，并应用ExchangeStrategies

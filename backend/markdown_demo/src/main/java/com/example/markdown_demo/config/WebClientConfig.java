@@ -18,7 +18,7 @@ public class WebClientConfig {
         // Create a custom HttpClient with increased buffer size
         HttpClient httpClient = HttpClient.create(ConnectionProvider.newConnection())
                 .responseTimeout(Duration.ofSeconds(30))
-                .doOnConnected(conn -> conn.addHandlerLast(new HttpObjectAggregator(10 * 1024 * 1024))); // 10MB buffer size
+                .doOnConnected(conn -> conn.addHandlerLast(new HttpObjectAggregator(16 * 1024 * 1024))); // 10MB buffer size
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
