@@ -124,37 +124,42 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     @Override
     public List<NoteShowWithUserDTO> noteShowWithUser() {
         Set<Integer> noteIdsInThoughtNotes = thoughtNotesMapper.selectList(new QueryWrapper<ThoughtNotes>()
-                        .select("note_id")) // Only select the note_id column
+                        .select("note_id")) // 仅选择 note_id 列
                 .stream()
                 .map(ThoughtNotes::getNoteId)
                 .collect(Collectors.toSet());
 
-        // Step 2: Query Notes table for non-private notes and exclude those with noteId in the set if the set is not empty
         QueryWrapper<Notes> notesQueryWrapper = new QueryWrapper<>();
         notesQueryWrapper.eq("is_private", false);
         if (!noteIdsInThoughtNotes.isEmpty()) {
-            notesQueryWrapper.notIn("id", noteIdsInThoughtNotes); // Exclude noteIds that are in ThoughtNotes only if the set is not empty
+            notesQueryWrapper.notIn("id", noteIdsInThoughtNotes); // 排除 ThoughtNotes 中的 noteId
         }
         List<Notes> notesList = notesMapper.selectList(notesQueryWrapper);
 
-        // Map Notes to NoteShowWithUserDTO
+        // 映射 Notes 到 NoteShowWithUserDTO
         List<NoteShowWithUserDTO> result = notesList.stream()
                 .map(this::mapToNoteShowWithUserDTO)
                 .collect(Collectors.toList());
-
         return result;
     }
+
 
     private NoteShowWithUserDTO mapToNoteShowWithUserDTO(Notes note) {
         NoteShowWithUserDTO dto = new NoteShowWithUserDTO();
         dto.setNoteId(note.getId());
-        Users user = usersMapper.selectById(note.getUserId()); // Retrieve the user by ID
-        dto.setUsername(user.getUsername()); // Set the username from the user entity
-        dto.setTitle(note.getTitle());
-        dto.setContent(note.getContent());
-        dto.setUpdatedAt(note.getUpdatedAt());
+
+        Users user = usersMapper.selectById(note.getUserId()); // 通过 ID 检索用户
+        // 确保用户实体不为空
+        if (user != null) {
+            dto.setUsername(user.getUsername()); // 设置来自用户实体的用户名
+            dto.setTitle(note.getTitle());
+            dto.setContent(note.getContent());
+            dto.setUpdatedAt(note.getUpdatedAt());
+            dto.setAvatar(user.getAvatar()); // 设置用户的头像 URL
+        }
         return dto;
     }
+
 
     // 修改 Notes 类的 addTagsToNote 方法
     @Override

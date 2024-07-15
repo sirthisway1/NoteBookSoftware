@@ -16,4 +16,5 @@ public class NoteShowWithUserDTO {
     private String title;
     private String content;
     private String updatedAt;
+    private String avatar;
 }
