@@ -4,9 +4,6 @@ mybatis-plus:
   type-handlers-package: com.example.markdown_demo.common.typehandler
 
 spring:
-  web:
-    resources:
-      static-locations: classpath:templates/
   codec:
     max-in-memory-size: 10MB
   mvc:
@@ -17,7 +14,10 @@ spring:
     url: jdbc:mysql://localhost:3306/notebook?useUnicode=true&useSSL=false&character_set_server=utf8mb4&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
-
+  servlet:
+    multipart:
+      max-file-size: 128MB
+      max-request-size: 150MB
 
 file:
   upload:

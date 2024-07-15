@@ -16,6 +16,7 @@ public class NoteShowDTO {
     private String title;
     private String createdAt;
     private String updatedAt;
+    private Boolean isPrivate;
     private List<String> tags;
 
 }

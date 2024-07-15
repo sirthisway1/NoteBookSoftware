@@ -1,6 +1,7 @@
 package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.UserInfoDTO;
+import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.dto.LoginDTO;
@@ -14,6 +15,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 
 @RestController
@@ -56,11 +59,26 @@ public class UsersController {
 
     @GetMapping("/user")
     public Result<UserInfoDTO> getUserInfo(HttpServletRequest request) {
-        Integer userId = getUserIdFromRequest(request);
-        UserInfoDTO userInfo = userService.getUserInfo(userId);
-        if (userInfo == null) {
-            return Result.fail(ResultType.NOT_FOUND.getCode(), "用户不存在");
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            UserInfoDTO userInfo = userService.getUserInfo(userId);
+            return Result.success(userInfo);
+        }catch (BusinessException e) {
+            return Result.fail(ResultType.NOT_FOUND.getCode(), e.getMessage());
         }
-        return Result.success(userInfo);
+
+
+
+    }
+
+    @PostMapping("/user/avatar")
+    public Result<String> updateAvatar(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            userService.updateUserAvatar(userId, file);
+            return Result.success("头像更新成功");
+        } catch (BusinessException e) {
+            return Result.fail(e.getStatusCode(), e.getMessage());
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.example.markdown_demo.common.dto.UserInfoDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -31,4 +32,13 @@ public interface UsersService extends IService<Users> {
      * @throws BusinessException 如果提供的登录凭证无效或不匹配，将抛出此异常。
      */
     String login(LoginDTO loginDTO) throws BusinessException;
+
+    /**
+     * 更新用户头像
+     * @param userId 用户的ID
+     * @param avatarFile 用户上传的头像文件
+     * @throws BusinessException 如果更新过程中出现错误
+     */
+    void updateUserAvatar(Integer userId, MultipartFile avatarFile) throws BusinessException;
+
 }

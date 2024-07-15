@@ -25,17 +25,18 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName(value = "m_users", autoResultMap = true)
 public class Users implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-
     private String username;
-
     private String password;
-
     private String email;
+
+    // 添加新的头像和个人简介字段
+    private String avatar;
+    private String bio;
+
     @TableField(typeHandler = LocalDateTimeToStringTypeHandler.class)
     private String createdAt;
     @TableField(typeHandler = LocalDateTimeToStringTypeHandler.class)
