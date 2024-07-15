@@ -5,6 +5,8 @@ import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.service.AudioToTextService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 import org.json.JSONObject;
@@ -17,8 +19,8 @@ import java.io.IOException;
 public class AudioToTextServiceImpl implements AudioToTextService {
 
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
-    private static final String API_KEY = "your_api_key_here";
-    private static final String SECRET_KEY = "your_secret_key_here";
+    private static final String API_KEY = "f3jTQ1lBoO1dFPm9FjSUTYog";
+    private static final String SECRET_KEY = "GXp25ovceYUj2fM7whtmy5X44mFlQwtp";
     private static String speech = "";
     private static String format = "";
     private static Integer len = 0;
@@ -60,7 +62,14 @@ public class AudioToTextServiceImpl implements AudioToTextService {
                 .addHeader("Accept", "application/json")
                 .build();
         Response response = HTTP_CLIENT.newCall(request).execute();
-        return response.body().string();
+        String jsonResponse = response.body().string();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(jsonResponse);
+        JsonNode resultNode = rootNode.path("result");
+        String resultString = resultNode.toString();
+        // 去掉中括号和反斜杠
+        resultString = resultString.replace("[", "").replace("]", "").replace("\\", "").replace("\"", "");
+        return resultString;
     }
 
     private String getAccessToken() throws IOException {
