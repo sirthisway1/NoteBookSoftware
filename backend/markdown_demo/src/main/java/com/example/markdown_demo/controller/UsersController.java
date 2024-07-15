@@ -81,4 +81,21 @@ public class UsersController {
             return Result.fail(e.getStatusCode(), e.getMessage());
         }
     }
+
+
+
+
+    @PutMapping("/user/update")
+    public Result<?> updateUserInfo(HttpServletRequest request, @RequestBody UserInfoDTO userInfoDTO) {
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            userService.updateUserInfo(userId, userInfoDTO);
+            return Result.success("用户信息更新成功");
+        } catch (BusinessException e) {
+            return Result.fail(e.getStatusCode(), e.getMessage());
+        } catch (Exception e) {
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(), "内部服务器错误");
+        }
+    }
+
 }

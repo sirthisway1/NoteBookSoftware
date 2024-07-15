@@ -109,4 +109,43 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         user.setAvatar(avatarUrl);
         usersMapper.updateById(user);
     }
+
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserInfo(Integer userId, UserInfoDTO userInfoDTO) throws BusinessException {
+        Users existingUser = lambdaQuery().eq(Users::getId, userId).one();
+        if (existingUser == null) {
+            throw new BusinessException(ResultType.NOT_FOUND);
+        }
+
+        // 检查邮箱是否已被其他用户使用
+        if (!existingUser.getEmail().equals(userInfoDTO.getEmail())
+                && lambdaQuery().eq(Users::getEmail, userInfoDTO.getEmail()).count() > 0) {
+            throw new BusinessException(ResultType.EMAIL_ALREADY_EXISTS);
+        }
+
+        // 更新用户信息
+        existingUser.setUsername(userInfoDTO.getUsername());
+        existingUser.setPassword(userInfoDTO.getPassword()); // 注意这里应进行加密处理
+        existingUser.setEmail(userInfoDTO.getEmail());
+        existingUser.setBio(userInfoDTO.getBio());
+
+        updateById(existingUser);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

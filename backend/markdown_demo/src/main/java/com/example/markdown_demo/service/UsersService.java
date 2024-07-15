@@ -40,5 +40,12 @@ public interface UsersService extends IService<Users> {
      * @throws BusinessException 如果更新过程中出现错误
      */
     void updateUserAvatar(Integer userId, MultipartFile avatarFile) throws BusinessException;
+    /**
+     * 更新用户信息
+     * @param userId 用户的ID
+     * @param userInfoDTO 包含用户更新信息的DTO对象，包括用户名、密码、邮箱和个人简介。
+     * @throws BusinessException 如果更新过程中出现错误，如邮箱已存在等。
+     */
+    void updateUserInfo(Integer userId, UserInfoDTO userInfoDTO) throws BusinessException;
 
 }
