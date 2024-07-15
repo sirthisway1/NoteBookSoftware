@@ -78,13 +78,30 @@ public class NotesController {
     @PostMapping("/addTags")
     public Result<Void> addTagsToNote(@RequestParam Integer noteId, @RequestParam String tags, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
-        boolean success = notesService.addTagsToNote(noteId, tags, userId);
-        if (success) {
-            return Result.success(null);
-        } else {
-            return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
+        // 假设 tags 是以逗号分隔的字符串，这里需要分割并调用服务层方法
+        String[] tagArray = tags.split(",");
+        Result<Void> result = null;
+
+        for (String tag : tagArray) {
+            // 对每个标签调用服务层方法
+            Result<Void> currentResult = notesService.addTagsToNote(noteId, tag.trim(), userId);
+            // 如果当前标签添加失败，立即返回错误结果
+            if (currentResult.getCode().equals(ResultType.INTERNAL_SERVER_ERROR.getCode())
+                    || currentResult.getCode().equals(ResultType.NOT_FOUND.getCode())
+                    || currentResult.getCode().equals(ResultType.NO_PERMISSION.getCode())
+                    || currentResult.getCode().equals(ResultType. TAG_ALREADY_EXISTS.getCode())) { // 假设已存在标签的错误代码
+                return currentResult; // 直接返回错误结果
+            }
+            // 如果是第一次成功添加标签，或者后续添加标签也成功，更新 result 变量
+            if (result == null) {
+                result = currentResult;
+            }
         }
+
+        // 如果所有标签都添加成功，返回最后一个成功的结果
+        return result != null ? result : Result.fail(ResultType.INTERNAL_SERVER_ERROR);
     }
+
 
     @PostMapping("/removeTags")
     public Result<Void> removeTagsFromNote(@RequestParam Integer noteId, @RequestParam String tags, HttpServletRequest request) {

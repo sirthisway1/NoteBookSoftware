@@ -12,9 +12,9 @@ public enum ResultType {
     NO_PERMISSION("403", "没有操作权限"),
     NOT_FOUND("404", "资源不存在"),
     PATH_NOT_FOUND("404", "查询路径不存在"),
-    USERNAME_ALREADY_EXISTS("409", "用户名已被注册"),
+    USERNAME_ALREADY_EXISTS("409", "名已被注册"),
     EMAIL_ALREADY_EXISTS("409", "邮箱已被注册"),
-
+    TAG_ALREADY_EXISTS("410", "标签已经存在"),
 
     INTERNAL_SERVER_ERROR("500", "服务器内部错误"),
     UNAUTHORIZED("501", "token验证失败");
