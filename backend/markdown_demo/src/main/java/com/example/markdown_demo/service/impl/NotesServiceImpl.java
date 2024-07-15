@@ -115,6 +115,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         dto.setTitle(note.getTitle());
         dto.setUpdatedAt(note.getUpdatedAt());
         dto.setCreatedAt(note.getCreatedAt());
+        dto.setIsPrivate(note.getIsPrivate());
         dto.setTags(note.getTags());
         return dto;
     }
