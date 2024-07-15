@@ -34,7 +34,7 @@ public class FileServiceImpl implements FileService {
     private String downloadIp;
 
     @Override
-    public Map<String, Object> uploadFile(MultipartFile[] files) {
+    public Map<String, Object> uploadWangFile(MultipartFile[] files) {
         List<String> filePaths = new ArrayList<>();
         for (MultipartFile file : files) {
             String originalFilename = file.getOriginalFilename();  // 文件完整名称
@@ -92,6 +92,14 @@ public class FileServiceImpl implements FileService {
         resMap.put("data", dataList);
         return resMap;
     }
-
+    public String uploadFile(MultipartFile file){
+        Map<String, Object> uploadResult = uploadWangFile(new MultipartFile[] {file});
+        List<Map<String, String>> dataList = (List<Map<String, String>>) uploadResult.get("data");
+        if (dataList.isEmpty()) {
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "上传头像失败");
+        }
+        String Url = dataList.get(0).get("url");
+        return Url;
+    }
 
 }

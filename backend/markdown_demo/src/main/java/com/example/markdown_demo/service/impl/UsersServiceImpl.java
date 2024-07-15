@@ -94,7 +94,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Override
     public void updateUserAvatar(Integer userId, MultipartFile avatarFile) throws BusinessException {
         // 调用文件服务上传头像，获取URL
-        Map<String, Object> uploadResult = fileService.uploadFile(new MultipartFile[] {avatarFile});
+        Map<String, Object> uploadResult = fileService.uploadWangFile(new MultipartFile[] {avatarFile});
         List<Map<String, String>> dataList = (List<Map<String, String>>) uploadResult.get("data");
         if (dataList.isEmpty()) {
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "上传头像失败");
