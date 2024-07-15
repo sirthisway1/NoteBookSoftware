@@ -5,13 +5,13 @@
           <h2>添加标签</h2>
           <div class="input-group">
             <input v-model="newTag" placeholder="输入新标签" @keyup.enter="addTag" />
-            <button @click="addTag" class="add-btn">添加</button>
+            <button @click="addTag(newTag)" class="add-btn">添加</button>
           </div>
           <h3>当前标签:</h3>
           <ul class="tag-list">
             <li v-for="tag in localTags" :key="tag">
               {{ tag }}
-              <button @click="removeTag(tag)" class="remove-btn">x</button>
+              <button @click="removeTag(tag)" class="remove-btn">X</button>
             </li>
           </ul>
           <button @click="close" class="close-btn">关闭</button>
@@ -21,10 +21,12 @@
   </template>
   
   <script>
+  import axios from 'axios';
   export default {
     props: {
       visible: Boolean,
       tags: Array,
+      selectedNote: Object,
     },
     data() {
       return {
@@ -36,26 +38,79 @@
     tags: {
         immediate: true,
         handler(newTags) {
-        console.log('Received tags:', newTags);
-        this.localTags = [...newTags];
+          this.localTags = Array.isArray(newTags) ? [...newTags] : [];
         },
+       
     },
     },
     methods: {
-      addTag() {
-        if (this.newTag.trim() && !this.localTags.includes(this.newTag.trim())) {
-          this.localTags.push(this.newTag.trim());
-          this.$emit('update-tags', this.localTags);
-          this.newTag = '';
+      async addTag(tag) {
+        const token = localStorage.getItem('token');
+              if (!token) {
+                alert('请先登录');
+                this.$router.push('/login');
+                return;
+              }
+          try {
+            const response = await axios.post('/api/notes/addTags', null, {
+              params: {
+                noteId: this.selectedNote.noteId,
+                tags: tag
+              },
+              headers: { 
+                  token: token
+                }
+            });
+
+            if (response.data.code === "200") {
+              this.localTags.push(tag);
+              this.newTag = ''; // 清空输入框
+              this.$emit('update:tags', this.localTags); // 通知父组件更新标签
+              alert('标签添加成功');
+            } else {
+              alert(`添加标签失败: ${response.data.message}`);
+            }
+          } catch (error) {
+            console.error('Error adding tag:', error);
+            alert('添加标签失败');
+          }
+        },
+    async removeTag(tag) {
+      const token = localStorage.getItem('token');
+              if (!token) {
+                alert('请先登录');
+                this.$router.push('/login');
+                return;
+              }
+        try {
+          const response = await axios.post('/api/notes/removeTags', null, {
+            params: {
+              noteId: this.selectedNote.noteId,
+              tags: tag
+            },
+            headers: { 
+                  token: token
+                }
+          });
+
+          if (response.data.code === "200") {
+            const index = this.selectedNote.tags.indexOf(tag);
+            if (index > -1) {
+              this.localTags.splice(index, 1);
+            }
+            this.$emit('update:tags', this.localTags);
+            alert('标签移除成功');
+          } else {
+            alert(`移除标签失败: ${response.data.message}`);
+          }
+        } catch (error) {
+          console.error('Error removing tag:', error);
+          alert('移除标签失败');
         }
       },
-      removeTag(tag) {
-        this.localTags = this.localTags.filter(t => t !== tag);
-        this.$emit('update-tags', this.localTags);
-      },
       close() {
-        this.$emit('close');
-      },
+      this.$emit('close');
+    },
     },
   };
   </script>

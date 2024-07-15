@@ -19,7 +19,11 @@
           <label>输入笔记名称:</label>
           <input type="text" v-model="noteName">
         </div>
-      
+        
+        <div class="form-group">
+          <label>输入标签:</label>
+          <input type="text" v-model="tagsInput" @keydown.enter="addTag">
+        </div>
       </div>
       <div class="modal-footer">
         <button class="confirm-button" @click="confirm">确认</button>
@@ -41,84 +45,109 @@ export default {
       notebooks: [],
       selectedNotebook: '',
       noteName: '',
+      tags:[]
     };
   },
+  computed:{
+      tagsInput: {
+      get() {
+        return this.tags.join(',');
+      },
+      set(newValue) {
+        this.tags = newValue.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+      }
+    }
+  },
   methods: {
+    addTag(event) {
+    event.preventDefault();
+    const newTag = event.target.value.trim();
+    if (newTag && !this.tags.includes(newTag)) {
+      this.tags.push(newTag);
+    }
+    event.target.value = '';
+  },
     async fetchNotebooks() {
       try {
-        const response = await axios.get('/api/notebooks', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+        const token=localStorage.getItem('token');
+        const response = await axios.get('/api/notebooks/getAllNotebooks', {
+          headers: {token: token}
         });
-        if (response.data.code === 200) {
-          this.notebooks = response.data.data;
-        } else {
-          console.error('获取笔记本列表失败:', response.data.message);
+        if (response.data.code === "200") {
+          this.notebooks = response.data.data.notebooks;
         }
       } catch (error) {
         console.error('获取笔记本列表时出错:', error);
+        if (error.response) {
+            alert('获取笔记本列表失败: ' + error.response.data.message);
+        }
       }
     },
     closeModal() {
       this.$emit('close');
     },
     async confirm() {
-  if (!this.selectedNotebook || !this.noteName) {
-    alert('请选择笔记本并输入笔记名称');
-    return;
-  }
-
-  let content = null;
-  if (this.theNoteType === 1) {
-    content = JSON.stringify({
-      "ur_im": "空", //紧急且重要
-      "nur_im": "空",//不紧急但重要
-      "ur_nim": "空",//紧急但不重要
-      "nur_nim": "空",//不紧急且不重要
-    });
-  } else if (this.theNoteType === 2) {
-    content = JSON.stringify({
-      "advantage": "空", //优势
-      "disadvantage": "空", //劣势
-      "chance": "空", //机会
-      "threat": "空",//威胁
-    });
-  } else if (this.theNoteType === 3) {
-    content = JSON.stringify({
-      "what": "空",
-      "why": "空",
-      "who": "空",
-      "where": "空",
-      "when": "空",
-      "how": "空"
-    });
-  }
-
-  try {
-    const response = await axios.post('/api/notes', {
-      notebookId: this.selectedNotebook,
-      title: this.noteName,
-      type: this.theNoteType,
-      content: content // 使用默认的内容对象
-    }, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      const token=localStorage.getItem('token');
+      if (!this.selectedNotebook || !this.noteName) {
+        alert('请选择笔记本并输入笔记名称');
+        return;
       }
-    });
 
-    if (response.data.code === 200) {
-      console.log('笔记创建成功');
-      this.$emit('note-created', response.data.data);
-      this.closeModal();
-    } else {
-      console.error('创建笔记失败:', response.data.message);
+      //李子禹新增部分
+      let content = null;
+
+      if (this.theNoteType === 1) {
+        content = JSON.stringify({
+          "ur_im": "空", //紧急且重要
+          "nur_im": "空",//不紧急但重要
+          "ur_nim": "空",//紧急但不重要
+          "nur_nim": "空",//不紧急且不重要
+        });
+      } else if (this.theNoteType === 2) {
+        content = JSON.stringify({
+          "advantage": "空", //优势
+          "disadvantage": "空", //劣势
+          "chance": "空", //机会
+          "threat": "空",//威胁
+        });
+      } else if (this.theNoteType === 3) {
+        content = JSON.stringify({
+          "what": "空",
+          "why": "空",
+          "who": "空",
+          "where": "空",
+          "when": "空",
+          "how": "空"
+        });
+      }
+      //到此结束
+
+
+      try {
+        const response = await axios.post('/api/notes/create', {
+          notebookId: this.selectedNotebook,
+          title: this.noteName,
+          content: "欢迎来到为知笔记",  // 默认的content为null
+          tags:this.tags,
+          type: this.theNoteType,
+        }, {
+          headers: {token: token}
+        });
+
+        if (response.data.code === "200") {
+          alert('笔记创建成功');
+          this.$emit('note-created', response.data.data);
+          this.closeModal();
+        }else{
+          console.error('创建笔记时出错:', response.data);
+        }
+      } catch (error) {
+        console.error('创建笔记时出错:', error);
+        if (error.response) {
+            alert('创建笔记失败: ' + error.response.data.message);
+        }
+      }
     }
-  } catch (error) {
-    console.error('创建笔记时出错:', error);
-  }
-}
-
   },
   mounted() {
     this.fetchNotebooks();

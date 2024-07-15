@@ -3,17 +3,22 @@
   <div class="container">
     <div class="close-button" @click="goToStart">×</div>
     <div class="sidebar">
-      <div class="sidebar-username" id="username">{{ username }}</div>
+      <div class="sidebar-user">
+          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <div class="sidebar-username" id="username">{{ username }}</div>
+      </div>
       <div class="sidebar-item start-button" @click="goToStart">
         <div class="icon-placeholder"><img src="/vue图片/图片1.png" alt="开始图标" class="icon-image"></div>
         <span>开始</span>
       </div>
       <div class="sidebar-item" @click="goToNotebook">笔记本</div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
+      <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
     </div>
     <div class="main-content">
       <div class="top-content">
         <h2>私密笔记列表</h2>
+        <!-- <p>{{ privateNotes }}</p> -->
       </div>
       
       <div class="bottom-content">
@@ -35,7 +40,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      username: 'User',
+      useravatar:'',
+      username: '',
       privateNotes: [],
     };
   },
@@ -45,18 +51,16 @@ export default {
   methods: {
     async fetchPrivateNotes() {
       try {
-        // 假设你已经在登录时存储了 token
+        // 登录时存储了 token
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/notes', {
+        const response = await axios.get('/api/notes/NoteShow', {
           headers: {
-            'Authorization': `Bearer ${token}`
+            token: token
           }
         });
-        if (response.data.code === 200) {
+        if (response.data.code === "200") {
           this.privateNotes = response.data.data.filter(note => note.isPrivate);
-        } else {
-          console.error('获取笔记列表失败:', response.data.message);
-        }
+        } 
       } catch (error) {
         console.error('获取笔记列表出错:', error);
       }
@@ -70,11 +74,44 @@ export default {
     goToCommunity() {
       // 实现跳转到发现社区页面的逻辑
     },
+    goToUserCenter() {
+      this.$router.push({ name: 'UserCenter' });
+    },
     formatDate(dateString) {
       const date = new Date(dateString);
-      return date.toLocaleString(); // 你可以根据需要自定义日期格式
-    }
+      return date.toLocaleString('zh-CN', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }); // 自定义日期格式
+    },
+    //获取当前用户
+    async fetchCurrentUser() {
+      const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          this.$router.push('/login');
+          return;
+        }
+
+      try {
+        const response = await axios.get('/api/user',{headers: { token: token }});
+        if (response.data && response.data.code === "200") {
+          this.currentUser = response.data.data;
+          this.username = this.currentUser.username;
+          this.useravatar = this.currentUser.avatar;
+          console.log('用户名：',this.username);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    },
   },
+  mounted() {
+    this.fetchCurrentUser(); 
+  }
 };
 </script>
 
@@ -112,16 +149,36 @@ export default {
     background-color: #f0f0f0;
   }
   
-  .sidebar-username {
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 15px 0;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
+/* 用户名以及头像 */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  position: relative; /* 添加这行 */
+  left:40px;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  flex-shrink: 0; /* 防止头像被压缩 */
+  position: relative; /* 添加这行 */
+  top: 0px; /* 调整这个值来控制上移的距离 */
+}
+
+.sidebar-username {
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: left;
+  display: flex;
+  align-items: center; /* 垂直居中文本 */
+  min-height: 40px; /* 与头像高度一致 */
+}
+/* 用户名以及头像 */
   
   .icon-placeholder {
     width: 60px;
@@ -201,14 +258,14 @@ export default {
     background-color: white;
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     width: calc(33.333% - 20px);
   }
   
   .note-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 8px 8px 15px rgba(0,0,0,0.2);
   }
   
   .note-item h3 {

@@ -2,13 +2,17 @@
   <div class="container">
     <!-- 左侧侧边栏 -->
     <div class="sidebar">
-      <div class="sidebar-item" id="username">{{ username }}</div>
+      <div class="sidebar-user">
+          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <div class="sidebar-username" id="username">{{ username }}</div>
+      </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
       <div class="sidebar-item notebook-button">
         <div class="icon-placeholder"><img src="/vue图片/图片2.png" alt="开始图标" class="icon-image"></div>
         <span>笔记本</span>
       </div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
+      <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
       <!-- <div class="sidebar-item" @click="goToCommunity">标签管理</div> -->
     </div>
     
@@ -51,6 +55,7 @@
       <div class="note-summary">
         <!-- 简介 -->
         <h3>简介</h3>
+        
         <div class="summary-content">{{ notebookSummary }}</div>
       </div>
 
@@ -82,20 +87,20 @@
   <script>
  
  import axios from 'axios';
-  //测试代码
+
 import CreateNoteModal from './CreateNoteModal.vue';
-import NoteCreateTree from './NoteCreateTree.vue';
+// import NoteCreateTree from './NoteCreateTree.vue';
 import EChartsComponent from './EChartsComponent.vue';
 
 export default {
   components: {
     CreateNoteModal,
-    NoteCreateTree,
+    // NoteCreateTree,
     EChartsComponent,
   },
   data() {
     return {
-      
+      useravatar:'',
       notes:[],
       selectedNote: null,
       hasMoreNotes: false, // 设置翻页功能的状态
@@ -156,6 +161,9 @@ export default {
     goToCommunity() {
       this.$router.push({ name: 'Community' });
     },
+    goToUserCenter() {
+      this.$router.push({ name: 'UserCenter' });
+    },
     backToStart() {
       this.$router.push({ name: 'Start' }); 
     },
@@ -164,15 +172,16 @@ export default {
     },
     //后端完成之前的测试方法，直接引用测试数据中的笔记内容
     async fetchNoteDetail() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('请先登录');
+        return;
+      }
       try {
-        const response = await axios.get(`/api/notes/${this.noteId}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        if (response.data.code === 200) {
-          const { note, summary } = response.data.data;
-          this.notebookSummary = summary;
+        const response = await axios.get(`/api/notes/detail/${this.noteId}`, {headers: { token: token } });
+        if (response.data.code === "200") {
+          const  note  = response.data.data;
+          // this.notebookSummary = summary;
           this.selectedNote = note;
           this.noteType = note.type;
           if (this.noteType === 1 || this.noteType === 2 || this.noteType === 3) {
@@ -190,25 +199,73 @@ export default {
       }
     },
 
+    // async fetchNotebookDetails() {
+    //   try {
+    //     const response = await axios.get(`/api/notebooks/${this.notebookId}`, {
+    //       headers: {
+    //         'Authorization': `Bearer ${localStorage.getItem('token')}`
+    //       }
+    //     });
+    //     if (response.data.code === 200) {
+    //       const { name, summary, notes } = response.data.data;
+    //       this.notebookName = name;
+    //       this.notebookSummary = summary;
+    //       this.notes = notes;
+    //     } else {
+    //       console.error('获取笔记本详情失败:', response.data.message);
+    //     }
+    //   } catch (error) {
+    //     console.error('获取笔记本详情时出错:', error);
+    //   }
+    // },
+
+    //获取笔记本详细+笔记详细
     async fetchNotebookDetails() {
-    try {
-      const response = await axios.get(`/api/notebooks/${this.notebookId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      if (response.data.code === 200) {
-        const { name, summary, notes } = response.data.data;
-        this.notebookName = name;
-        this.notebookSummary = summary;
-        this.notes = notes;
-      } else {
-        console.error('获取笔记本详情失败:', response.data.message);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('请先登录');
+        return;
       }
-    } catch (error) {
-      console.error('获取笔记本详情时出错:', error);
-    }
-  },
+      
+      this.isLoading = true;
+      try {
+        // 获取笔记本详情
+        const notebookResponse = await axios.get(`/api/notebooks/${this.notebookId}`, {
+          headers: { token: token }
+        });
+        
+        if (notebookResponse.data.code === "200") {
+          this.notebookName = notebookResponse.data.data.notebookDetail.name;
+          this.notebookSummary = notebookResponse.data.data.notebookDetail.summary;
+          
+          // 笔记ID集合在 notebookResponse.data.data.noteIds 中
+          const noteIds = notebookResponse.data.data.notebookDetail.noteId;
+          
+          // 获取每个笔记的详细信息
+          const notePromises = noteIds.map(noteId => 
+            axios.get(`/api/notes/detail/${noteId}`, {
+              headers: { token: token }
+            })
+          );
+          
+          const noteResponses = await Promise.all(notePromises);
+          
+          // 处理每个笔记的响应
+          this.notes = noteResponses.map(response => {
+            if (response.data.code === "200") {
+              return response.data.data;
+            }
+            return null;
+          }).filter(note => note !== null);
+        } else {
+          console.error('获取笔记本详情失败:', notebookResponse.data.message);
+        }
+      } catch (error) {
+        console.error('获取笔记本详情时出错:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
   // 设置图表选项的方法
   setChartOption(type, content) {
@@ -374,29 +431,34 @@ export default {
       });
     }
   },
-    addComment() {
-      // 添加评论功能（暂不实现）
+    
+  //获取当前用户
+  async fetchCurrentUser() {
+      const token = localStorage.getItem('token');
+        if (!token) {
+          alert('请先登录');
+          this.$router.push('/login');
+          return;
+        }
+
+      try {
+        const response = await axios.get('/api/user',{headers: { token: token }});
+        if (response.data && response.data.code === "200") {
+          this.currentUser = response.data.data;
+          this.username = this.currentUser.username;
+          this.useravatar = this.currentUser.avatar;
+          console.log('用户名：',this.username);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
     },
-    async fetchComments() {
-      // try {
-      //   const response = await axios.get(`/api/notes/${this.noteId}/comments`, {
-      //     headers: {
-      //       'Authorization': `Bearer ${this.token}`
-      //     }
-      //   });
-      //   if (response.data.code === 200) {
-      //     this.comments = response.data.data;
-      //   } else {
-      //     console.error(response.data.message);
-      //   }
-      // } catch (error) {
-      //   console.error('Failed to fetch comments:', error);
-      // }
-    }
+
   },
   mounted() {
   this.fetchNoteDetail();
   this.fetchNotebookDetails();
+  this.fetchCurrentUser();
 },
   watch: {
     '$route.params.noteId': 'fetchNoteDetail'
@@ -438,6 +500,38 @@ export default {
 .sidebar-item:hover {
   background-color: #f0f0f0;
 }
+
+/* 用户名以及头像 */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 20px;
+  position: relative; /* 添加这行 */
+  left:40px;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  flex-shrink: 0; /* 防止头像被压缩 */
+  position: relative; /* 添加这行 */
+  top: 0px; /* 调整这个值来控制上移的距离 */
+}
+
+.sidebar-username {
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: left;
+  display: flex;
+  align-items: center; /* 垂直居中文本 */
+  min-height: 40px; /* 与头像高度一致 */
+}
+/* 用户名以及头像 */
+
 .notebook-button {
   background-color: #4CAF50;
   color: white;
