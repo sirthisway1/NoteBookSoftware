@@ -42,6 +42,7 @@
           </div>
         </div>
         <div class="button-container">
+          
           <button class="action-button save-button" @click="updateUserData">保存所有修改</button>
           <button class="action-button logout-button" @click="goToLogin">退出登录</button>
         </div>
