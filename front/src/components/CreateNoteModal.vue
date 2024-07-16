@@ -138,6 +138,8 @@ export default {
           alert('笔记创建成功');
           this.$emit('note-created', response.data.data);
           this.closeModal();
+          this.$emit('noteCreated');
+          
         }else{
           console.error('创建笔记时出错:', response.data);
         }

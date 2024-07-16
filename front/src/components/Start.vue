@@ -92,7 +92,7 @@
         </div>
     </div>
     <!-- 包含模态框组件 -->
-    <CreateNoteModal :visible="isCreateNoteModalVisible" :theNoteType="noteType" @close="hideCreateNoteModal" />
+    <CreateNoteModal :visible="isCreateNoteModalVisible" :theNoteType="noteType" @close="hideCreateNoteModal"  @noteCreated="search" />
     </div>
 </template>
   
