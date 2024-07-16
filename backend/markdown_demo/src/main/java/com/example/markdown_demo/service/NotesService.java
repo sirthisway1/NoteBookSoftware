@@ -1,5 +1,6 @@
 package com.example.markdown_demo.service;
 
+import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.entity.Notes;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -33,7 +34,7 @@ public interface NotesService extends IService<Notes> {
      * @return 笔记详情
      */
     NoteDetailDTO getNoteDetail(Integer noteId, Integer userId);
-
+    void deleteNote(Integer noteId, Integer userId)throws BusinessException;
 
 
     List<NoteShowDTO> noteShow(Integer userId);

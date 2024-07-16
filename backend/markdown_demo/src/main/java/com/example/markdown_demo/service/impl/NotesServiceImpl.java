@@ -106,7 +106,21 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         else dto.setType(0);
         return dto;
     }
-
+    @Override
+    public void deleteNote(Integer noteId, Integer userId)throws BusinessException{
+        Notes note = getById(noteId);
+        if (note == null) {
+            throw new BusinessException(ResultType.NOT_FOUND);
+        }
+        if (!note.getUserId().equals(userId)) {
+            throw new BusinessException(ResultType.NO_PERMISSION);
+        }
+        try {
+            notesMapper.deleteById(noteId);
+        } catch (Exception e) {
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), e.getMessage());
+        }
+    }
     @Override
     public List<NoteShowDTO> noteShow(Integer userId) {
         QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();

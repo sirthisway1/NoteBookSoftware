@@ -1,6 +1,7 @@
 package com.example.markdown_demo.controller;
 
 import com.example.markdown_demo.common.dto.*;
+import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.common.utils.JwtUtil;
@@ -59,6 +60,16 @@ public class NotesController {
         return Result.success(noteDetail);
     }
 
+    @DeleteMapping("/delete/{noteId}")
+    public Result<?>noteDelete(@PathVariable Integer noteId, HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        try{
+            notesService.deleteNote(noteId, userId);
+            return Result.success("笔记删除成功");
+        }catch (BusinessException e){
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"笔记删除失败");
+        }
+    }
     @GetMapping("/NoteShow")
     public Result<List<NoteShowDTO>> noteShowDTO( HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
