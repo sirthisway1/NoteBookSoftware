@@ -43,16 +43,30 @@
         </div>
         <div class="button-container">
           
+
+          
           <button class="action-button save-button" @click="updateUserData">保存所有修改</button>
-          <button class="action-button logout-button" @click="goToLogin">退出登录</button>
+          <button class="action-button logout-button" @click="showConfirmModal = true">退出登录</button>
         </div>
       </div>
     </div>
+
+    
+    <ConfirmModal
+          v-if="showConfirmModal"
+          :isVisible="showConfirmModal"
+          message="是否确认退出登录？"
+          @confirm="handleConfirmLogout"
+          @cancel="handleCancelLogout"
+        />
+
+
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import ConfirmModal from './ConfirmModal.vue';
 
 export default {
   data() {
@@ -70,7 +84,11 @@ export default {
       editingPassword: false,
       editingBio: false,
       originalUser: {}, // 用于存储原始用户数据
+      showConfirmModal: false
     };
+  },
+  components: {
+    ConfirmModal
   },
   methods: {
     goToStart() {
@@ -85,9 +103,8 @@ export default {
     goToUserCenter() {
       // 已在用户中心页面，无需操作
     },
-    async goToLogin(){
+    async goToLogin() {
       try {
-        
         // 2. 清除本地存储的登录信息
         localStorage.removeItem('token');
         
@@ -99,6 +116,15 @@ export default {
         localStorage.removeItem('token');
         this.$router.push({ name: 'Login' });
       }
+    },
+
+    handleConfirmLogout() {
+      this.showConfirmModal = false;
+      this.goToLogin();
+    },
+
+    handleCancelLogout() {
+      this.showConfirmModal = false;
     },
     showNameModal(){
       this.showNameDialog = true;
