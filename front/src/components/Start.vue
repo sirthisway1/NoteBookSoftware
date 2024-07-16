@@ -45,17 +45,18 @@
         </div>
         <div class="bottom-content">
           <div class="note-list">
-            <div v-for="note in filteredNotes" :key="note.noteId" class="note-item">
-              <h3>{{ note.title }}</h3>
-              <p>最后修改日期: {{ formatDate(note.updatedAt) }}</p>
-              <!-- <p>创建日期: {{ formatDate(note.createdAt) }}</p> -->
-              <p>标签：
-                <span v-for="(tag, index) in note.tags" :key="index" class="tag">
-                  {{ tag }}{{ index < note.tags.length - 1 ? ', ' : '' }}
-                </span>
-              </p>
-            </div>
+          <div v-for="note in paginatedNotes" :key="note.noteId" class="note-item">
+            <h3>{{ note.title }}</h3>
+            <p>最后修改日期: {{ formatDate(note.updatedAt) }}</p>
+            <!-- <p>创建日期: {{ formatDate(note.createdAt) }}</p> -->
+            <p>标签：
+              <span v-for="(tag, index) in note.tags" :key="index" class="tag">
+                {{ tag }}{{ index < note.tags.length - 1 ? ', ' : '' }}
+              </span>
+            </p>
           </div>
+        </div>
+
           <div class="pagination">
             <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
             <span>{{ currentPage }} / {{ totalPages }}</span>
@@ -116,7 +117,7 @@ export default {
       searchMode: 'keyword',
       filteredNotes: [],
       currentPage: 1,
-      notesPerPage: 6,
+      notesPerPage: 12,
     };
   },
   computed: {
