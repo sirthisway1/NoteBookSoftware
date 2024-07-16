@@ -82,7 +82,11 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         if (!note.getUserId().equals(userId) && note.getIsPrivate()) {
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
-
+        // 获取用户信息来添加头像 URL
+         Users user = usersMapper.selectById(note.getUserId());
+         if (user == null) {
+        throw new BusinessException(ResultType.NOT_FOUND);
+        }
         NoteDetailDTO dto = new NoteDetailDTO();
         dto.setNoteId(note.getId());
         dto.setTitle(note.getTitle());
@@ -91,7 +95,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         dto.setIsPrivate(note.getIsPrivate());
         dto.setCreatedAt(note.getCreatedAt());
         dto.setUpdatedAt(note.getUpdatedAt());
-
+        dto.setAvatar(user.getAvatar()); // 设置用户的头像 URL
         // 查询思维笔记类型
         QueryWrapper<ThoughtNotes> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("note_id", noteId);
@@ -102,6 +106,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         else dto.setType(0);
         return dto;
     }
+
     @Override
     public List<NoteShowDTO> noteShow(Integer userId) {
         QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();

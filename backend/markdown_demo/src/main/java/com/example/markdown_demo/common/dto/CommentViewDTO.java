@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class CommentViewDTO {
 
-
+    private String avatar;    // 添加头像URL字段
     private String content;
     private String username;
     private String createdAt;

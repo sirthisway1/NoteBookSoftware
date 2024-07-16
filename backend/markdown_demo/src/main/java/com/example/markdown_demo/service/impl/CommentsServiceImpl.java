@@ -119,8 +119,12 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         return commentsList.stream()
                 .map(comment -> {
                     // 通过用户 ID 获取用户名
+                    Users user = usersMapper.selectById(comment.getUserId());
+                    if (user == null) {
+                        throw new RuntimeException("找不到这个id " + comment.getUserId());
+                    }
                     String username = getUsernameByUserId(comment.getUserId());
-                    return new CommentViewDTO(comment.getContent(), username, comment.getCreatedAt(), comment.getId());
+                    return new CommentViewDTO(user.getAvatar(),comment.getContent(), username, comment.getCreatedAt(), comment.getId());
                 })
                 .collect(Collectors.toList());
 

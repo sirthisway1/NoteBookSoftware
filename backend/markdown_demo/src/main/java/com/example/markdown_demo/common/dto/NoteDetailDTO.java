@@ -21,4 +21,5 @@ public class NoteDetailDTO {
     private String createdAt;
     private String updatedAt;
     private Integer type;
+    private String avatar;    // 添加头像URL字段
 }
