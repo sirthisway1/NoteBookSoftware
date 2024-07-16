@@ -22,7 +22,7 @@ public class FileController {
         return fileService.uploadWangFile(files);
     }
     @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
-    public String fileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+    public String fileUpload(@RequestParam("file") MultipartFile file) {
         return fileService.uploadFile(file);
     }
 
