@@ -32,11 +32,12 @@
 <button class="icon-button" @click="privateNote"><i class="fas fa-lock"></i></button>
 
 <template v-if="noteType === 0">
-  <!-- 添加录音按钮-->
-  <button class="icon-button" :class="{ 'recording': isRecording }" @click="toggleRecording">
-    <i :class="isRecording ? 'fas fa-stop' : 'fas fa-microphone'"></i>
+  <!-- 录音的按钮 -->
+  <button class="icon-button" @click="toggleRecording">
+    <i v-if="!isRecording" class="fas fa-microphone"></i>
+    <i v-else class="fas fa-music note-icon"></i>
   </button>
-  </template>
+</template>
 <button class="icon-button" @click="closeEditor"><i class="fas fa-times"></i></button>
 </div>
 
@@ -565,6 +566,22 @@ updateTags(newTags) {
     async handleRecordingStop() {
       // 将录音数据块合并成一个 Blob
       const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+      
+      // 创建一个下载链接
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(audioBlob);
+      downloadLink.download = `recording_${new Date().getTime()}.wav`; // 设置下载文件名
+      
+      // 将链接添加到文档中并模拟点击
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      
+      // 清理
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(downloadLink.href);
+      //重置
+      this.audioChunks = [];
+
       const formData = new FormData();
       formData.append('file', audioBlob, 'audio.wav');
 
@@ -574,13 +591,13 @@ updateTags(newTags) {
             'Content-Type': 'multipart/form-data',
           },
         });
-          // 从服务器响应中获取转换后的文本内容
-          const text = response.data.data.text;
-          // 将文本内容插入到编辑器中
-          this.valueHtml += `<p>${text}</p>`;
+        // 从服务器响应中获取转换后的文本内容
+        const text = response.data.data.text;
+        // 将文本内容插入到编辑器中
+        this.valueHtml += `<p>${text}</p>`;
       } catch (error) {
-          console.error('Error uploading audio:', error); // 处理上传错误
-        }
+        console.error('Error uploading audio:', error); // 处理上传错误
+      }
     },
   },
 async mounted() {
@@ -930,5 +947,18 @@ border-radius: 8px;
 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 max-width: 500px;
 width: 90%;
+}
+
+.note-icon {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

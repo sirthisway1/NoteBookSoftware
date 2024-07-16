@@ -41,7 +41,10 @@
             <button @click="toggleEdit('bio')">{{ editingBio ? '确认' : '修改' }}</button>
           </div>
         </div>
-        <button class="save-all-button" @click="updateUserData">保存所有修改</button>
+        <div class="button-container">
+          <button class="action-button save-button" @click="updateUserData">保存所有修改</button>
+          <button class="action-button logout-button" @click="goToLogin">退出登录</button>
+        </div>
       </div>
     </div>
   </div>
@@ -80,6 +83,21 @@ export default {
     },
     goToUserCenter() {
       // 已在用户中心页面，无需操作
+    },
+    async goToLogin(){
+      try {
+        
+        // 2. 清除本地存储的登录信息
+        localStorage.removeItem('token');
+        
+        // 3. 跳转到登录页面
+        this.$router.push({ name: 'Login' });
+      } catch (error) {
+        console.error('登出失败:', error);
+        // 即使 API 调用失败，也清除本地登录信息并跳转
+        localStorage.removeItem('token');
+        this.$router.push({ name: 'Login' });
+      }
     },
     showNameModal(){
       this.showNameDialog = true;
@@ -370,7 +388,8 @@ export default {
   background-color: #45a049;
 }
 
-.save-all-button {
+/* .save-all-button {
+  
   margin-top: 30px;
   padding: 12px 25px;
   background-color: #4CAF50;
@@ -380,11 +399,53 @@ export default {
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s, transform 0.2s;
+  
 }
 
 .save-all-button:hover {
   background-color: #45a049;
   transform: translateY(-2px);
+} */
+
+
+/* 按钮 */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.action-button {
+  padding: 12px 25px;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+  flex: 1;
+  margin: 0 10px;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+}
+
+.save-button {
+  background-color: #4CAF50;
+}
+
+.save-button:hover {
+  background-color: #45a049;
+}
+
+.logout-button {
+  background-color: #4CAF50;
+}
+
+.logout-button:hover {
+  background-color: #45a049;
 }
 
 @media (max-width: 768px) {
