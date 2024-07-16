@@ -18,5 +18,6 @@ public class NoteShowDTO {
     private String updatedAt;
     private Boolean isPrivate;
     private List<String> tags;
+    private Integer likeCount; // 存储点赞数
 
 }
