@@ -1,11 +1,13 @@
 package com.example.markdown_demo.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import com.example.markdown_demo.common.dto.AudioUploadDTO;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.service.AudioToTextService;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
@@ -18,38 +20,27 @@ import java.io.IOException;
 @Service
 public class AudioToTextServiceImpl implements AudioToTextService {
 
+    @Value("${baidu.api.key}")
+    private String API_KEY;
+    @Value("${baidu.api.secret}")
+    private String SECRET_KEY;
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
-    private static final String API_KEY = "f3jTQ1lBoO1dFPm9FjSUTYog";
-    private static final String SECRET_KEY = "GXp25ovceYUj2fM7whtmy5X44mFlQwtp";
-    private static String speech = "";
-    private static String format = "";
-    private static Integer len = 0;
 
-    public String processAudioFile(MultipartFile file)throws BusinessException{
-        String originalFilename = file.getOriginalFilename();
-        format = FileUtil.extName(originalFilename);
-        switch (format) {
-            case "pcm": case "wav": case "amr": case "m4a":
-                try {
-                    convertFileToBase64(file);
-                    return makeRequest();
-                }catch (IOException e){
-                    throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "语音转换失败: IO异常");
-                }
-            default:
-                throw new BusinessException(ResultType.INVALID_REQUEST_BODY, "语音转换失败: 文件格式错误");
+
+    public String processAudioFile(AudioUploadDTO audioUploadDTO)throws BusinessException{
+
+        String filename = audioUploadDTO.getFilename();
+        String format = null;
+        format = filename.substring(filename.lastIndexOf(".") + 1);
+        try {
+            return makeRequest(audioUploadDTO.getAudio(),audioUploadDTO.getLen(),format);
+        }catch (IOException e){
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(),e.getMessage());
         }
-    }
-    private void convertFileToBase64(MultipartFile file) throws IOException {
-        // 将文件转换为字节数组
-        byte[] fileBytes = IOUtils.toByteArray(file.getInputStream());
-        // 将字节数组转换为Base64编码的字符串
-        speech = Base64.getEncoder().encodeToString(fileBytes);
-        // 获取字节数
-        len = fileBytes.length;
+
     }
 
-    private String makeRequest() throws IOException {
+    private String makeRequest(String speech,Integer len,String format) throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         String requestBodyJson = String.format(
                 "{\"format\":\"%s\",\"rate\":16000,\"channel\":1,\"cuid\":\"aw6fZ0c9feQMVpZHs0t28jmaktbIuOVq\",\"token\":\"%s\",\"speech\":\"%s\",\"len\":%d,\"dev_pid\":80001}",

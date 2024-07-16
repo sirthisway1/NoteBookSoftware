@@ -2,7 +2,7 @@ package com.example.markdown_demo.controller;
 
 
 import com.example.markdown_demo.common.dto.AudioRequestDTO;
-import com.example.markdown_demo.common.lang.BusinessException;
+import com.example.markdown_demo.common.dto.AudioUploadDTO;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.service.AudioGenerationService;
@@ -12,7 +12,6 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,12 +59,12 @@ public class AudioAnswerController {
             }
         }
     }
-    @PostMapping("/uploadAudio")
-    public Result<?> uploadAudio(@RequestParam("file")  MultipartFile file){
+    @PostMapping(value = "/uploadAudio", produces = "application/json")
+    public Result<?> uploadAudio(@RequestBody AudioUploadDTO audioUploadDTO){
         // 处理上传的音频文件
         try {
             // 这里调用Service来处理文件，例如保存到服务器或进行语音识别等
-            String text=audioToTextService.processAudioFile(file);
+            String text=audioToTextService.processAudioFile(audioUploadDTO);
             return Result.success(Map.of("text", text));
         } catch (Exception e) {
             return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"语音转换失败: " + e.getMessage());
