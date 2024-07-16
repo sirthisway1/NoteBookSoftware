@@ -64,11 +64,11 @@
   .modal-buttons {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 40px; /* 增加按钮之间的距离 */
   }
   
   .modal-button {
-    padding: 10px 20px;
+    padding: 10px 40px; /* 使按钮变长 */
     border: none;
     border-radius: 25px;
     cursor: pointer;
