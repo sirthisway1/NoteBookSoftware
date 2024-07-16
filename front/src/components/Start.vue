@@ -454,6 +454,7 @@ export default {
     transition: var(--transition);
   }
   
+  
  
   .dropdown {
     display: none; /* 默认隐藏 */
@@ -505,28 +506,31 @@ export default {
   
   .search-button {
   margin-left: 10px;
-  padding: 3px 10px;
+  padding: 0px 15px; /* 调整内边距使按钮变得扁平 */
   background-color: #4CAF50;
   color: white;
   border: none;
   cursor: pointer;
-
+  border-radius: 8px; /* 减少边框半径 */
+  transition: background-color 0.3s;
 }
-  
+
 .search-button:hover {
   background-color: #45a049;
 }
 
-  .toggle-button {
+.toggle-button {
   margin-left: 10px;
-  padding: 5px 10px;
+  padding: 0px 15px; /* 调整内边距使按钮变得扁平 */
   background-color: #9affb8;
   border: 1px solid #9affb8;
-  border-radius: 4px;
+  border-radius: 8px; /* 减少边框半径 */
   cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 14px; /* 调整字体大小 */
 }
 
-  .toggle-button:hover {
+.toggle-button:hover {
   background-color: #4bffae;
 }
 
