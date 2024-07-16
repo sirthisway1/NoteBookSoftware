@@ -20,6 +20,7 @@
     <div class="main-content">
       <div class="note-detail" v-if="note">
         <h1>{{ note.title }}</h1>
+        <img :src="writeravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
         <div class="note-info">
           <span>作者: {{ note.username }}</span>
           <span>创建时间: {{ formatDate(note.createdAt) }}</span>
@@ -40,6 +41,7 @@
           </div>
           <div class="comment-list">
             <div v-for="comment in comments" :key="comment.commentId" class="comment-item">
+              <img :src="comment.avatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
               <strong>{{ comment.username }}:</strong>
               <p>{{ comment.content }}</p>
               <!-- <p>{{ comment }}</p> -->
@@ -69,6 +71,7 @@ export default {
       likeCount: null,
       isLiked: false,
       newComment: '',
+      writeravatar:'',
     };
   },
   methods: {
@@ -102,6 +105,7 @@ export default {
         if (response.data && response.data.code === "200") {
           this.note = response.data.data;
           this.note.username=textname;
+          this.writeravatar=response.data.data.avatar;
         } 
       } catch (error) {
         console.error("Error fetching note details:", error);
@@ -149,7 +153,8 @@ export default {
       try {
         const response = await axios.post(`/api/noteLikes/toggleLike`, null,{params: {noteId:noteId} ,headers: { token: token }});
         if (response.data && response.data.code === "200") {
-          this.isLiked = response.data.data.Liked;
+          await this.checkIfLiked();
+          // this.isLiked = response.data.data.Liked;
           console.log("是否点赞:",this.isLiked);
           this.likeCount = response.data.data.likeCount;
           // await this.fetchLikeCount();
@@ -173,8 +178,10 @@ export default {
       const noteId = this.$route.params.noteId;
       try {
         const response = await axios.get(`/api/noteLikes/count/${noteId}`,{headers: { token: token }});
-        if (response.data && response.status === "200") {
-         this.likeCount=response.data.count;
+        if (response.data && response.data.code === "200") {
+          console.log("Count response:", response);  // 添加这行
+         this.likeCount=response.data.data.count;
+         console.log("点赞数:", this.likeCount);
         }
         console.log("点赞获取成功");
       } catch (error) {
@@ -193,8 +200,11 @@ export default {
       const noteId = this.$route.params.noteId;
       try {
         const response = await axios.get(`/api/noteLikes/isLiked/${noteId}`,{headers: { token: token }});
-        if (response.data && response.status === "200") {
-          this.isLiked = response.data.isLiked;
+        if (response.data && response.data.code === "200") {
+         
+          this.isLiked = response.data.data.isLiked;
+          console.log("点赞",this.isLiked);
+          // console.log("点赞成功");
         }
       } catch (error) {
         console.error("Error checking if liked:", error);
@@ -218,6 +228,7 @@ export default {
           // alert("查看评论成功")
           // 注意这里的数据结构变化
           this.comments = response.data.data;
+          // this.postavatar = response.data.data.avatar;
           console.log("Fetched comments:", this.comments);
           
         } else {
@@ -334,6 +345,7 @@ export default {
     await this.fetchCurrentUser();
     await this.fetchNoteDetail();
     await this.fetchLikeCount();
+    await this.checkIfLiked();
     // await this.fetchComments();
   },
 };

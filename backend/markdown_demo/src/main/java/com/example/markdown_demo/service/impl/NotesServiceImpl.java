@@ -1,9 +1,11 @@
 package com.example.markdown_demo.service.impl;
 
 import com.example.markdown_demo.common.lang.Result;
+import com.example.markdown_demo.entity.NoteLikes;
 import com.example.markdown_demo.entity.Notes;
 import com.example.markdown_demo.entity.ThoughtNotes;
 import com.example.markdown_demo.entity.Users;
+import com.example.markdown_demo.mapper.NoteLikesMapper;
 import com.example.markdown_demo.mapper.NotesMapper;
 import com.example.markdown_demo.mapper.ThoughtNotesMapper;
 import com.example.markdown_demo.mapper.UsersMapper;
@@ -29,6 +31,8 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     @Autowired
     private UsersMapper usersMapper;
 
+    @Autowired
+    private NoteLikesMapper likesMapper;
     @Autowired
     private ThoughtNotesMapper thoughtNotesMapper;
 
@@ -278,4 +282,42 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
 
+    @Override
+    public List<NoteShowDTO> getTopLikedNotes() {
+        // 查询点赞数最高的三个笔记的ID
+        List<Integer> topLikedNoteIds = likesMapper.selectMaps(new QueryWrapper<NoteLikes>()
+                        .select("note_id", "count(user_id) as like_count")
+                        .groupBy("note_id")
+                        .orderByDesc("like_count")
+                        .last("LIMIT 3"))
+                .stream()
+                .map(map -> (Integer) map.get("note_id"))
+                .collect(Collectors.toList());
+
+        if (topLikedNoteIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 查询详细信息
+        return getNoteDetailsWithLikes(topLikedNoteIds);
+    }
+
+    private List<NoteShowDTO> getNoteDetailsWithLikes(List<Integer> noteIds) {
+        List<Notes> notes = notesMapper.selectBatchIds(noteIds);
+        return notes.stream().map(note -> {
+            NoteShowDTO dto = new NoteShowDTO();
+            dto.setNoteId(note.getId());
+            dto.setTitle(note.getTitle());
+            dto.setCreatedAt(note.getCreatedAt().toString());
+            dto.setUpdatedAt(note.getUpdatedAt().toString());
+            dto.setIsPrivate(note.getIsPrivate());
+            dto.setTags(note.getTags());
+            // 查询并设置点赞数
+            Integer likeCount = Math.toIntExact(likesMapper.selectCount(new QueryWrapper<NoteLikes>().eq("note_id", note.getId())));
+            dto.setLikeCount(likeCount);
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }
+
+

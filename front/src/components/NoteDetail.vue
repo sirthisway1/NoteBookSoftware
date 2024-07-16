@@ -18,36 +18,29 @@
     
     <!-- 中间笔记本内容区 -->
     <div class="middle-section">
-      <div class="notebook-header">
-        <!-- 笔记本标题 -->
-        <h2>{{ notebookName }}</h2>
-        <!-- 笔记数量 -->
-        <div class="note-count-container">
-          <p class="note-count">{{ notes.length }}条笔记</p>
-          <i class="fas fa-plus add-note" @click="showCreateNoteModal"></i>
-        </div>
-        <!-- 搜索框 -->
-        <div class="search-container">
-          <i class="fas fa-search search-icon" @click="searchNotes"></i>
-          <input type="text" v-model="searchQuery"/>
-          <i class="fas fa-times clear-icon" @click="clearSearch"></i>
-        </div>
-      </div>
+      <div class="note-header">
+    <h2>{{ notebookName }}</h2>
+    <div class="note-count-container">
+      <p class="note-count">{{ notes.length }}条笔记</p>
+      <i class="fas fa-plus add-note" @click="showCreateNoteModal"></i>
+    </div>
+  </div>
       <!-- 操作按钮 -->
       <button class="action-button" @click="backToStart">返回首页</button>
       <button class="action-button" @click="backToNotebook">目录</button>
 
       <!-- 笔记列表 -->
+      <!-- 笔记列表部分 -->
       <div class="notebook-list">
         <div v-for="(note, index) in notes" :key="index" class="note-item" :class="{ selected: selectedNote && selectedNote.noteId === note.noteId }" @click="selectNote(note)">
           {{ note.title }}
         </div>
-        <!-- 若有更多笔记，添加翻页功能 -->
         <div v-if="hasMoreNotes" class="pagination">
           <button @click="prevPage">上一页</button>
           <button @click="nextPage">下一页</button>
         </div>
       </div>
+
     </div>
 
     <!-- 右侧笔记详情区 -->
@@ -548,20 +541,25 @@ export default {
 
 .note-count-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: center; /* 垂直居中对齐 */
+  position: relative; /* 为了让子元素绝对定位 */
+  width: 100%;
 }
 
 .note-count {
-  flex: 1;
+  position: absolute; /* 绝对定位 */
+  left: 50%; /* 距离左边 50% */
+  transform: translateX(-50%); /* 左右居中对齐 */
   text-align: center;
 }
 
 .add-note {
+  margin-left: auto; /* 将加号推到最右边 */
   cursor: pointer;
   font-size: 1.2em;
   color: #000000; /* 可根据需要修改颜色 */
 }
+
 
 .icon {
     width: 50px;
@@ -611,7 +609,7 @@ export default {
   align-items: center;
   border: 1px solid #ccc;
   padding: 5px;
-  background-color: #fff;
+  background-color: #f0f0f0;
 }
 
 .search-container input {
@@ -650,6 +648,7 @@ export default {
 .notebook-list {
   flex-grow: 1;
   overflow-y: auto;
+  background-color: #f0f0f0;
 }
 
 .note-item {
@@ -660,6 +659,15 @@ export default {
 .note-item.selected {
   background-color: #a0e0a0;
 }
+
+.note-header {
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  align-items: center; /* 水平居中对齐 */
+  margin-bottom: 20px; /* 调整与下方内容的距离 */
+  text-align: center; /* 使文本居中 */
+}
+
 
 .pagination {
   display: flex;
@@ -682,15 +690,16 @@ export default {
 }
 
 .edit-button {
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
   border: none;
   padding: 5px 10px;
   cursor: pointer;
+  margin-left: auto; /* 添加这行 */
 }
 
 .edit-button:hover {
-  background-color: #0056b3;
+  background-color: #006527;
 }
 
 .summary-content {
@@ -699,6 +708,13 @@ export default {
   height: 100px;
   background-color: #f9f9f9;
 }
+
+.content-header {
+  display: flex; /* 添加这行 */
+  justify-content: space-between; /* 可选：如果有多个子元素可以均匀分布 */
+  align-items: center; /* 垂直居中 */
+}
+
 
 .content-area {
   border: 1px solid #d0d0d0;

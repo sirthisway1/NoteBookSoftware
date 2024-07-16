@@ -23,9 +23,10 @@
               <div class="button">新建笔记</div>
               <div class="dropdown">
                 <div class="dropdown-item" @click="showCreateNoteModal(0)">新建日常笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(1)">SWOT模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(2)">5W1H模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(3)">时间管理四象限模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(1)">时间管理四象限模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(2)">SWOT模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(3)">5W1H模板思维笔记</div>
+               
               </div>
             </div>
           </div>
@@ -44,17 +45,18 @@
         </div>
         <div class="bottom-content">
           <div class="note-list">
-            <div v-for="note in filteredNotes" :key="note.noteId" class="note-item">
-              <h3>{{ note.title }}</h3>
-              <p>最后修改日期: {{ formatDate(note.updatedAt) }}</p>
-              <!-- <p>创建日期: {{ formatDate(note.createdAt) }}</p> -->
-              <p>标签：
-                <span v-for="(tag, index) in note.tags" :key="index" class="tag">
-                  {{ tag }}{{ index < note.tags.length - 1 ? ', ' : '' }}
-                </span>
-              </p>
-            </div>
+          <div v-for="note in paginatedNotes" :key="note.noteId" class="note-item">
+            <h3>{{ note.title }}</h3>
+            <p>最后修改日期: {{ formatDate(note.updatedAt) }}</p>
+            <!-- <p>创建日期: {{ formatDate(note.createdAt) }}</p> -->
+            <p>标签：
+              <span v-for="(tag, index) in note.tags" :key="index" class="tag">
+                {{ tag }}{{ index < note.tags.length - 1 ? ', ' : '' }}
+              </span>
+            </p>
           </div>
+        </div>
+
           <div class="pagination">
             <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
             <span>{{ currentPage }} / {{ totalPages }}</span>
@@ -90,7 +92,7 @@
         </div>
     </div>
     <!-- 包含模态框组件 -->
-    <CreateNoteModal :visible="isCreateNoteModalVisible" :theNoteType="noteType" @close="hideCreateNoteModal" />
+    <CreateNoteModal :visible="isCreateNoteModalVisible" :theNoteType="noteType" @close="hideCreateNoteModal"  @noteCreated="search" />
     </div>
 </template>
   
@@ -115,7 +117,7 @@ export default {
       searchMode: 'keyword',
       filteredNotes: [],
       currentPage: 1,
-      notesPerPage: 6,
+      notesPerPage: 12,
     };
   },
   computed: {

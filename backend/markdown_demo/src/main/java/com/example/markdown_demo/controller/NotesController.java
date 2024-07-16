@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 
+
+
 @RestController
 @RequestMapping("/api/notes")
 public class NotesController {
@@ -155,4 +157,19 @@ public class NotesController {
         List<NoteShowDTO> notes = notesService.searchNotesByTags(tags, userId);
         return Result.success(notes);
     }
+
+
+    @GetMapping("/top-liked")
+    public Result<List<NoteShowDTO>> getTopLikedNotes() {
+        List<NoteShowDTO> topLikedNotes = notesService.getTopLikedNotes();
+        return Result.success(topLikedNotes);  // 返回成功结果，并传入获取到的笔记列表
+    }
+
+
+
+
+
+
+
+
 }

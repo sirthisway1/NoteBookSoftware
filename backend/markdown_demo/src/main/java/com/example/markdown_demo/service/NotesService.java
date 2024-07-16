@@ -82,4 +82,6 @@ public interface NotesService extends IService<Notes> {
      * @return 匹配的笔记ID列表
      */
     List<NoteShowDTO> searchNotesByTags(String tags, Integer userId);
+
+    List<NoteShowDTO> getTopLikedNotes();
 }
