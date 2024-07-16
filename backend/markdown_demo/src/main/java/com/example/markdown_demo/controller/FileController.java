@@ -19,7 +19,11 @@ public class FileController {
 
     @RequestMapping(value = "/wang/upload", method = RequestMethod.POST)
     public Map<String, Object> wangEditorUpload(HttpServletRequest request, @RequestParam("file") MultipartFile[] files) {
-        return fileService.uploadFile(files);
+        return fileService.uploadWangFile(files);
+    }
+    @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
+    public String fileUpload(@RequestParam("file") MultipartFile file) {
+        return fileService.uploadFile(file);
     }
 
 //    @PostMapping("/uploadFile")
