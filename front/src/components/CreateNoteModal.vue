@@ -127,7 +127,7 @@ export default {
         const response = await axios.post('/api/notes/create', {
           notebookId: this.selectedNotebook,
           title: this.noteName,
-          content: "欢迎来到为知笔记",  // 默认的content为null
+          content: content,  // 默认的content为null
           tags:this.tags,
           type: this.theNoteType,
         }, {

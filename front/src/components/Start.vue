@@ -23,9 +23,10 @@
               <div class="button">新建笔记</div>
               <div class="dropdown">
                 <div class="dropdown-item" @click="showCreateNoteModal(0)">新建日常笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(1)">SWOT模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(2)">5W1H模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(3)">时间管理四象限模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(1)">时间管理四象限模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(2)">SWOT模板思维笔记</div>
+                <div class="dropdown-item" @click="showCreateNoteModal(3)">5W1H模板思维笔记</div>
+               
               </div>
             </div>
           </div>
