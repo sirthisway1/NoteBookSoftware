@@ -26,14 +26,17 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="confirm-button" @click="confirm">确认</button>
+        <div class="mb-4"><el-button  @click="confirm" type="primary" plain>确认</el-button></div>
       </div>
     </div>
+  
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import { ElMessage } from 'element-plus'
+
 
 export default {
   props: {
@@ -135,10 +138,17 @@ export default {
         });
 
         if (response.data.code === "200") {
-          alert('笔记创建成功');
+          ElMessage({
+            showClose: true,
+            message: '笔记创建成功',
+            type: 'success',
+          })
           this.$emit('note-created', response.data.data);
-          this.closeModal();
+          
           this.$emit('noteCreated');
+          setTimeout(() => {
+            this.closeModal();
+          }, 1500);  // 1.5秒后关闭模态框
           
         }else{
           console.error('创建笔记时出错:', response.data);
@@ -149,7 +159,8 @@ export default {
             alert('创建笔记失败: ' + error.response.data.message);
         }
       }
-    }
+    },
+    
   },
   mounted() {
     this.fetchNotebooks();

@@ -18,50 +18,80 @@
       </div>
       <div class="main-content">
         <div class="top-content">
-          <div class="top-left">
-            <div class="button-container">
-              <div class="button">新建笔记</div>
-              <div class="dropdown">
-                <div class="dropdown-item" @click="showCreateNoteModal(0)">新建日常笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(1)">时间管理四象限模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(2)">SWOT模板思维笔记</div>
-                <div class="dropdown-item" @click="showCreateNoteModal(3)">5W1H模板思维笔记</div>
-               
-              </div>
-            </div>
-          </div>
-          <div class="top-right">
-            <div class="button" @click="showNewNotebookModal">新建笔记本</div>
-          </div>
-        </div>
-        <div class="search-bar">
-          <input type="text" v-model="searchInput" :placeholder="searchMode === 'keyword' ? '关键字搜索' : '标签搜索'">
-          
-          <button @click="search" class="search-button">搜索全部笔记</button>
-          <button @click="searchTwo" class="search-button">搜索</button>
-          <div class="toggle-button" @click="toggleSearchMode">
-            {{ searchMode === 'keyword' ? '切换到标签搜索' : '切换到关键字搜索' }}
-          </div>
-        </div>
-        <div class="bottom-content">
-          <div class="note-list">
-          <div v-for="note in paginatedNotes" :key="note.noteId" class="note-item">
-            <h3>{{ note.title }}</h3>
-            <p>最后修改日期: {{ formatDate(note.updatedAt) }}</p>
-            <!-- <p>创建日期: {{ formatDate(note.createdAt) }}</p> -->
-            <p>标签：
-              <span v-for="(tag, index) in note.tags" :key="index" class="tag">
-                {{ tag }}{{ index < note.tags.length - 1 ? ', ' : '' }}
-              </span>
-            </p>
-          </div>
+          <el-col :span="12">
+            <el-dropdown>
+              <el-button type="primary">新建笔记<el-icon class="el-icon--right"><arrow-down /></el-icon></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="showCreateNoteModal(0)">新建日常笔记</el-dropdown-item>
+                  <el-dropdown-item @click="showCreateNoteModal(1)">SWOT模板思维笔记</el-dropdown-item>
+                  <el-dropdown-item @click="showCreateNoteModal(2)">5W1H模板思维笔记</el-dropdown-item>
+                  <el-dropdown-item @click="showCreateNoteModal(3)">时间管理四象限模板思维笔记</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </el-col>
+          <el-col :span="12" style="text-align: right;">
+            <el-button @click="showNewNotebookModal" type="primary">新建笔记本</el-button>
+          </el-col>
         </div>
 
-          <div class="pagination">
-            <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
-            <span>{{ currentPage }} / {{ totalPages }}</span>
-          <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+        <div class="search-bar">
+          <el-input
+            v-model="searchInput"
+            :placeholder="isTagMode === false ? '关键字搜索' : '标签搜索'"
+            class="input-with-select"
+          >
+            <template #append>
+              <el-button @click="searchTwo">搜索</el-button>
+            </template>
+          </el-input>
+            <!-- <el-button @click="searchTwo">搜索</el-button> -->
+            <el-switch
+              v-model="isTagMode"
+              active-text="标签搜索"
+              inactive-text="关键字搜索"
+              @change="toggleSearchMode"
+            />
         </div>
+
+        <div class="bottom-content">
+            <el-row>
+              <el-col :span="24" v-for="note in paginatedNotes" :key="note.noteId">
+                <el-card class="note-item" shadow="hover">
+                  <template #header>
+                    <div class="card-header">
+                      <h3>{{ note.title }}</h3>
+                      <el-tag size="small" type="info">
+                        最后修改: {{ formatDate(note.updatedAt) }}
+                      </el-tag>
+                    </div>
+                  </template>
+                  <div class="card-tags">
+                    <el-tag
+                      v-for="(tag, index) in note.tags"
+                      :key="index"
+                      size="small"
+                      effect="plain"
+                      class="mr-5"
+                    >
+                      {{ tag }}
+                    </el-tag>
+                  </div>
+                </el-card>
+              </el-col>
+            </el-row>
+
+            <div class="pagination">
+              <el-pagination
+                layout="prev, pager, next"
+                :total="totalNotes"
+                :page-size="notesPerPage"
+                :current-page="currentPage"
+                @current-change="handlePageChange"
+              >
+              </el-pagination>
+            </div>
         </div>
       </div>
 
@@ -79,7 +109,12 @@
             <h3>基本信息</h3>
             <div>
               <label>笔记本名称:</label>
-              <input type="text" v-model="newNotebookName">
+              <el-input
+                type="text"
+                v-model="newNotebookName"
+                placeholder="请输入笔记本名称"
+                clearable
+              />
             </div>
             <div>
               <label>简介:</label>
@@ -99,8 +134,24 @@
 <script>
 import axios from 'axios';
 import CreateNoteModal from './CreateNoteModal.vue';
+import { ref } from 'vue'
 
 export default {
+  setup() {
+    const isTagMode = ref(false)
+    const searchMode = ref('keyword')
+
+    const toggleSearchMode = (val) => {
+      searchMode.value = val ? 'tag' : 'keyword'
+      emit('update:searchMode', searchMode.value)
+    }
+
+    return {
+      isTagMode,
+      searchMode,
+      toggleSearchMode
+    }
+  },
   components: {
     CreateNoteModal,
   },
@@ -117,12 +168,13 @@ export default {
       searchMode: 'keyword',
       filteredNotes: [],
       currentPage: 1,
-      notesPerPage: 12,
+      notesPerPage: 3,
+      totalCount: 0,
     };
   },
   computed: {
-    totalPages() {
-      return Math.ceil(this.filteredNotes.length / this.notesPerPage);
+    totalNotes() {
+      return this.filteredNotes.length;
     },
     paginatedNotes() {
       const start = (this.currentPage - 1) * this.notesPerPage;
@@ -167,6 +219,7 @@ export default {
 
         if (response.data.code === "200") {
           this.filteredNotes = response.data.data;
+          this.currentPage = 1; // 重置到第一页
         } 
       } catch (error) {
         console.error('搜索笔记时出错:', error);
@@ -203,14 +256,26 @@ export default {
           if (response.data.code === "200") {
             // 处理成功响应
             this.filteredNotes = response.data.data;
+            this.currentPage = 1; // 重置到第一页
           } 
         })
         .catch(error => {
           console.error('请求出错:', error);
           if (error.response) {
             alert('未搜索到: ' + error.response.data.message);
-        }
+            this.search();
+          }
+          
         });
+    },
+    //更新搜索列表
+    updateFilteredNotes() {
+      const start = (this.currentPage - 1) * this.notesPerPage;
+      const end = start + this.notesPerPage;
+      this.filteredNotes = this.notes.slice(start, end);
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
     },
     //传入type参数
     showCreateNoteModal(type) {
@@ -288,11 +353,13 @@ export default {
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
+        this.updateFilteredNotes();
       }
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
+        this.updateFilteredNotes();
       }
     },
   },
@@ -679,7 +746,7 @@ export default {
   .note-item {
   background-color: white;
   border-radius: 8px;
-  padding: 15px;
+  padding: 5px;
   box-shadow: 5px 5px 5px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
 }
