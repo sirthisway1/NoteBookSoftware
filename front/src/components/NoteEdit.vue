@@ -32,12 +32,12 @@
 <button class="icon-button" @click="privateNote"><i class="fas fa-lock"></i></button>
 
 <template v-if="noteType === 0">
-  <!-- 录音的按钮 -->
-  <button class="icon-button" @click="toggleRecording">
-    <i v-if="!isRecording" class="fas fa-microphone"></i>
-    <i v-else class="fas fa-music note-icon"></i>
-  </button>
-</template>
+  <!-- 录音 -->
+      <button class="icon-button" @click="toggleRecording">
+        <i v-if="!isRecording" class="fas fa-microphone"></i>
+        <i v-else class="fas fa-music note-icon"></i>
+      </button>
+    </template>
 <button class="icon-button" @click="closeEditor"><i class="fas fa-times"></i></button>
 </div>
 
@@ -164,6 +164,12 @@ import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import CreateNoteModal from './CreateNoteModal.vue';
 
+import Recorder from 'recorder-core'
+import 'recorder-core/src/engine/mp3'
+import 'recorder-core/src/engine/mp3-engine'
+import 'recorder-core/src/extensions/waveview'
+import 'recorder-core/src/engine/wav'
+
 export default {
 components: { Editor, Toolbar, CreateNoteModal,TagModal,
 },
@@ -212,8 +218,10 @@ data() {
     noteContent: this.getNoteContent(this.$route.params.noteContent),
     
     isRecording: false, // 录音状态
-    mediaRecorder: null, // MediaRecorder实例
-    audioChunks: [], // 存储录音数据块
+    rec: null,
+    wave: null,
+    recBlob: null,
+    valueHtml: '',
     
     // 编辑器相关数据
     editorRef: shallowRef(null),
@@ -526,97 +534,99 @@ updateTags(newTags) {
         console.error("Error fetching current user:", error);
       }
     },
-    
-    // 开始录音
-  async startRecording() {
-    try {
-      // 请求麦克风权限并设置采样率和声道
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          sampleRate: 16000,
-          channelCount: 1,
-          sampleSize: 16,
-          volume: 1
+    //开始和结束录音
+    toggleRecording() {
+      if (this.isRecording) {
+        this.stopRecording(); // 停止录音
+      } else {
+        this.startRecording(); // 开始录音
+      }
+    },
+     // 开始录音
+    async startRecording() {
+      if (this.rec) {
+        this.rec.start();
+        this.isRecording = true;
+        console.log("开始录音");
+      } else {
+        this.initRecorder();
+      }
+    },
+    // 停止录音
+    stopRecording() {
+      if (!this.rec) {
+        console.error("未打开录音");
+        return;
+      }
+      this.rec.stop((blob, duration) => {
+        this.recBlob = blob;
+        this.isRecording = false;
+        console.log("录音结束，时长:", duration, "ms");
+        this.handleRecordingStop(blob);
+      }, (err) => {
+        console.error("结束录音出错：", err);
+      });
+    },
+    // 处理录音停止事件
+    async initRecorder() {
+      this.rec = Recorder({
+        type: "wav",
+        sampleRate: 16000,
+        bitRate: 16,
+        numChannels: 1,
+        onProcess: (buffers, powerLevel, bufferDuration, bufferSampleRate) => {
+          if (this.wave) this.wave.input(buffers[buffers.length-1], powerLevel, bufferSampleRate);
         }
       });
-      this.audioContext = new AudioContext();
-      this.audioStream = this.audioContext.createMediaStreamSource(stream);
-      this.recorder = new MediaRecorder(stream);
 
-      this.audioChunks = [];
+      this.rec.open(() => {
+        console.log("录音已打开");
+        if (this.$refs.recwave) {
+          this.wave = Recorder.WaveView({ elem: this.$refs.recwave });
+        }
+        this.startRecording();
+      }, (msg, isUserNotAllow) => {
+        console.log((isUserNotAllow ? "用户拒绝了权限，" : "") + "无法录音: " + msg);
+      });
+    },
+    async handleRecordingStop(audioBlob) {
+  // 创建下载链接
+  const downloadLink = document.createElement('a');
+  downloadLink.href = URL.createObjectURL(audioBlob);
+  downloadLink.download = `recording_${new Date().getTime()}.wav`;
 
-      this.recorder.ondataavailable = event => {
-        this.audioChunks.push(event.data);
-      };
+  // 添加链接到文档并触发点击
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
 
-      this.recorder.onstop = this.handleRecordingStop;
+  // 清理
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(downloadLink.href);
 
-      this.recorder.start();
-      this.isRecording = true;
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
+  const formData = new FormData();
+  formData.append("audio", audioBlob, downloadLink.download);
+
+  try {
+    const response = await axios.post('/api/model/uploadAudio', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    const text = response.data.data.text;
+    this.valueHtml += `<p>${text}</p>`;
+    
+    // 可以添加一个下载链接到 valueHtml
+    // this.valueHtml += `<p><a href="${downloadLink.href}" download="${downloadLink.download}">下载录音</a></p>`;
+  } catch (error) {
+    console.error('Error uploading audio:', error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
     }
-  },
-
-  // 处理录音停止事件
-  async handleRecordingStop() {
-    this.isRecording = false;
-
-    const audioBlob = new Blob(this.audioChunks, { type: 'audio/pcm' });
-
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64data = reader.result.split(',')[1]; // 获取 base64 数据
-      // const base64EncodedLength = Math.ceil(base64data.length / 4) * 3;
-
-
-
-      // 创建一个下载链接
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(audioBlob);
-      downloadLink.download = `recording_${new Date().getTime()}.pcm`;
-
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-
-      document.body.removeChild(downloadLink);
-      URL.revokeObjectURL(downloadLink.href);
-      this.audioChunks = [];
-
-      // 以 Base64 编码的音频数据上传
-      const payload = {
-        audio: base64data, //base64编码的字符串
-        filename: `recording_${new Date().getTime()}.pcm`, //文件名字符串
-        // length: Math.ceil(base64data.length / 4) * 3, //Base64编码后的数据长度
-        length: audioBlob.size,
-      };
-
-      try {
-        const response = await axios.post('/api/model/uploadAudio', payload, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        const text = response.data.data.text;
-        this.valueHtml += `<p>${text}</p>`;
-      } catch (error) {
-        console.error('Error uploading audio:', error);
-      }
-    };
-
-    reader.readAsDataURL(audioBlob);
-  },
-
-  toggleRecording() {
-    if (this.isRecording) {
-      this.recorder.stop();
-    } else {
-      this.startRecording();
-    }
-  },
-
-
+  }
+}
   },
 async mounted() {
   await this.fetchCurrentUser();

@@ -139,7 +139,7 @@ export default {
 
         if (response.data.code === "200") {
           ElMessage({
-            showClose: true,
+            duration:1000,
             message: '笔记创建成功',
             type: 'success',
           })

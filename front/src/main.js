@@ -22,6 +22,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import PrivateNotes from './components/PrivateNotes.vue';
 import MindnoteEdit from './components/MindnoteEdit.vue';
 import axios from 'axios';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -62,7 +63,10 @@ const router = createRouter({
 const app = createApp(App);
 app.use(router);
 app.use(ElementPlus);
-app.component('QuillEditor', QuillEditor);
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
 app.mount('#app');
 // // 获取私密笔记列表
 // app.get('/api/notes/private', (req, res) => {

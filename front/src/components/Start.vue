@@ -6,10 +6,9 @@
           <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
           <div class="sidebar-username" id="username">{{ username }}</div>
         </div>
-        <div class="sidebar-item start-button" @click="goToStart">
-          <div class="icon-placeholder"><img src="/vue图片/图片1.png" alt="开始图标" class="icon-image">
-          </div>
-          <span>开始</span>
+        <div class="sidebar-item active" @click="goToStart">
+          <el-icon :size="40"><HomeFilled /></el-icon>
+          开始
         </div>
         <div class="sidebar-item" @click="goToNotebook">笔记本</div>
         <div class="sidebar-item" @click="goToCommunity">发现社区</div>
@@ -56,38 +55,55 @@
         </div>
 
         <div class="bottom-content">
-            <el-row>
-              <el-col :span="24" v-for="note in paginatedNotes" :key="note.noteId">
-                <el-card class="note-item" shadow="hover">
-                  <template #header>
-                    <div class="card-header">
+          <el-row>
+            <el-col :span="24" v-for="note in paginatedNotes" :key="note.noteId">
+              <el-card class="note-item" shadow="hover">
+                <template #header>
+                  
+                  <div class="card-header">
+                    <el-icon :size="20" style="margin-top: 4px;"><Tickets /></el-icon>
+                    <div class="title-and-date">
                       <h3>{{ note.title }}</h3>
-                      <el-tag size="small" type="info">
+                      <el-tag size="small" type="info" class="day">
                         最后修改: {{ formatDate(note.updatedAt) }}
                       </el-tag>
                     </div>
-                  </template>
-                  <div class="card-tags">
-                    <el-tag
-                      v-for="(tag, index) in note.tags"
-                      :key="index"
-                      size="small"
-                      effect="plain"
-                      class="mr-5"
-                    >
-                      {{ tag }}
-                    </el-tag>
+                    <div><el-button
+                        :icon="Delete"
+                        size="midle"
+                        @click.stop="deleteNote(note.noteId)"
+                        circle
+                        class="delete-button"
+                      >
+                      <Delete style="width: 1em; height: 1em;" />
+                    </el-button></div>
+                    
+                    
                   </div>
-                </el-card>
-              </el-col>
-            </el-row>
+                </template>
+                <div class="card-tags">
+                  <el-tag
+                    v-for="(tag, index) in note.tags"
+                    :key="index"
+                    size="small"
+                    effect="light"
+                    class="mr-5"
+                  >
+                    {{ tag }}
+                  </el-tag>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
 
             <div class="pagination">
               <el-pagination
                 layout="prev, pager, next"
+                background
                 :total="totalNotes"
                 :page-size="notesPerPage"
                 :current-page="currentPage"
+                :color="white"
                 @current-change="handlePageChange"
               >
               </el-pagination>
@@ -134,10 +150,14 @@
 <script>
 import axios from 'axios';
 import CreateNoteModal from './CreateNoteModal.vue';
+
 import { ref } from 'vue'
+import { ElIcon } from 'element-plus';
 
 export default {
+  
   setup() {
+    
     const isTagMode = ref(false)
     const searchMode = ref('keyword')
 
@@ -154,6 +174,7 @@ export default {
   },
   components: {
     CreateNoteModal,
+    
   },
   data() {
     return {
@@ -169,7 +190,7 @@ export default {
       filteredNotes: [],
       currentPage: 1,
       notesPerPage: 3,
-      totalCount: 0,
+      
     };
   },
   computed: {
@@ -339,6 +360,45 @@ export default {
         console.error("Error fetching current user:", error);
       }
     },
+
+    // 删除笔记
+    async deleteNote(noteId) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('请先登录');
+        return;
+      }
+
+      if (confirm("确定要删除这个笔记吗？")) {
+        try {
+          const response = await axios.delete(`/api/notes/delete/${noteId}`, {
+            headers: { token: token }
+          });
+          
+          if (response.data.code === "200") {
+            alert("笔记删除成功");
+            // 从列表中移除已删除的笔记
+            this.notes = this.notes.filter(note => note.id !== noteId);
+            await this.search();
+            // 如果有分页，可能需要更新总页数
+            // this.updateTotalPages();
+          } else {
+            alert(response.data.message || "笔记删除失败");
+          }
+        } catch (error) {
+          console.error('删除笔记时发生错误:', error);
+          alert("删除笔记失败，请稍后重试");
+        }
+      }
+    },
+
+    // // 更新总页数的方法（如果需要的话）
+    // updateTotalPages() {
+    //   // 根据笔记总数和每页显示数量计算总页数
+    //   // 这里需要根据您的具体实现来调整
+    //   this.totalPages = Math.ceil(this.notes.length / this.pageSize);
+    // },
+
     formatDate(dateString) {
       const date = new Date(dateString);
       return date.toLocaleString('zh-CN', { 
@@ -406,7 +466,7 @@ export default {
   justify-content: center;
   padding: 15px 0;
   cursor: pointer;
-  color: #333;
+  color: #6e6e6e;
   transition: background-color 0.3s;
 }
 
@@ -414,6 +474,10 @@ export default {
   background-color: #f0f0f0;
 }
 
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
+}
 /* 用户名以及头像 */
 .sidebar-user {
   display: flex;
@@ -469,7 +533,7 @@ export default {
 
 /* 选中效果 */
 .start-button {
-  background-color: #4CAF50;
+  background-color: #379cce;
   color: white;
   border-radius: 20px;
   padding: 10px 20px;
@@ -478,7 +542,7 @@ export default {
 }
 
 .start-button:hover {
-  background-color: #45a049;
+  background-color: #3baae1;
 }
 
 
@@ -768,40 +832,20 @@ export default {
   color: #666;
 }
 
-.tag {
-  display: inline-block;
-  background-color: #e0e0e0;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.8em;
-  margin-right: 5px;
+.card-header {
+  display: flex;
+  justify-content: space-between; /* 在标题和按钮之间留出空间 */
+}
+
+.title-and-date{
+  margin-right: 70%;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
-}
-
-.pagination button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin: 0 10px;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.pagination button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.pagination button:hover:not(:disabled) {
-  background-color: #45a049;
+  margin-top: 5%;
 }
 
 </style>

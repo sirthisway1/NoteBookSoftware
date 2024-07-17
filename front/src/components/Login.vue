@@ -23,8 +23,15 @@
 
 <script>
 import axios from 'axios';
+import { onMounted, onUnmounted } from 'vue';
+import effect from '@/assets/effect.js';
 
 export default {
+  setup() {
+    const { start, stop } = effect();
+    onMounted(() => start());
+    onUnmounted(() => stop());
+  },
   data() {
     return {
       username: '',
@@ -76,7 +83,8 @@ export default {
     },
     register() {
       this.$router.push('/register');
-    }
+    },
+    
   }
 };
 </script>
@@ -87,7 +95,6 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f5f5f5;
   font-family: "宋体", sans-serif;
 }
 

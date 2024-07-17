@@ -27,8 +27,19 @@
 
 <script>
 import axios from 'axios';
+import { onMounted, onUnmounted } from 'vue';
+import effect from '@/assets/effect.js';
 
 export default {
+  setup() {
+    const { start, stop } = effect();
+
+    // 在组件挂载时启动特效
+    onMounted(() => start());
+
+    // 在组件卸载时停止特效
+    onUnmounted(() => stop());
+  },
   data() {
     return {
       email: '',
@@ -91,15 +102,15 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f5f5f5;
   font-family: "宋体", sans-serif;
 }
 
+
 .register-box {
-  width: 300px;
-  padding: 20px;
+  width: 320px;
+  padding: 30px;
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 15px;
   background-color: #fff;
   text-align: center;
 }
@@ -116,40 +127,40 @@ h2 {
 
 label {
   display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
+  margin-bottom: 10px;
+  font-size: 18px;
 }
 
 input {
-  width: 95%;
+  width: calc(100% - 25px);
   padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  font-size: 18px;
+  border: none;
+  border-radius: 15px;
+  background-color: #eee;
 }
+
 
 .button-group {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  margin-top: 20px;
 }
 
 button {
   padding: 10px 20px;
-  font-size: 14px;
-  color: #000000;
-  background-color: #aaa;
+  font-size: 18px;
+  color: #fff;
+  background-color: #555;
   border: none;
-  border-radius: 5px;
+  border-radius: 15px;
   cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
   font-family: "宋体", sans-serif;
 }
 
-button:first-child {
-  background-color: #aaa;
-}
-
 button:hover {
-  /* opacity: 0.8; */
-  background-color: #64ffc1;
+  background-color: #64ffc1; /* 浅绿色 */
+  opacity: 0.8;
 }
 </style>

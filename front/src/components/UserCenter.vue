@@ -9,7 +9,10 @@
       <div class="sidebar-item" @click="goToStart">开始</div>
       <div class="sidebar-item" @click="goToNotebook">笔记本</div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
-      <div class="sidebar-item active" @click="goToUserCenter">用户中心</div>
+      <div class="sidebar-item active" @click="goToUserCenter">
+        <el-icon :size="40"><Avatar /></el-icon>
+        用户中心
+      </div>
     </div>
     <div class="main-content">
       <div class="user-center">
@@ -262,12 +265,16 @@ export default {
   justify-content: center;
   padding: 15px 0;
   cursor: pointer;
-  color: #333;
+  color: #6e6e6e;
   transition: background-color 0.3s;
 }
 
-.sidebar-item:hover, .sidebar-item.active {
+.sidebar-item:hover {
   background-color: #f0f0f0;
+}
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
 }
 
 /* 用户名以及头像 */
