@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class KeyWordServiceImpl implements KeyWordService {
     private String SECRET_KEY;
     @Override
     public List<String> extractKeyWords(String text, int num) throws IOException {
+        text = extractTextFromHtml(text);
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         String json = "{\"text\":[\"" + text + "\"],\"num\":" + num + "}";
         RequestBody body = RequestBody.create(mediaType, json);
@@ -70,6 +73,15 @@ public class KeyWordServiceImpl implements KeyWordService {
         Response response = HTTP_CLIENT.newCall(request).execute();
         return new JSONObject(response.body().string()).getString("access_token");
     }
+
+    public static String extractTextFromHtml(String htmlContent) {
+        // 使用Jsoup解析HTML内容
+        Document doc = Jsoup.parse(htmlContent);
+        // 提取纯文本
+        String text = doc.text();
+        return text;
+    }
+
 
 
 
