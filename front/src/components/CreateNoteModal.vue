@@ -9,20 +9,39 @@
       <div class="modal-body">
         <div class="form-group">
           <label>请选择笔记本:</label>
-          <select v-model="selectedNotebook">
-            <option v-for="notebook in notebooks" :key="notebook.notebookId" :value="notebook.notebookId">
-              {{ notebook.name }}
-            </option>
-          </select>
+          <el-select
+            v-model="selectedNotebook"
+            placeholder="选择一个笔记本"
+            style="width: 100%;"
+          >
+            <el-option
+              v-for="notebook in notebooks"
+              :key="notebook.notebookId"
+              :value="notebook.notebookId"
+              :label="notebook.name"
+            >
+            </el-option>
+          </el-select>
         </div>
         <div class="form-group">
           <label>输入笔记名称:</label>
-          <input type="text" v-model="noteName">
+          <el-input
+            v-model="noteName"
+            placeholder="请输入笔记名称"
+            clearable
+            style="width: 100%;"
+          ></el-input>
         </div>
         
         <div class="form-group">
           <label>输入标签:</label>
-          <input type="text" v-model="tagsInput" @keydown.enter="addTag">
+          <el-input
+            v-model="tagsInput"
+            placeholder="请输入标签"
+            clearable
+            @keydown.enter.native="addTag"
+            style="width: 100%;"
+          ></el-input>
         </div>
       </div>
       <div class="modal-footer">
@@ -213,13 +232,7 @@ export default {
 }
 
 .form-group select,
-.form-group input {
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+
 
 .modal-footer {
   margin-top: 20px;

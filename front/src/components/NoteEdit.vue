@@ -8,11 +8,11 @@
           <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
-      <div class="sidebar-item notebook-button">
-      <div class="icon-placeholder"><img src="/vue图片/图片2.png" alt="开始图标" class="icon-image"></div>
-        <span>笔记本</span>
+      <div class="sidebar-item active" @click="goToNotebook">
+        <el-icon :size="40"><Management /></el-icon>
+       笔记本
       </div>
-      <div class="sidebar-item" @click="goToCommunity">发现社区</div>、
+      <div class="sidebar-item" @click="goToCommunity">发现社区</div>
       <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
       <!-- <div class="sidebar-item" @click="goToCommunity">标签管理</div> -->
     </div>
@@ -24,134 +24,134 @@
       
       <div class="editor-container ">
 
-        
-<div class="editor-header">
-<input type="text" v-model="noteTitle" placeholder="编辑标题" class="title-input"/>
-<button class="icon-button" @click="tagNote"><i class="fas fa-tags"></i></button>
-<!-- <button class="icon-button" @click="favoriteNote"><i class="fas fa-star"></i></button> -->
-<button class="icon-button" @click="privateNote"><i class="fas fa-lock"></i></button>
+        <div class="editor-header">
+          <input type="text" v-model="noteTitle" placeholder="编辑标题" class="title-input"/>
+          <button class="icon-button" @click="tagNote"><i class="fas fa-tags"></i></button>
+          <!-- <button class="icon-button" @click="favoriteNote"><i class="fas fa-star"></i></button> -->
+          <button class="icon-button" @click="privateNote"><i class="fas fa-lock"></i></button>
 
-<template v-if="noteType === 0">
-  <!-- 录音 -->
-      <button class="icon-button" @click="toggleRecording">
-        <i v-if="!isRecording" class="fas fa-microphone"></i>
-        <i v-else class="fas fa-music note-icon"></i>
-      </button>
-    </template>
-<button class="icon-button" @click="closeEditor"><i class="fas fa-times"></i></button>
-</div>
+          <template v-if="noteType === 0">
+            <!-- 录音 -->
+                <button class="icon-button" @click="toggleRecording">
+                  <i v-if="!isRecording" class="fas fa-microphone"></i>
+                  <i v-else class="fas fa-music note-icon"></i>
+                </button>
+          </template>
 
+          <button class="icon-button" @click="closeEditor"><i class="fas fa-times"></i></button>
+        </div>
 
-<div class="editor-body">
-<template v-if="noteType === 0">
-  <div v-if="isEditorReady">
-    <!-- 富文本编辑器 -->
-    <Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
-    <Editor
-    :defaultConfig="editorConfig"
-    :mode="mode"
-    v-model="valueHtml"
-    class="quill-editor"
-    @onCreated="handleCreated"
-    @onChange="handleChange"
-    @onDestroyed="handleDestroyed"
-    @onFocus="handleFocus"
-    @onBlur="handleBlur"
-    @customAlert="customAlert"
-    @customPaste="customPaste"
-    />
-  </div>
-</template>
-<template v-else-if="noteType === 1">
-<!-- 时间管理四象限分析 -->
-<div class="quadrant">
-<div class="quadrant-item">
-<label>紧急且重要</label>
-<textarea v-model="noteContent.ur_im"></textarea>
-</div>
-<div class="quadrant-item">
-<label>不紧急但重要</label>
-<textarea v-model="noteContent.nur_im"></textarea>
-</div>
-<div class="quadrant-item">
-<label>紧急但不重要</label>
-<textarea v-model="noteContent.ur_nim"></textarea>
-</div>
-<div class="quadrant-item">
-<label>不紧急且不重要</label>
-<textarea v-model="noteContent.nur_nim"></textarea>
-</div>
-</div>
-</template>
-<template v-else-if="noteType === 2">
-<!-- SWOT分析 -->
-<div class="swot">
-<div class="swot-item">
-<label>优势</label>
-<textarea v-model="noteContent.advantage"></textarea>
-</div>
-<div class="swot-item">
-<label>劣势</label>
-<textarea v-model="noteContent.disadvantage"></textarea>
-</div>
-<div class="swot-item">
-<label>机会</label>
-<textarea v-model="noteContent.chance"></textarea>
-</div>
-<div class="swot-item">
-<label>威胁</label>
-<textarea v-model="noteContent.threat"></textarea>
-</div>
-</div>
-</template>
-<template v-else-if="noteType === 3">
-<!-- 5W1H分析 -->
-<div class="five-wh">
-<div class="five-wh-item">
-<label>What (什么)</label>
-<textarea v-model="noteContent.what"></textarea>
-</div>
-<div class="five-wh-item">
-<label>Why (为什么)</label>
-<textarea v-model="noteContent.why"></textarea>
-</div>
-<div class="five-wh-item">
-<label>Who (谁)</label>
-<textarea v-model="noteContent.who"></textarea>
-</div>
-<div class="five-wh-item">
-<label>Where (在哪里)</label>
-<textarea v-model="noteContent.where"></textarea>
-</div>
-<div class="five-wh-item">
-<label>When (何时)</label>
-<textarea v-model="noteContent.when"></textarea>
-</div>
-<div class="five-wh-item">
-<label>How (如何)</label>
-<textarea v-model="noteContent.how"></textarea>
-</div>
-</div>
-</template>
-</div>
-<div class="editor-footer">
+        <div class="editor-body">
+          <template v-if="noteType === 0">
+            <div v-if="isEditorReady">
+              <!-- 富文本编辑器 -->
+              <Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
+              <Editor
+              :defaultConfig="editorConfig"
+              :mode="mode"
+              v-model="valueHtml"
+              class="quill-editor"
+              @onCreated="handleCreated"
+              @onChange="handleChange"
+              @onDestroyed="handleDestroyed"
+              @onFocus="handleFocus"
+              @onBlur="handleBlur"
+              @customAlert="customAlert"
+              @customPaste="customPaste"
+              />
+            </div>
+          </template>
+          <template v-else-if="noteType === 1">
+          <!-- 时间管理四象限分析 -->
+          <div class="quadrant">
+          <div class="quadrant-item">
+          <label>紧急且重要</label>
+          <textarea v-model="noteContent.ur_im"></textarea>
+          </div>
+          <div class="quadrant-item">
+          <label>不紧急但重要</label>
+          <textarea v-model="noteContent.nur_im"></textarea>
+          </div>
+          <div class="quadrant-item">
+          <label>紧急但不重要</label>
+          <textarea v-model="noteContent.ur_nim"></textarea>
+          </div>
+          <div class="quadrant-item">
+          <label>不紧急且不重要</label>
+          <textarea v-model="noteContent.nur_nim"></textarea>
+          </div>
+          </div>
+          </template>
+          <template v-else-if="noteType === 2">
+          <!-- SWOT分析 -->
+          <div class="swot">
+          <div class="swot-item">
+          <label>优势</label>
+          <textarea v-model="noteContent.advantage"></textarea>
+          </div>
+          <div class="swot-item">
+          <label>劣势</label>
+          <textarea v-model="noteContent.disadvantage"></textarea>
+          </div>
+          <div class="swot-item">
+          <label>机会</label>
+          <textarea v-model="noteContent.chance"></textarea>
+          </div>
+          <div class="swot-item">
+          <label>威胁</label>
+          <textarea v-model="noteContent.threat"></textarea>
+          </div>
+          </div>
+          </template>
+          <template v-else-if="noteType === 3">
+          <!-- 5W1H分析 -->
+          <div class="five-wh">
+          <div class="five-wh-item">
+          <label>What (什么)</label>
+          <textarea v-model="noteContent.what"></textarea>
+          </div>
+          <div class="five-wh-item">
+          <label>Why (为什么)</label>
+          <textarea v-model="noteContent.why"></textarea>
+          </div>
+          <div class="five-wh-item">
+          <label>Who (谁)</label>
+          <textarea v-model="noteContent.who"></textarea>
+          </div>
+          <div class="five-wh-item">
+          <label>Where (在哪里)</label>
+          <textarea v-model="noteContent.where"></textarea>
+          </div>
+          <div class="five-wh-item">
+          <label>When (何时)</label>
+          <textarea v-model="noteContent.when"></textarea>
+          </div>
+          <div class="five-wh-item">
+          <label>How (如何)</label>
+          <textarea v-model="noteContent.how"></textarea>
+          </div>
+          </div>
+          </template>
+        </div>
+
+        <div class="editor-footer">
 <button @click="saveNote" class="save-button">保存</button>
 <button @click="insertText">插入文本</button>
 <button @click="printHtml">打印 HTML</button>
 <button @click="disable">禁用</button>
-</div>
-</div>
+        </div>
+      </div>
     </div>
     <!-- 包含模态框组件 -->
     <CreateNoteModal :visible="isCreateNoteModalVisible" @close="hideCreateNoteModal" />
   </div>
-  <TagModal 
-  :visible="isTagModalVisible" 
-  :tags="selectedNote ? selectedNote.tags : []"
-  :selectedNote="selectedNote"
-  @close="closeTagModal"
-  @update-tags="updateTags"
-/>
+    <TagModal 
+        :visible="isTagModalVisible" 
+        :tags="selectedNote ? selectedNote.tags : []"
+        :selectedNote="selectedNote"
+        @close="closeTagModal"
+        @update-tags="updateTags"
+    />
 </template>
 
 <script>
@@ -169,6 +169,8 @@ import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
 import 'recorder-core/src/extensions/waveview'
 import 'recorder-core/src/engine/wav'
+
+import { ElMessage } from 'element-plus'
 
 export default {
 components: { Editor, Toolbar, CreateNoteModal,TagModal,
@@ -491,7 +493,12 @@ updateTags(newTags) {
       });
 
       if (response.data.code === "200") {
-        alert('笔记更新成功');
+        ElMessage({
+          duration:1000,
+          showClose: true,
+          message: '保存成功',
+          type: 'success',
+        })
         // 更新 selectedNote 数据
         this.selectedNote = {
         ...this.selectedNote,
@@ -678,6 +685,7 @@ watch: {
   display: flex;
   height: 100vh;
   width: 100%;
+  background-color: rgb(239, 239, 239)
 }
 
 /* 左侧侧边栏样式 */
@@ -709,6 +717,10 @@ transition: background-color 0.3s;
 background-color: #f0f0f0;
 }
 
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
+}
 /* 用户名以及头像 */
 .sidebar-user {
   display: flex;
@@ -740,18 +752,6 @@ background-color: #f0f0f0;
 }
 /* 用户名以及头像 */
 
-.notebook-button {
-background-color: #4CAF50;
-color: white;
-border-radius: 20px;
-padding: 10px 20px;
-margin: 10px 20px;
-transition: background-color 0.3s;
-}
-
-.notebook-button:hover {
-background-color: #45a049;
-}
 
 
 .note-count-container {
@@ -802,7 +802,7 @@ object-fit: cover; /* 确保图片填满圆形且不变形 */
 /* 中间笔记本内容区样式 */
 .middle-section {
 width: 200px; /* 具体宽度 */
-background-color: #f0f0f0;
+background-color: #f5f7fa;
 padding: 10px;
 display: flex;
 flex-direction: column;

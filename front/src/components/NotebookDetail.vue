@@ -8,9 +8,9 @@
           <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
-      <div class="sidebar-item notebook-button" @click="goToNotebook">
-        <div class="icon-placeholder"><img src="/vue图片/图片2.png" alt="开始图标" class="icon-image"></div>
-        <span>笔记本</span>
+      <div class="sidebar-item active" @click="goToNotebook">
+        <el-icon :size="40"><Management /></el-icon>
+       笔记本
       </div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
       <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
@@ -56,6 +56,11 @@
          
         </div>
         <div class="content-area">{{  }}</div>
+      </div>
+
+      <div class="keyward-summary">
+        <h3>关键字显示</h3>
+        <div class="keyword-content">{{  }}</div>
       </div>
     </div>
 
@@ -241,6 +246,10 @@ export default {
   background-color: #f0f0f0;
 }
 
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
+}
 /* 用户名以及头像 */
 .sidebar-user {
   display: flex;
@@ -294,20 +303,8 @@ export default {
     font-size: 14px; /* 设置文字大小 */
 }
 
-.notebook-button {
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 20px;
-  padding: 10px 20px;
-  margin: 10px 20px;
-  transition: background-color 0.3s;
-}
 
-.notebook-button:hover {
-  background-color: #45a049;
-}
-
-  .note-count-container {
+.note-count-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -469,7 +466,13 @@ export default {
   .content-area {
     border: 1px solid #d0d0d0;
     padding: 10px;
-    height: 420px;
+    height: 400px;
+    background-color: #f9f9f9;
+  }
+  .keyword-content{
+    border: 1px solid #d0d0d0;
+    padding: 10px;
+    height: 100px;
     background-color: #f9f9f9;
   }
 </style>

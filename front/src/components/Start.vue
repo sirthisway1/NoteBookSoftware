@@ -137,7 +137,7 @@
               <textarea v-model="newNotebookDescription"></textarea>
             </div>
             <div class="modal-actions">
-              <button @click="createNotebook">创建</button>
+              <el-button type="primary" plain @click="createNotebook">创建</el-button>
             </div>
           </div>
         </div>
@@ -530,22 +530,6 @@ export default {
 .sidebar-item span {
     font-size: 14px; /* 设置文字大小 */
 }
-
-/* 选中效果 */
-.start-button {
-  background-color: #379cce;
-  color: white;
-  border-radius: 20px;
-  padding: 10px 20px;
-  margin: 10px 20px;
-  transition: background-color 0.3s;
-}
-
-.start-button:hover {
-  background-color: #3baae1;
-}
-
-
 
 .main-content {
   flex-grow: 1;

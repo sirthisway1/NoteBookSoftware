@@ -7,9 +7,9 @@
           <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
-      <div class="sidebar-item notebook-button">
-        <div class="icon-placeholder"><img src="/vue图片/图片2.png" alt="开始图标" class="icon-image"></div>
-        <span>笔记本</span>
+      <div class="sidebar-item active" @click="goToNotebook">
+        <el-icon :size="40"><Management /></el-icon>
+       笔记本
       </div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
       <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
@@ -57,6 +57,7 @@
         <div class="content-header">
           <h3>笔记内容</h3>
           <button v-if="selectedNote" class="edit-button" @click="editNote">编辑</button>
+          <button v-if="selectedNote" class="edit-button" @click="analysisKeyword">关键词分析</button>
         </div>
         <div class="content-area">
           <template v-if="noteType === 0">
@@ -66,6 +67,12 @@
             <EChartsComponent :option="chartOption" v-if="chartOption" />
           </template>
         </div>
+      </div>
+      <div class="keyward-summary">
+          <h3>关键字显示</h3>
+          <div class="keyword-content">
+            {{ keywardSummery }}
+          </div>
       </div>
 
     </div>
@@ -84,6 +91,8 @@
 import CreateNoteModal from './CreateNoteModal.vue';
 // import NoteCreateTree from './NoteCreateTree.vue';
 import EChartsComponent from './EChartsComponent.vue';
+
+import { ElMessage } from 'element-plus'
 
 export default {
   components: {
@@ -106,6 +115,7 @@ export default {
       isLoading: true,
       noteType: 0,
       notebookId: this.$route.params.notebookId, // 从路由获取笔记本ID
+      keywardSummery: '这里是提取出来的关键字'
       //模拟评论
       
       
@@ -192,25 +202,6 @@ export default {
       }
     },
 
-    // async fetchNotebookDetails() {
-    //   try {
-    //     const response = await axios.get(`/api/notebooks/${this.notebookId}`, {
-    //       headers: {
-    //         'Authorization': `Bearer ${localStorage.getItem('token')}`
-    //       }
-    //     });
-    //     if (response.data.code === 200) {
-    //       const { name, summary, notes } = response.data.data;
-    //       this.notebookName = name;
-    //       this.notebookSummary = summary;
-    //       this.notes = notes;
-    //     } else {
-    //       console.error('获取笔记本详情失败:', response.data.message);
-    //     }
-    //   } catch (error) {
-    //     console.error('获取笔记本详情时出错:', error);
-    //   }
-    // },
 
     //获取笔记本详细+笔记详细
     async fetchNotebookDetails() {
@@ -425,8 +416,8 @@ export default {
     }
   },
     
-  //获取当前用户
-  async fetchCurrentUser() {
+    //获取当前用户
+    async fetchCurrentUser() {
       const token = localStorage.getItem('token');
         if (!token) {
           alert('请先登录');
@@ -447,6 +438,48 @@ export default {
       }
     },
 
+    async analysisKeyword() {
+      if (!this.selectedNote || !this.selectedNote.content) {
+        console.error('No note selected or note content is empty');
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('请先登录');
+        return;
+      }
+
+      try {
+        const response = await axios.post('/api/model/keyWord', 
+          null,
+          { params: {
+              text: this.selectedNote.content
+            },
+            headers: { 
+              'Content-Type': 'application/x-www-form-urlencoded',
+              token: token 
+            },
+          }
+        );
+
+        if (response.data && response.data.code === "200") {
+          ElMessage({
+            showClose: true,
+            message: '分析成功',
+            type: 'success',
+          })
+          const keywords = response.data.data.keywords;
+          this.keywardSummery = keywords.join(', '); // 将关键词数组转换为字符串
+        } else {
+          console.error('关键词分析失败:', response.data.message);
+          this.keywardSummery = '关键词分析失败';
+        }
+      } catch (error) {
+        console.error('关键词分析出错:', error);
+        this.keywardSummery = '关键词分析出错';
+      }
+    }
   },
   mounted() {
   this.fetchNoteDetail();
@@ -494,6 +527,10 @@ export default {
   background-color: #f0f0f0;
 }
 
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
+}
 /* 用户名以及头像 */
 .sidebar-user {
   display: flex;
@@ -525,18 +562,6 @@ export default {
 }
 /* 用户名以及头像 */
 
-.notebook-button {
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 20px;
-  padding: 10px 20px;
-  margin: 10px 20px;
-  transition: background-color 0.3s;
-}
-
-.notebook-button:hover {
-  background-color: #45a049;
-}
 
 
 .note-count-container {
@@ -635,14 +660,14 @@ export default {
 .action-button {
   margin: 10px 0;
   padding: 10px;
-  background-color: #d0d0d0;
+  background-color: #489ccd;
   border: none;
   text-align: center;
   cursor: pointer;
 }
 
 .action-button:hover {
-  background-color: #c0c0c0;
+  background-color: #73c7ff;
 }
 
 .notebook-list {
@@ -657,7 +682,7 @@ export default {
 }
 
 .note-item.selected {
-  background-color: #a0e0a0;
+  background-color: #409bf6;
 }
 
 .note-header {
@@ -719,7 +744,7 @@ export default {
 .content-area {
   border: 1px solid #d0d0d0;
   padding: 10px;
-  height: 420px;
+  height: 400px;
   background-color: #f9f9f9;
   position: relative;
 }
@@ -729,36 +754,17 @@ export default {
   height: 100%;
 }
 
-.add-comment-button {
-  margin-top: 20px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-}
-
-.add-comment-button:hover {
-  background-color: #218838;
-}
-
-.comment-list {
-  margin-top: 20px;
+.keyword-content{
   border: 1px solid #d0d0d0;
   padding: 10px;
+  height: 200px;
   background-color: #f9f9f9;
-  max-height: 200px; /* 设置最大高度 */
-  overflow-y: auto; /* 添加垂直滚动条 */
+  position: relative;
 }
 
-.comment-item {
-  margin-bottom: 10px;
-}
 
-.comment-item strong {
-  display: block;
-  margin-bottom: 5px;
-}
+
+
 
 .quadrant, .swot, .five-wh {
   display: grid;

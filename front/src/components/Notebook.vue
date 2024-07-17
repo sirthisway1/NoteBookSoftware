@@ -7,9 +7,9 @@
           <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
-      <div class="sidebar-item notebook-button" @click="goToNotebook">
-        <div class="icon-placeholder"><img src="/vue图片/图片2.png" alt="开始图标" class="icon-image"></div>
-      <span>笔记本</span>
+      <div class="sidebar-item active" @click="goToNotebook">
+        <el-icon :size="40"><Management /></el-icon>
+       笔记本
       </div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
       <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
@@ -22,7 +22,8 @@
             <div class="notebook-header">
               <div class="notebook-name" @click="goToNotebookDetails(notebook)">{{ notebook.name }}</div>
               <div class="dropdown">
-                <button class="dropbtn" @click.stop="toggleDropdown(notebook.notebookId)">⚙️</button>
+                <!-- <button class="dropbtn" @click.stop="toggleDropdown(notebook.notebookId)"></button> -->
+                <el-icon class="dropbtn" @click.stop="toggleDropdown(notebook.notebookId)"><Tools /></el-icon>
                 <div class="dropdown-content" v-if="notebook.showDropdown">
                   <div class="dropdown-item" @click="editNotebookName(notebook.notebookId)">修改笔记本名称</div>
                   <div class="dropdown-item" @click="editNotebookSummary(notebook.notebookId)">修改笔记本简介</div>
@@ -339,6 +340,11 @@ transition: background-color 0.3s;
 background-color: #f0f0f0;
 }
 
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
+}
+
 /* 用户名以及头像 */
 .sidebar-user {
   display: flex;
@@ -392,19 +398,6 @@ object-fit: cover; /* 确保图片填满圆形且不变形 */
 
 .sidebar-item span {
   font-size: 14px; /* 设置文字大小 */
-}
-
-.notebook-button {
-background-color: #4CAF50;
-color: white;
-border-radius: 20px;
-padding: 10px 20px;
-margin: 10px 20px;
-transition: background-color 0.3s;
-}
-
-.notebook-button:hover {
-background-color: #45a049;
 }
 
 
@@ -486,7 +479,7 @@ background-color: #45a049;
 }
 
 .dropbtn {
-  background-color: #4CAF50;
+  background-color: #4c8caf;
   color: white;
   padding: 8px;
   border: none;
@@ -497,7 +490,7 @@ background-color: #45a049;
 }
 
 .dropbtn:hover {
-  background-color: #45a049;
+  background-color: #77bdeb;
 }
 
 .dropdown-content {

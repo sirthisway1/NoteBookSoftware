@@ -347,13 +347,13 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 15px;
-  border: 4px solid #4CAF50;
+  border: 4px solid #409bf6;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .upload-button {
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: #409bf6;
   color: white;
   border: none;
   border-radius: 25px;
@@ -363,7 +363,7 @@ export default {
 }
 
 .upload-button:hover {
-  background-color: #45a049;
+  background-color: #62b0ff;
   transform: translateY(-2px);
 }
 
@@ -398,7 +398,7 @@ export default {
 }
 
 .info-item input:focus, .info-item textarea:focus {
-  border-color: #4CAF50;
+  border-color: #409bf6;
   outline: none;
 }
 
@@ -410,7 +410,7 @@ export default {
 .info-item button {
   margin-left: 15px;
   padding: 8px 15px;
-  background-color: #4CAF50;
+  background-color: #409bf6;
   color: white;
   border: none;
   border-radius: 4px;
@@ -419,7 +419,7 @@ export default {
 }
 
 .info-item button:hover {
-  background-color: #45a049;
+  background-color: #62b0ff;
 }
 
 /* .save-all-button {
@@ -467,19 +467,19 @@ export default {
 }
 
 .save-button {
-  background-color: #4CAF50;
+  background-color: #409bf6;
 }
 
 .save-button:hover {
-  background-color: #45a049;
+  background-color: #62b0ff;
 }
 
 .logout-button {
-  background-color: #4CAF50;
+  background-color: #409bf6;
 }
 
 .logout-button:hover {
-  background-color: #45a049;
+  background-color: #62b0ff;
 }
 
 @media (max-width: 768px) {

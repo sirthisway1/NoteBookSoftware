@@ -8,10 +8,9 @@
         </div>
         <div class="sidebar-item" @click="goToStart">开始</div>
         <div class="sidebar-item" @click="goToNotebook">笔记本</div>
-        <div class="sidebar-item community-button" @click="goToCommunity">
-          <div class="icon-placeholder"><img src="/vue图片/图片3.png" alt="开始图标" class="icon-image">
-          </div>
-          <span>发现社区</span>
+        <div class="sidebar-item active" @click="goToCommunity">
+          <el-icon :size="40"><Comment /></el-icon>
+          发现社区
         </div>
         <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
         <!-- <div class="sidebar-item" @click="goToTags">标签管理</div> -->
@@ -186,6 +185,10 @@ export default {
   background-color: #f0f0f0;
 }
 
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
+}
 /* 用户名以及头像 */
 .sidebar-user {
   display: flex;
@@ -219,14 +222,7 @@ export default {
 }
 /* 用户名以及头像 */
 
-.community-button {
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 20px;
-  padding: 10px 20px;
-  margin: 10px 20px;
-  transition: background-color 0.3s;
-}
+
 
 .icon-image {
   width: 100%;
@@ -288,7 +284,7 @@ export default {
 }
 
 .note-header {
-  background-color: #4CAF50;
+  background-color: #87c6e5;
   padding: 15px;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
@@ -301,21 +297,22 @@ export default {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 15px;
+  margin-right: 90%;
   border: 2px solid #ffffff;
 }
 
 .note-user {
   font-weight: bold;
   color: #ffffff;
-  margin-right: 15px;
+  margin-right: 90%;
 }
 
 .note-title {
-  font-size: 18px;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 20px;
   font-weight: bold;
-  color: #ffffff;
-  margin-left: auto;
+  color: #2e2e2e;
+  margin-right: 90%;
 }
 
 .note-info {

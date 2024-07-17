@@ -8,12 +8,10 @@
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
       <div class="sidebar-item" @click="goToNotebook">笔记本</div>
-      <div class="sidebar-item community-button" @click="goToCommunity">
-        <div class="icon-placeholder">
-          <img src="/vue图片/图片3.png" alt="开始图标" class="icon-image">
+      <div class="sidebar-item active" @click="goToCommunity">
+          <el-icon :size="40"><Comment /></el-icon>
+          发现社区
         </div>
-        <span>发现社区</span>
-      </div>
       <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
       <!-- <div class="sidebar-item" @click="goToTags">标签管理</div> -->
     </div>
@@ -386,6 +384,10 @@ export default {
 .sidebar-item:hover {
   background-color: #f0f0f0;
 }
+.sidebar-item.active{
+  background-color: #409bf6;
+  color: white;
+}
 
 /* 用户名以及头像 */
 .sidebar-user {
@@ -416,19 +418,6 @@ export default {
   min-height: 40px; /* 与头像高度一致 */
 }
 /* 用户名以及头像 */
-
-.community-button {
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 20px;
-  padding: 10px 20px;
-  margin: 10px 20px;
-  transition: background-color 0.3s;
-}
-
-.community-button:hover {
-  background-color: #45a049;
-}
 
 .main-content {
   flex-grow: 1;
