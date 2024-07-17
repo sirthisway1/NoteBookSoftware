@@ -36,23 +36,31 @@ public class AudioToTextServiceImpl implements AudioToTextService {
     @Value("${baidu.api.secret}")
     private String SECRET_KEY;
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
-    private static final String format="wav";
-    private static String speech="";
+    private static final String format = "wav";
+    private static String speech = "";
     private static Integer len;
-
-    public String processAudioFile(MultipartFile audio)throws BusinessException{
+    private static String resultString;
+    public String processAudioFile(MultipartFile audio) throws BusinessException {
         try {
             File inputFile = new File(System.getProperty("java.io.tmpdir") + "/" + audio.getOriginalFilename());
             FileUtils.copyInputStreamToFile(audio.getInputStream(), inputFile);
             info(inputFile.getAbsolutePath());
             String outputFilePath = System.getProperty("java.io.tmpdir") + "/converted.wav";
-            File outputFile = audioEncode(inputFile.getAbsolutePath(), outputFilePath, 16,16000, 1);
+            File outputFile = audioEncode(inputFile.getAbsolutePath(), outputFilePath, 16000, 1);
 
             convertFileToBase64(outputFile);
-            return makeRequest();
-        }catch (IOException e){
+            // 删除临时文件
+            if (outputFile.exists()) {
+                outputFile.delete();
+            }
+            if (inputFile.exists()) {
+                inputFile.delete();
+            }
+            makeRequest();
+            return resultString;
+        } catch (IOException e) {
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "语音转换失败: IO异常");
-        }catch(EncoderException e) {
+        } catch (EncoderException e) {
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
@@ -69,13 +77,14 @@ public class AudioToTextServiceImpl implements AudioToTextService {
         }
     }
 
-    private String makeRequest() throws IOException {
+    private void makeRequest() throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         String requestBodyJson = String.format(
                 "{\"format\":\"%s\",\"rate\":16000,\"channel\":1,\"cuid\":\"aw6fZ0c9feQMVpZHs0t28jmaktbIuOVq\",\"token\":\"%s\",\"speech\":\"%s\",\"len\":%d,\"dev_pid\":80001}",
                 format, getAccessToken(), speech, len
         );
-        RequestBody body = RequestBody.create(requestBodyJson, mediaType);Request request = new Request.Builder()
+        RequestBody body = RequestBody.create(requestBodyJson, mediaType);
+        Request request = new Request.Builder()
                 .url("https://vop.baidu.com/pro_api")
                 .method("POST", body)
                 .addHeader("Content-Type", "application/json")
@@ -86,10 +95,9 @@ public class AudioToTextServiceImpl implements AudioToTextService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(jsonResponse);
         JsonNode resultNode = rootNode.path("result");
-        String resultString = resultNode.toString();
+        resultString = resultNode.toString();
         // 去掉中括号和反斜杠
         resultString = resultString.replace("[", "").replace("]", "").replace("\\", "").replace("\"", "");
-        return resultString;
     }
 
     private String getAccessToken() throws IOException {
@@ -114,20 +122,22 @@ public class AudioToTextServiceImpl implements AudioToTextService {
         int bitRate = audio.getBitRate();
         int samplingRate = audio.getSamplingRate();
         System.out.println("声道:" + channels);
-        System.out.println("bitRate:" + bitRate);
-        System.out.println("samplingRate 采样率、音频采样级别 16000 = 16KHz:" + samplingRate);
+        System.out.println("比特率:" + bitRate);
+        System.out.println("采样率:" + samplingRate);
     }
 
-private File audioEncode(String inputFormatPath, String outputFormatPath, int bitRate,int samplingRate, int channels) {
-    String outputFormat = getSuffix(outputFormatPath);
-    String inputFormat = getSuffix(inputFormatPath);
-    File source = new File(inputFormatPath);
-    File target = new File(outputFormatPath);
-    try {
+    private File audioEncode(String inputFormatPath, String outputFormatPath, int samplingRate, int channels) throws EncoderException {
+        String outputFormat = getSuffix(outputFormatPath);
+        String inputFormat = getSuffix(inputFormatPath);
+        File source = new File(inputFormatPath);
+        File target = new File(outputFormatPath);
+
         MultimediaObject multimediaObject = new MultimediaObject(source);
+        MultimediaInfo info = multimediaObject.getInfo();
+        AudioInfo audioInfo = info.getAudio();
 
         AudioAttributes audio = new AudioAttributes();
-        audio.setBitRate(bitRate);
+        audio.setBitRate(audioInfo.getBitRate());
         audio.setSamplingRate(samplingRate);
         audio.setChannels(channels);
 
@@ -139,13 +149,9 @@ private File audioEncode(String inputFormatPath, String outputFormatPath, int bi
         Encoder encoder = new Encoder();
         encoder.encode(multimediaObject, target, attrs);
         return target;
-    } catch (IllegalArgumentException | EncoderException e) {
-        e.printStackTrace();
     }
-    return null;
-}
 
-private static String getSuffix(String outputFormatPath) {
-    return outputFormatPath.substring(outputFormatPath.lastIndexOf(".") + 1);
-}
+    private static String getSuffix(String outputFormatPath) {
+        return outputFormatPath.substring(outputFormatPath.lastIndexOf(".") + 1);
+    }
 }
