@@ -7,6 +7,8 @@ import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.service.AudioGenerationService;
 import com.example.markdown_demo.service.AudioToTextService;
+import com.example.markdown_demo.service.KeyWordService;
+import com.example.markdown_demo.service.impl.KeyWordServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 
 
@@ -27,7 +30,8 @@ public class AudioAnswerController {
     private AudioGenerationService audioGenerationService;
     @Autowired
     private AudioToTextService audioToTextService;
-
+    @Autowired
+    private KeyWordService keyWordService;
     @GetMapping(value = "/generate-text-answer", produces = "application/json")
     public Result<String> generateTextAnswer(@RequestParam String text) {
         try {
@@ -70,5 +74,22 @@ public class AudioAnswerController {
         } catch (Exception e) {
             return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"语音转换失败: " + e.getMessage());
         }
+    }
+
+
+    @PostMapping(value = "/keyWord")
+    public Result<?> keyWord(@RequestParam("keywords") String text){
+
+
+        try {
+
+            List<String> keyWords= keyWordService.extractKeyWords(text,5);
+            return Result.success(Map.of("keywords", keyWords));
+        } catch (Exception e) {
+            return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"关键字提取失败 " + e.getMessage());
+        }
+
+
+
     }
 }

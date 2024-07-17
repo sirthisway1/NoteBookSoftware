@@ -35,5 +35,7 @@ baidu:
   api:
     key: f3jTQ1lBoO1dFPm9FjSUTYog
     secret: GXp25ovceYUj2fM7whtmy5X44mFlQwtp
-
-
+keyword:
+  api:
+    key: GWzMP4mWSP3QrXRXl1tiyNSI
+    secret: g3GeIDxmEq6ZsBvy4H2XpImlGdSkksoS

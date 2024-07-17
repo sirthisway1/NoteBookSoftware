@@ -66,7 +66,7 @@ public class AudioToTextServiceImpl implements AudioToTextService {
 
     }
 
-    public void convertFileToBase64(File file) throws IOException {
+    private void convertFileToBase64(File file) throws IOException {
         // 将文件转换为字节数组
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] fileBytes = IOUtils.toByteArray(fis);
