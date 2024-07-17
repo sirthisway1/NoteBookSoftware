@@ -12,6 +12,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,12 +60,12 @@ public class AudioAnswerController {
             }
         }
     }
-    @PostMapping(value = "/uploadAudio", produces = "application/json")
-    public Result<?> uploadAudio(@RequestBody AudioUploadDTO audioUploadDTO){
+    @PostMapping(value = "/uploadAudio")
+    public Result<?> uploadAudio(@RequestParam("audio") MultipartFile audio){
         // 处理上传的音频文件
         try {
             // 这里调用Service来处理文件，例如保存到服务器或进行语音识别等
-            String text=audioToTextService.processAudioFile(audioUploadDTO);
+            String text=audioToTextService.processAudioFile(audio);
             return Result.success(Map.of("text", text));
         } catch (Exception e) {
             return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"语音转换失败: " + e.getMessage());

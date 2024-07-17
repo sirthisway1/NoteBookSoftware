@@ -9,8 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AudioUploadDTO {
-
-    private String audio;
-    private String filename;
-    private Integer len;
+    private MultipartFile audio;
 }

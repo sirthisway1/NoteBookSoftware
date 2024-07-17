@@ -7,6 +7,7 @@ import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.service.AudioToTextService;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
@@ -14,7 +15,17 @@ import org.springframework.stereotype.Service;
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.commons.io.IOUtils;
+import ws.schild.jave.Encoder;
+import ws.schild.jave.EncoderException;
+import ws.schild.jave.MultimediaObject;
+import ws.schild.jave.encode.AudioAttributes;
+import ws.schild.jave.encode.EncodingAttributes;
+import ws.schild.jave.info.AudioInfo;
+import ws.schild.jave.info.MultimediaInfo;
+
+import java.io.FileInputStream;
 import java.util.Base64;
+import java.io.File;
 import java.io.IOException;
 
 @Service
@@ -25,22 +36,40 @@ public class AudioToTextServiceImpl implements AudioToTextService {
     @Value("${baidu.api.secret}")
     private String SECRET_KEY;
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
+    private static final String format="wav";
+    private static String speech="";
+    private static Integer len;
 
-
-    public String processAudioFile(AudioUploadDTO audioUploadDTO)throws BusinessException{
-
-        String filename = audioUploadDTO.getFilename();
-        String format = null;
-        format = filename.substring(filename.lastIndexOf(".") + 1);
+    public String processAudioFile(MultipartFile audio)throws BusinessException{
         try {
-            return makeRequest(audioUploadDTO.getAudio(),audioUploadDTO.getLen(),format);
+            File inputFile = new File(System.getProperty("java.io.tmpdir") + "/" + audio.getOriginalFilename());
+            FileUtils.copyInputStreamToFile(audio.getInputStream(), inputFile);
+            info(inputFile.getAbsolutePath());
+            String outputFilePath = System.getProperty("java.io.tmpdir") + "/converted.wav";
+            File outputFile = audioEncode(inputFile.getAbsolutePath(), outputFilePath, 16,16000, 1);
+
+            convertFileToBase64(outputFile);
+            return makeRequest();
         }catch (IOException e){
-            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(),e.getMessage());
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, "语音转换失败: IO异常");
+        }catch(EncoderException e) {
+            throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
     }
 
-    private String makeRequest(String speech,Integer len,String format) throws IOException {
+    public void convertFileToBase64(File file) throws IOException {
+        // 将文件转换为字节数组
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] fileBytes = IOUtils.toByteArray(fis);
+            // 将字节数组转换为Base64编码的字符串
+            speech = Base64.getEncoder().encodeToString(fileBytes);
+            // 获取字节数
+            len = fileBytes.length;
+        }
+    }
+
+    private String makeRequest() throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         String requestBodyJson = String.format(
                 "{\"format\":\"%s\",\"rate\":16000,\"channel\":1,\"cuid\":\"aw6fZ0c9feQMVpZHs0t28jmaktbIuOVq\",\"token\":\"%s\",\"speech\":\"%s\",\"len\":%d,\"dev_pid\":80001}",
@@ -75,4 +104,48 @@ public class AudioToTextServiceImpl implements AudioToTextService {
         Response response = HTTP_CLIENT.newCall(request).execute();
         return new JSONObject(response.body().string()).getString("access_token");
     }
+
+    private void info(String filePath) throws EncoderException {
+        File file = new File(filePath);
+        MultimediaObject multimediaObject = new MultimediaObject(file);
+        MultimediaInfo info = multimediaObject.getInfo();
+        AudioInfo audio = info.getAudio();
+        int channels = audio.getChannels();
+        int bitRate = audio.getBitRate();
+        int samplingRate = audio.getSamplingRate();
+        System.out.println("声道:" + channels);
+        System.out.println("bitRate:" + bitRate);
+        System.out.println("samplingRate 采样率、音频采样级别 16000 = 16KHz:" + samplingRate);
+    }
+
+private File audioEncode(String inputFormatPath, String outputFormatPath, int bitRate,int samplingRate, int channels) {
+    String outputFormat = getSuffix(outputFormatPath);
+    String inputFormat = getSuffix(inputFormatPath);
+    File source = new File(inputFormatPath);
+    File target = new File(outputFormatPath);
+    try {
+        MultimediaObject multimediaObject = new MultimediaObject(source);
+
+        AudioAttributes audio = new AudioAttributes();
+        audio.setBitRate(bitRate);
+        audio.setSamplingRate(samplingRate);
+        audio.setChannels(channels);
+
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setInputFormat(inputFormat);
+        attrs.setOutputFormat(outputFormat);
+        attrs.setAudioAttributes(audio);
+
+        Encoder encoder = new Encoder();
+        encoder.encode(multimediaObject, target, attrs);
+        return target;
+    } catch (IllegalArgumentException | EncoderException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+private static String getSuffix(String outputFormatPath) {
+    return outputFormatPath.substring(outputFormatPath.lastIndexOf(".") + 1);
+}
 }

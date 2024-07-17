@@ -126,6 +126,24 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.8.0</version>
 		</dependency>
+		<!-- JAVE2（Java音频视频编码器）库是ffmpeg项目上的Java包装器。 -->
+		<dependency>
+			<groupId>ws.schild</groupId>
+			<artifactId>jave-core</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
+		<!-- 在windows上开发 开发机可实现压缩效果 window64位 -->
+		<dependency>
+			<groupId>ws.schild</groupId>
+			<artifactId>jave-nativebin-win32</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>ws.schild</groupId>
+			<artifactId>jave-nativebin-win64</artifactId>
+			<version>3.1.1</version>
+		</dependency>
 		<!-- shiro -->
 		<dependency>
 		<groupId>org.apache.shiro</groupId>
