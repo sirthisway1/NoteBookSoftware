@@ -8,6 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AudioUploadDTO {
-    private MultipartFile audio;
+public class HtmlUploadDTO {
+    private String text;
 }

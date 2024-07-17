@@ -2,13 +2,12 @@ package com.example.markdown_demo.controller;
 
 
 import com.example.markdown_demo.common.dto.AudioRequestDTO;
-import com.example.markdown_demo.common.dto.AudioUploadDTO;
+import com.example.markdown_demo.common.dto.HtmlUploadDTO;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.common.lang.ResultType;
 import com.example.markdown_demo.service.AudioGenerationService;
 import com.example.markdown_demo.service.AudioToTextService;
 import com.example.markdown_demo.service.KeyWordService;
-import com.example.markdown_demo.service.impl.KeyWordServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -78,18 +77,14 @@ public class AudioAnswerController {
 
 
     @PostMapping(value = "/keyWord")
-    public Result<?> keyWord(@RequestParam("keywords") String text){
-
-
+    public Result<?> keyWord(@RequestBody HtmlUploadDTO htmlUploadDTO){
+        
         try {
-
-            List<String> keyWords= keyWordService.extractKeyWords(text,5);
+            List<String> keyWords= keyWordService.extractKeyWords(htmlUploadDTO.getText(),5);
             return Result.success(Map.of("keywords", keyWords));
         } catch (Exception e) {
             return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"关键字提取失败 " + e.getMessage());
         }
-
-
 
     }
 }
