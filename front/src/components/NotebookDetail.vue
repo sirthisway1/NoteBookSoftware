@@ -420,7 +420,7 @@ export default {
 }
 
 .note-item.selected {
-  background-color: #b2dfdb; /* 选中背景色 */
+  background-color: #77c1f2b2; /* 选中背景色 */
 }
 
 .pagination {

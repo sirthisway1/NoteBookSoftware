@@ -290,9 +290,11 @@ export default {
   border-top-right-radius: 12px;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .sidebar-avatar2 {
+  display: inline-block;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -302,9 +304,11 @@ export default {
 }
 
 .note-user {
+  display: inline-block;
   font-weight: bold;
   color: #ffffff;
   margin-right: 90%;
+  
 }
 
 .note-title {

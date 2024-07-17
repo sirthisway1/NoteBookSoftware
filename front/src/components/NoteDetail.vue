@@ -71,7 +71,7 @@
       <div class="keyward-summary">
           <h3>关键字显示</h3>
           <div class="keyword-content">
-            {{ keywardSummery }}
+            {{ keywordSummaries[selectedNote ? selectedNote.noteId : ''] || '尚未分析' }}
           </div>
       </div>
 
@@ -84,7 +84,7 @@
 
   
   
-  <script>
+<script>
  
  import axios from 'axios';
 
@@ -115,7 +115,7 @@ export default {
       isLoading: true,
       noteType: 0,
       notebookId: this.$route.params.notebookId, // 从路由获取笔记本ID
-      keywardSummery: '这里是提取出来的关键字'
+      keywordSummaries: {},
       //模拟评论
       
       
@@ -189,10 +189,12 @@ export default {
           this.noteType = note.type;
           if (this.noteType === 1 || this.noteType === 2 || this.noteType === 3) {
             this.noteContent = JSON.parse(note.content);
+            
             this.setChartOption(note.type, this.noteContent);
           } else {
             this.noteContent = note.content;
             this.chartOption = null;
+            
           }
         } else {
           console.error('获取笔记详情失败:', response.data.message);
@@ -452,13 +454,12 @@ export default {
 
       try {
         const response = await axios.post('/api/model/keyWord', 
-          null,
-          { params: {
-              text: this.selectedNote.content
-            },
+          {
+            text: this.selectedNote.content
+          },
+          { 
             headers: { 
-              'Content-Type': 'application/x-www-form-urlencoded',
-              token: token 
+              'Content-Type': 'application/json',
             },
           }
         );
@@ -470,14 +471,14 @@ export default {
             type: 'success',
           })
           const keywords = response.data.data.keywords;
-          this.keywardSummery = keywords.join(', '); // 将关键词数组转换为字符串
+          this.keywordSummaries[this.selectedNote.noteId] = keywords.join(', '); // 将关键词数组转换为字符串
         } else {
           console.error('关键词分析失败:', response.data.message);
-          this.keywardSummery = '关键词分析失败';
+          this.keywordSummaries[this.selectedNote.noteId] = '关键词分析失败';
         }
       } catch (error) {
         console.error('关键词分析出错:', error);
-        this.keywardSummery = '关键词分析出错';
+        this.keywordSummaries[this.selectedNote.noteId] = '关键词分析出错';
       }
     }
   },
@@ -682,7 +683,7 @@ export default {
 }
 
 .note-item.selected {
-  background-color: #409bf6;
+  background-color: #77c1f2b2;
 }
 
 .note-header {
