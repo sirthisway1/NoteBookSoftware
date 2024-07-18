@@ -44,7 +44,9 @@ public class KeyWordServiceImpl implements KeyWordService {
 
             // 获取results数组
             JsonNode results = jsonNode.get("results");
-
+            if (results == null || results.isEmpty()){
+                return null;
+            }
             // 创建一个List<String>来存储关键词
             List<String> keywords = new ArrayList<>();
 
