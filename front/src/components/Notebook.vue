@@ -402,6 +402,7 @@ object-fit: cover; /* 确保图片填满圆形且不变形 */
 
 
 .main-content {
+  
   flex-grow: 1;
   display: flex;
   flex-direction: column;

@@ -17,10 +17,11 @@ import NoteCreateTree from './components/NoteCreateTree.vue';
 import UserCenter from './components/UserCenter.vue';
 import Community from './components/Community.vue';
 import CommunityDetail from './components/CommunityDetail.vue'
+import Week from './components/Week.vue';
 import '@fortawesome/fontawesome-free/css/all.css';
 // import FavoriteNotes from './components/FavoriteNotes.vue';
 import PrivateNotes from './components/PrivateNotes.vue';
-import MindnoteEdit from './components/MindnoteEdit.vue';
+// import MindnoteEdit from './components/MindnoteEdit.vue';
 import axios from 'axios';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
@@ -33,6 +34,8 @@ const routes = [
   { path: '/community', component: Community, name: 'Community' },
   { path: '/usercenter', component: UserCenter, name: 'UserCenter' },
 
+  { path: '/week', component: Week, name: 'Week' },
+
   { path: '/notebook/:notebookId', component: NotebookDetail, name: 'NotebookDetail' }, // 添加动态路由
   { path: '/notebook/:notebookId/create', component: NoteCreate, name: 'NoteCreate' }, // 添加“添加新笔记”界面路由
   { path: '/notebook/:notebookId/note/:noteId', component: NoteDetail, name: 'NoteDetail' }, // 添加NoteDetail的动态路由
@@ -40,7 +43,7 @@ const routes = [
   { path: '/notebook/:notebookId/createTree', component: NoteCreateTree, name: 'NoteCreateTree' }, //思维笔记
   { path: '/community/:noteId/:username', component: CommunityDetail, name: 'CommunityDetail' }, //发现社区跳转后的页面
   { path: '/private',component: PrivateNotes  ,name: 'PrivateNotes' },
-  { path: '/notebook/:notebookId/note/:noteId/mindnoteedit', component: MindnoteEdit, name: 'MindnoteEdit' },
+  // { path: '/notebook/:notebookId/note/:noteId/mindnoteedit', component: MindnoteEdit, name: 'MindnoteEdit' },
 
   
 ];
