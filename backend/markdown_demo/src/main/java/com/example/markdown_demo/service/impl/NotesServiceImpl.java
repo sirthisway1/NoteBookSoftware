@@ -172,27 +172,23 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         return Arrays.asList(tags, counts);
     }
 
-    @Override  public List<Integer> noteFetchActivity(Integer userId){
+    @Override
+    public List<Object> noteFetchActivity(Integer userId){
         LocalDate sevenDaysAgo = LocalDate.now().minusDays(6); // 7天前，包括今天
         LocalDate today = LocalDate.now().plusDays(1);
-
         // 创建一个 Map 来存储每天更新的笔记数量，初始值为 0
         Map<LocalDate, Integer> dailyActivityMap = new HashMap<>();
         for (LocalDate date = sevenDaysAgo; date.isBefore(today); date = date.plusDays(1)) {
             dailyActivityMap.put(date, 0);
         }
-
         // 查询条件
         LambdaQueryWrapper<Notes> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Notes::getUserId, userId);
         queryWrapper.between(Notes::getUpdatedAt, sevenDaysAgo, today); // 查询最近7天内更新的笔记
-
         // 查询笔记列表
         List<Notes> notesList = this.list(queryWrapper);
-
         // 定义日期格式，与数据库中存储的格式匹配
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
         // 统计每天更新的笔记数量
         for (Notes note : notesList) {
             // 将字符串转换回 LocalDateTime
@@ -202,14 +198,19 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
                 dailyActivityMap.put(updateDate, dailyActivityMap.get(updateDate) + 1);
             }
         }
-
-        // 将 Map 转换为 List，按照日期顺序排列
-        List<Integer> dailyActivityList = dailyActivityMap.entrySet().stream()
+        // 准备返回的数据
+        List<Object> result = new ArrayList<>();
+        List<String> dateList = new ArrayList<>();
+        List<Integer> activityList = new ArrayList<>();
+        dailyActivityMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
-
-        return dailyActivityList;
+                .forEach(entry -> {
+                    dateList.add(entry.getKey().format(DateTimeFormatter.ofPattern("MM-dd")));
+                    activityList.add(entry.getValue());
+                });
+        result.add(dateList);
+        result.add(activityList);
+        return result;
     }
 
     @Override

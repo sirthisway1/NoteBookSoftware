@@ -101,10 +101,19 @@ public class NotesController {
     }
 
     @GetMapping("/noteFetchActivity")
-    public Result<?>noteFetchActivity(HttpServletRequest request) {
+    public Result<?> noteFetchActivity(HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
-        List<Integer> noteActivity=notesService.noteFetchActivity(userId);
-        return Result.success(Map.of("noteActivity",noteActivity));
+        // 由于返回类型变更为 List<Object>，这里也需要相应地进行调整
+        List<Object> result = notesService.noteFetchActivity(userId);
+        // 解构结果为列表
+        List<String> dates = (List<String>) result.get(0);
+        List<Integer> activities = (List<Integer>) result.get(1);
+        // 创建一个 Map 来存储日期和活动次数
+        Map<String, Integer> dailyActivities = new HashMap<>();
+        for (int i = 0; i < dates.size(); i++) {
+            dailyActivities.put(dates.get(i), activities.get(i));
+        }
+        return Result.success(Map.of("dates", dates, "activities", activities));
     }
 
     @GetMapping("/NoteShowWithUser")
