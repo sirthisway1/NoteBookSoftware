@@ -137,18 +137,18 @@ export default {
           }
         },
         async fetchTopKeywords() {
-            // const token = localStorage.getItem('token');
-            // try {
-            //     const response = await axios.get('/api/notes/top-keywords',{headers: { token: token }});
-            //     if (response.data && response.data.code === "200") {
-            //     
-            //     this.WordCloudData=response.data.data;
-            //     this.updateChartPie();
-            //     this.getWordCloud();
-            //     }
-            // } catch (error) {
-            //     console.error("Error fetching top keywords:", error);
-            // }
+            const token = localStorage.getItem('token');
+            try {
+                const response = await axios.get('/api/notes/top-keywords',{headers: { token: token }});
+                if (response.data && response.data.code === "200") {
+                
+                this.WordCloudData=response.data.data;
+                this.updateChartPie();
+                this.getWordCloud();
+                }
+            } catch (error) {
+                console.error("Error fetching top keywords:", error);
+            }
         },
         async fetchTopTags() {
             const token = localStorage.getItem('token');
