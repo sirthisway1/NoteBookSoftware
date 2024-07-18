@@ -72,18 +72,28 @@ public class NotesController {
             return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"笔记删除失败");
         }
     }
+
     @GetMapping("/NoteShow")
     public Result<List<NoteShowDTO>> noteShowDTO( HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         List<NoteShowDTO>  noteShowDTO = notesService.noteShow(userId);
         return Result.success(noteShowDTO);
     }
+
     @GetMapping("/noteTopTags")
-    public Result<?>noteCountTags(HttpServletRequest request) {
+    public Result<?>noteTopTags(HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         List<String> maxTags=notesService.noteCountTags(userId);
         return Result.success(Map.of("topTags",maxTags));
     }
+
+    @GetMapping("/noteFetchActivity")
+    public Result<?>noteFetchActivity(HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        List<Integer> noteActivity=notesService.noteFetchActivity(userId);
+        return Result.success(Map.of("noteActivity",noteActivity));
+    }
+
     @GetMapping("/NoteShowWithUser")
     public Result<List<NoteShowWithUserDTO>> noteShowWithUserDTO(HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
