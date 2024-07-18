@@ -217,6 +217,12 @@ public class NotesController {
         return Result.success(topKeywords);
     }
 
+    @GetMapping("/notesCountWords")
+    public Result<List<KeywordFrequencyDTO>> notesCountWords(HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        List<KeywordFrequencyDTO> wordsCount = notesService.getNotesWords(userId);
+        return Result.success(wordsCount);
+    }
 
 
 

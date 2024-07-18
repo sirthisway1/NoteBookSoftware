@@ -16,6 +16,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.markdown_demo.common.dto.*;
 import com.example.markdown_demo.common.lang.BusinessException;
 import com.example.markdown_demo.common.lang.ResultType;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -498,7 +500,35 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
     }
 
+    public List<KeywordFrequencyDTO> getNotesWords(Integer userId) {
+        // 获取一周内的笔记，过滤出指定用户ID的笔记
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
+        QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(Notes::getUserId, userId) // 添加用户ID过滤条件
+                .ge(Notes::getCreatedAt, oneWeekAgo);
+        List<Notes> notes = this.list(queryWrapper);
 
+        // 创建一个列表来存储KeywordFrequencyDTO对象
+        List<KeywordFrequencyDTO> keywordFrequencyList = notes.stream().map(note -> {
+                    String content = note.getContent();
+                    // 检查content是否为null或空字符串，并且不是思维笔记
+                    if (content != null && !content.trim().isEmpty() && !isThoughtNote(note.getId())) {
+                        // 提取纯文本
+                        String textContent =extractTextFromHtml(content);
+                        // 获取文本长度
+                        long length = textContent.length();
+                        // 创建KeywordFrequencyDTO对象
+                        return new KeywordFrequencyDTO(length, note.getTitle());
+                    } else {
+                        return null; // 如果不符合条件，返回null
+                    }
+                }).filter(dto -> dto != null) // 过滤掉空值
+                .sorted((a, b) -> Long.compare(b.getValue(), a.getValue())) // 按内容长度从高到低排序
+                .collect(Collectors.toList());
+
+        return keywordFrequencyList;
+    }
     // 实现isThoughtNote方法
     private boolean isThoughtNote(Integer noteId) {
         // 调用ThoughtNotesService的方法来检查是否存在对应的思维笔记
@@ -519,6 +549,13 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
     }
 
+    public static String extractTextFromHtml(String htmlContent) {
+        // 使用Jsoup解析HTML内容
+        Document doc = Jsoup.parse(htmlContent);
+        // 提取纯文本
+        String text = doc.text();
+        return text;
+    }
 
 }
 
