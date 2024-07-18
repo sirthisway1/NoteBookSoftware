@@ -36,7 +36,8 @@ public interface NotesService extends IService<Notes> {
     NoteDetailDTO getNoteDetail(Integer noteId, Integer userId);
     void deleteNote(Integer noteId, Integer userId)throws BusinessException;
     List<Object>  noteCountTags(Integer userId);
-    List<Integer> noteFetchActivity(Integer userId);
+    List<Object> noteFetchActivity(Integer userId);
+    NoteFetchTimeDTO noteFetchTime(Integer userId);
     List<NoteShowDTO> noteShow(Integer userId);
     List<NoteShowWithUserDTO> noteShowWithUser();
     /**
