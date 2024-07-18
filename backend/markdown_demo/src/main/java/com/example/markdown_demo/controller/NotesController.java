@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,8 +85,19 @@ public class NotesController {
     @GetMapping("/noteTopTags")
     public Result<?>noteTopTags(HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
-        List<String> maxTags=notesService.noteCountTags(userId);
-        return Result.success(Map.of("topTags",maxTags));
+        List<Object> result = notesService.noteCountTags(userId);
+
+        // 解构结果为列表
+        List<String> tags = (List<String>) result.get(0);
+        List<Integer> counts = (List<Integer>) result.get(1);
+
+        // 创建一个 Map 来存储标签和次数
+        Map<String, Integer> tagCounts = new HashMap<>();
+        for (int i = 0; i < tags.size(); i++) {
+            tagCounts.put(tags.get(i), counts.get(i));
+        }
+
+        return Result.success(Map.of("tags", tags, "counts", counts));
     }
 
     @GetMapping("/noteFetchActivity")
