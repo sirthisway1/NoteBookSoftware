@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.*;
 
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
@@ -50,6 +48,8 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     private NoteLikesMapper likesMapper;
     @Autowired
     private ThoughtNotesMapper thoughtNotesMapper;
+
+    // 注入ThoughtNotesService
 
 
     private final KeyWordService keyWordService;
@@ -422,7 +422,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     }
 
     @Override
-    public List<String> getTopKeywordsFromNotesInLastWeek(Integer userId) {
+    public List<KeywordFrequencyDTO> getTopKeywordsFromNotesInLastWeek(Integer userId) {
         // 获取一周内的笔记，过滤出指定用户ID的笔记
         LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
         QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
@@ -441,6 +441,12 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             if (content == null || content.trim().isEmpty()) {
                 continue; // 如果为null或空，则跳过当前笔记
             }
+
+            // 检查该笔记是否为思维笔记
+            if (isThoughtNote(note.getId())) {
+                continue; // 如果是思维笔记，则跳过当前笔记
+            }
+
             List<String> keywords = null; // 提取关键词
             try {
                 keywords = keyWordService.extractKeyWords(content, 10);
@@ -453,15 +459,39 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             }
         }
 
-        // 找出频率最高的前五个关键词
-        List<String> topKeywords = keywordFrequencyMap.entrySet().stream()
+        // 找出频率最高的前五个关键词，并创建KeywordFrequencyDTO对象列表
+        List<KeywordFrequencyDTO> topKeywordsWithFrequency = keywordFrequencyMap.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(5)
-                .map(Map.Entry::getKey)
+                .map(entry -> new KeywordFrequencyDTO(entry.getValue(),entry.getKey()))
                 .collect(Collectors.toList());
 
-        return topKeywords;
+        return topKeywordsWithFrequency;
+
     }
+
+
+    // 实现isThoughtNote方法
+    private boolean isThoughtNote(Integer noteId) {
+        // 调用ThoughtNotesService的方法来检查是否存在对应的思维笔记
+        ThoughtNotes thoughtNote = getThoughtNoteByNoteId(noteId);
+        // 如果思维笔记存在，并且类型不是0（假设0代表不是思维笔记），则返回true
+        return thoughtNote != null && thoughtNote.getType() != null && thoughtNote.getType() != 0;
+    }
+
+
+
+
+
+    public ThoughtNotes getThoughtNoteByNoteId(Integer noteId) {
+            // 使用Mapper查询思维笔记
+            QueryWrapper<ThoughtNotes> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("note_id", noteId);
+            return thoughtNotesMapper.selectOne(queryWrapper);
+
+    }
+
+
 }
 
 

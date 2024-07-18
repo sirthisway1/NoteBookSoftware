@@ -194,9 +194,9 @@ public class NotesController {
     }
 
     @GetMapping("/top-keywords")
-    public Result<List<String>> getTopKeywordsFromNotesInLastWeek(HttpServletRequest request) {
+    public Result<List<KeywordFrequencyDTO>> getTopKeywordsFromNotesInLastWeek(HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
-        List<String> topKeywords = notesService.getTopKeywordsFromNotesInLastWeek(userId);
+        List<KeywordFrequencyDTO> topKeywords = notesService.getTopKeywordsFromNotesInLastWeek(userId);
         return Result.success(topKeywords);
     }
 
