@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
-
+import java.util.Map;
 
 
 @RestController
@@ -78,7 +78,12 @@ public class NotesController {
         List<NoteShowDTO>  noteShowDTO = notesService.noteShow(userId);
         return Result.success(noteShowDTO);
     }
-
+    @GetMapping("/noteTopTags")
+    public Result<?>noteCountTags(HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        List<String> maxTags=notesService.noteCountTags(userId);
+        return Result.success(Map.of("topTags",maxTags));
+    }
     @GetMapping("/NoteShowWithUser")
     public Result<List<NoteShowWithUserDTO>> noteShowWithUserDTO(HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
