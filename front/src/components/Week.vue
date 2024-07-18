@@ -50,7 +50,6 @@ import axios from 'axios';
 import * as echarts from 'echarts';
 import { ElMessage } from 'element-plus';
 import "echarts-wordcloud";//引入词云
-import ChartWordCloud from 'D:/github/NoteBookSoftware/front/src/components/ChartWordCloud.vue'
 
 export default {
     data() {
@@ -221,7 +220,7 @@ export default {
                     feature: {
                     mark: { show: true },
                     dataView: { show: true, readOnly: false },
-                    restore: { show: true },
+                    restore: { show: false },
                     saveAsImage: { show: true }
                     }
                 },
@@ -473,6 +472,7 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  border: 4px solid #409bf6;
   flex-shrink: 0; /* 防止头像被压缩 */
   position: relative; /* 添加这行 */
   top: 0px; /* 调整这个值来控制上移的距离 */

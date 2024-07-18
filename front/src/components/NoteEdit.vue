@@ -753,6 +753,7 @@ background-color: #f0f0f0;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  border: 4px solid #409bf6;
   flex-shrink: 0; /* 防止头像被压缩 */
   position: relative; /* 添加这行 */
   top: 0px; /* 调整这个值来控制上移的距离 */
