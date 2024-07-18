@@ -1,5 +1,6 @@
 package com.example.markdown_demo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.markdown_demo.common.lang.Result;
 import com.example.markdown_demo.entity.NoteLikes;
 import com.example.markdown_demo.entity.Notes;
@@ -18,8 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -110,6 +114,34 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         else dto.setType(0);
         return dto;
     }
+
+    @Override public List<String> noteCountTags(Integer userId){
+        // 获取一周前的日期
+        LocalDate oneWeekAgo = LocalDate.now().minus(1, ChronoUnit.WEEKS);
+
+        // 查询条件
+        LambdaQueryWrapper<Notes> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Notes::getUserId, userId);
+        queryWrapper.ge(Notes::getUpdatedAt, oneWeekAgo); // 假设 updatedAt 字段存储的是修改时间
+
+        // 查询笔记列表
+        List<Notes> notesList = this.list(queryWrapper);
+
+        // 统计标签频率
+        Map<String, Long> tagCounts = notesList.stream()
+                .flatMap(note -> note.getTags().stream()) // 使用 getTags() 直接获取 List<String> 类型的标签
+                .collect(Collectors.groupingBy(tag -> tag, Collectors.counting()));
+
+        // 按频率降序排序，并获取前三个
+        List<String> topThreeTags = tagCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return topThreeTags;
+    }
+
     @Override
     public void deleteNote(Integer noteId, Integer userId)throws BusinessException{
         Notes note = getById(noteId);
