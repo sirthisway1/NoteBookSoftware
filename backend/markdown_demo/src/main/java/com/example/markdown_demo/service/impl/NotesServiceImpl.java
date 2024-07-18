@@ -454,6 +454,9 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            if(keywords==null){
+                continue;
+            }
             // 更新关键词频率
             for (String keyword : keywords) {
                 keywordFrequencyMap.put(keyword, keywordFrequencyMap.getOrDefault(keyword, 0L) + 1);
