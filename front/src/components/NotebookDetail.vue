@@ -72,7 +72,7 @@
 <script>
 import axios from 'axios';
 import CreateNoteModal from './CreateNoteModal.vue';
-
+import { ElMessage } from 'element-plus'
 export default {
   components: {
     CreateNoteModal,

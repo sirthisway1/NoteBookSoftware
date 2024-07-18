@@ -111,11 +111,6 @@ export default {
          //获取当前用户
         async fetchCurrentUser() {
         const token = localStorage.getItem('token');
-            if (!token) {
-            alert('请先登录');
-            this.$router.push('/login');
-            return;
-            }
 
         try {
             const response = await axios.get('/api/user',{headers: { token: token }});
@@ -176,7 +171,7 @@ export default {
             const lineoption = {
                 title: {
                     left: 'center',
-                    text: '本周修改编辑笔记次数' //柱状图标题
+                    text: '本周修改编辑笔记分布' //柱状图标题
                 },
                 tooltip:{
                     trigger: 'axis'

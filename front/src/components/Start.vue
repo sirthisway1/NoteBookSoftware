@@ -151,7 +151,7 @@
 <script>
 import axios from 'axios';
 import CreateNoteModal from './CreateNoteModal.vue';
-
+import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 import { ElIcon } from 'element-plus';
 
@@ -232,7 +232,11 @@ export default {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          alert('请先登录');
+          ElMessage({
+            duration:1000,
+            message: '请先登录',
+            type: 'warning',
+          })
           this.$router.push('/login');
           return;
         }
@@ -249,7 +253,11 @@ export default {
       } catch (error) {
         console.error('搜索笔记时出错:', error);
         if (error.response) {
-            alert('未搜索到全部笔记: ' + error.response.data.message);
+          ElMessage({
+            duration:1000,
+            message: '搜索笔记时出错'+error.response.data.message,
+            type: 'error',
+          })
         }
       }
     },
@@ -259,7 +267,11 @@ export default {
 
       const token = localStorage.getItem('token');
         if (!token) {
-          alert('请先登录');
+          ElMessage({
+            duration:1000,
+            message: '请先登录',
+            type: 'warning',
+          })
           this.$router.push('/login');
           return;
         }
@@ -287,7 +299,11 @@ export default {
         .catch(error => {
           console.error('请求出错:', error);
           if (error.response) {
-            alert('未搜索到: ' + error.response.data.message);
+            ElMessage({
+            duration:1000,
+            message: '搜索笔记时出错'+error.response.data.message,
+            type: 'error',
+          })
             this.search();
           }
           
@@ -332,13 +348,21 @@ export default {
         });
 
         if (response.data.code === "200") {
-          alert('笔记本创建成功');
+          ElMessage({
+            duration:1000,
+            message: '创建成功',
+            type: 'success',
+          })
           this.hideNewNotebookModal();
         } 
       } catch (error) {
         console.error('创建笔记本时出错:', error);
         if (error.response) {
-            alert('笔记本创建失败: ' + error.response.data.message);
+          ElMessage({
+            duration:1000,
+            message: '创建失败'+error.response.data.message,
+            type: 'error',
+          })
         }
       }
 
@@ -380,7 +404,11 @@ export default {
           });
           
           if (response.data.code === "200") {
-            alert("笔记删除成功");
+            ElMessage({
+            duration:1000,
+            message: '删除成功',
+            type: 'success',
+          })
             // 从列表中移除已删除的笔记
             this.notes = this.notes.filter(note => note.id !== noteId);
             await this.search();
