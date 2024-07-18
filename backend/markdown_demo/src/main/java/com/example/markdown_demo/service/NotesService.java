@@ -38,6 +38,7 @@ public interface NotesService extends IService<Notes> {
     List<Object>  noteCountTags(Integer userId);
     List<Object> noteFetchActivity(Integer userId);
     NoteFetchTimeDTO noteFetchTime(Integer userId);
+    List<KeywordFrequencyDTO> getNotesWords(Integer userId);
     List<NoteShowDTO> noteShow(Integer userId);
     List<NoteShowWithUserDTO> noteShowWithUser();
     /**
