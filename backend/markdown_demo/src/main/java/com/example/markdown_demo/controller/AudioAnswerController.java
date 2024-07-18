@@ -80,7 +80,7 @@ public class AudioAnswerController {
     public Result<?> keyWord(@RequestBody HtmlUploadDTO htmlUploadDTO){
 
         try {
-            List<String> keyWords= keyWordService.extractKeyWords(htmlUploadDTO.getText(),5);
+            List<String> keyWords= keyWordService.extractKeyWords(htmlUploadDTO.getText(),10);
             return Result.success(Map.of("keywords", keyWords));
         } catch (Exception e) {
             return Result.fail(ResultType.INTERNAL_SERVER_ERROR.getCode(),"关键字提取失败 " + e.getMessage());
