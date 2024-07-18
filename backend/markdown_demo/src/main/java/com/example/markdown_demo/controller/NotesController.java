@@ -124,9 +124,13 @@ public class NotesController {
 
     @GetMapping("/noteFetchTime")
     public Result<NoteFetchTimeDTO> noteFetchTime(HttpServletRequest request) {
-        Integer userId = getUserIdFromRequest(request);
-        NoteFetchTimeDTO noteFetchTimeDTO = notesService.noteFetchTime(userId);
-        return Result.success(noteFetchTimeDTO);
+        try {
+            Integer userId = getUserIdFromRequest(request);
+            NoteFetchTimeDTO noteFetchTimeDTO = notesService.noteFetchTime(userId);
+            return Result.success(noteFetchTimeDTO);
+        } catch (BusinessException e) {
+            return Result.fail(e.getStatusCode(),e.getMessage());
+        }
     }
 
     @PostMapping("/addTags")

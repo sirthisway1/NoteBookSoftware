@@ -241,12 +241,16 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         queryWrapper.orderByDesc(Notes::getUpdatedAt);
 
         List<Notes> notesList = this.list(queryWrapper);
-        if (!notesList.isEmpty()) {
-            Notes latestNote = notesList.get(0); // 最晚修改时间的笔记
+        // 过滤掉思维笔记
+        List<Notes> filteredNotes = notesList.stream()
+                .filter(note -> !isThoughtNote(note.getId()))
+                .collect(Collectors.toList());
+
+        if (!filteredNotes.isEmpty()) {
+            Notes latestNote = filteredNotes.get(0); // 最晚修改时间的笔记
             return new NoteFetchTimeDTO(latestNote.getContent(), latestNote.getUpdatedAt(), latestNote.getTitle());
         }
-
-        return new NoteFetchTimeDTO(); // 如果没有找到笔记，返回空的DTO
+        throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(),"没有找到笔记"); // 如果没有找到笔记，返回空的DTO
     }
 
     @Override
