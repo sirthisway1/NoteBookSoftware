@@ -11,9 +11,9 @@ public class KeywordFrequencyDTO {
 
 
 
-        private String keyword; // 关键词
-
         private Long value; // 关键词的频率
+        private String name; // 关键词
+
 
 }
 

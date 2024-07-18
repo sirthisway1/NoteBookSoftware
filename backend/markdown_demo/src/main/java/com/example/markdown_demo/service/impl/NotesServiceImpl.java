@@ -452,7 +452,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         List<KeywordFrequencyDTO> topKeywordsWithFrequency = keywordFrequencyMap.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(5)
-                .map(entry -> new KeywordFrequencyDTO(entry.getKey(), entry.getValue()))
+                .map(entry -> new KeywordFrequencyDTO(entry.getValue(),entry.getKey()))
                 .collect(Collectors.toList());
 
         return topKeywordsWithFrequency;
