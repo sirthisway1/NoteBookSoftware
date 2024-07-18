@@ -17,6 +17,7 @@ import NoteCreateTree from './components/NoteCreateTree.vue';
 import UserCenter from './components/UserCenter.vue';
 import Community from './components/Community.vue';
 import CommunityDetail from './components/CommunityDetail.vue'
+// import ChartWordCloud from './components/ChartWordCloud.vue'
 import Week from './components/Week.vue';
 import '@fortawesome/fontawesome-free/css/all.css';
 // import FavoriteNotes from './components/FavoriteNotes.vue';
@@ -24,6 +25,7 @@ import PrivateNotes from './components/PrivateNotes.vue';
 // import MindnoteEdit from './components/MindnoteEdit.vue';
 import axios from 'axios';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import 'echarts-wordcloud';
 
 const routes = [
   { path: '/', redirect: '/login' },

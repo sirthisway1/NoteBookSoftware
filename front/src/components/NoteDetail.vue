@@ -747,11 +747,13 @@ export default {
   height: 400px;
   background-color: #f9f9f9;
   position: relative;
+
 }
 
 .content-area > div {
   width: 100%;
   height: 100%;
+  max-width: 1000px
 }
 
 .keyword-content{

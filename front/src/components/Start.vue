@@ -676,9 +676,10 @@ export default {
   }
   
   .side-button {
-  background-color: #8b4513;
+  background-color: #1b79b3;
   color: white;
-  padding: 15px 20px;
+  padding: 10px 10px;
+  width:100px;
   margin-top: 20px;
   cursor: pointer;
   border-radius: 5px;
@@ -686,7 +687,7 @@ export default {
   transition: background-color 0.3s;
 }
 .side-button:hover {
-  background-color: #a0522d;
+  background-color: rgb(106, 156, 236);
 }
   .modal {
     display: flex;
