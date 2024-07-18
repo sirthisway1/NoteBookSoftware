@@ -10,6 +10,7 @@ import com.example.markdown_demo.mapper.NoteLikesMapper;
 import com.example.markdown_demo.mapper.NotesMapper;
 import com.example.markdown_demo.mapper.ThoughtNotesMapper;
 import com.example.markdown_demo.mapper.UsersMapper;
+import com.example.markdown_demo.service.KeyWordService;
 import com.example.markdown_demo.service.NotesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.markdown_demo.common.dto.*;
@@ -19,12 +20,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +46,14 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     private NoteLikesMapper likesMapper;
     @Autowired
     private ThoughtNotesMapper thoughtNotesMapper;
+
+
+    private final KeyWordService keyWordService;
+
+    @Autowired
+    public NotesServiceImpl(KeyWordService keyWordService) {
+        this.keyWordService = keyWordService;
+    }
 
     @Override
     public void createNote(NoteCreateDTO createNoteDTO, Integer userId) {
@@ -91,9 +106,9 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
         // 获取用户信息来添加头像 URL
-         Users user = usersMapper.selectById(note.getUserId());
-         if (user == null) {
-        throw new BusinessException(ResultType.NOT_FOUND);
+        Users user = usersMapper.selectById(note.getUserId());
+        if (user == null) {
+            throw new BusinessException(ResultType.NOT_FOUND);
         }
         NoteDetailDTO dto = new NoteDetailDTO();
         dto.setNoteId(note.getId());
@@ -110,12 +125,13 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         ThoughtNotes thoughtNote = thoughtNotesMapper.selectOne(queryWrapper);
         if (thoughtNote != null) {
             dto.setType(thoughtNote.getType());
-        }
-        else dto.setType(0);
+        } else dto.setType(0);
         return dto;
     }
 
-    @Override public List<String> noteCountTags(Integer userId){
+
+    @Override
+    public List<String> noteCountTags(Integer userId){
         // 获取一周前的日期
         LocalDate oneWeekAgo = LocalDate.now().minus(1, ChronoUnit.WEEKS);
 
@@ -142,8 +158,9 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         return topThreeTags;
     }
 
+
     @Override
-    public void deleteNote(Integer noteId, Integer userId)throws BusinessException{
+    public void deleteNote(Integer noteId, Integer userId) throws BusinessException {
         Notes note = getById(noteId);
         if (note == null) {
             throw new BusinessException(ResultType.NOT_FOUND);
@@ -157,6 +174,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), e.getMessage());
         }
     }
+
     @Override
     public List<NoteShowDTO> noteShow(Integer userId) {
         QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
@@ -240,7 +258,6 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             return Result.fail(ResultType.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 
     @Override
@@ -350,6 +367,49 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
             return dto;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<String> getTopKeywordsFromNotesInLastWeek(Integer userId) {
+        // 获取一周内的笔记，过滤出指定用户ID的笔记
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
+        QueryWrapper<Notes> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(Notes::getUserId, userId) // 添加用户ID过滤条件
+                .ge(Notes::getCreatedAt, oneWeekAgo);
+        List<Notes> notes = this.list(queryWrapper);
+
+        // 初始化一个Map来存储所有关键词的频率
+        Map<String, Long> keywordFrequencyMap = new HashMap<>();
+
+        // 遍历每个笔记，提取关键词并更新频率
+        for (Notes note : notes) {
+            String content = note.getContent();
+            // 检查content是否为null或空字符串
+            if (content == null || content.trim().isEmpty()) {
+                continue; // 如果为null或空，则跳过当前笔记
+            }
+            List<String> keywords = null; // 提取关键词
+            try {
+                keywords = keyWordService.extractKeyWords(content, 10);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            // 更新关键词频率
+            for (String keyword : keywords) {
+                keywordFrequencyMap.put(keyword, keywordFrequencyMap.getOrDefault(keyword, 0L) + 1);
+            }
+        }
+
+        // 找出频率最高的前五个关键词
+        List<String> topKeywords = keywordFrequencyMap.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(5)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return topKeywords;
+    }
 }
+
 
 

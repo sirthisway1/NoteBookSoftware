@@ -84,4 +84,13 @@ public interface NotesService extends IService<Notes> {
     List<NoteShowDTO> searchNotesByTags(String tags, Integer userId);
 
     List<NoteShowDTO> getTopLikedNotes();
+
+
+    /**
+     * 获取一周内笔记的文本信息并提取出现频率最高的关键词
+     * @return 出现频率最高的关键词列表
+     */
+
+
+    List<String> getTopKeywordsFromNotesInLastWeek(Integer userId);
 }
