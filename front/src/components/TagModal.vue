@@ -22,6 +22,7 @@
   
   <script>
   import axios from 'axios';
+  import { ElMessage } from 'element-plus'
   export default {
     props: {
       visible: Boolean,

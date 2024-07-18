@@ -25,6 +25,7 @@
 import axios from 'axios';
 import { onMounted, onUnmounted } from 'vue';
 import effect from '@/assets/effect.js';
+import { ElMessage } from 'element-plus'
 
 export default {
   setup() {
@@ -69,7 +70,11 @@ export default {
 
         const data = response.data;
         if (data.code === "200") {
-          alert('登录成功');
+          ElMessage({
+            duration:1000,
+            message: '登录成功',
+            type: 'success',
+          })
           // 处理登录成功后的逻辑，保存token
           localStorage.setItem('token', data.data.token);
           this.$router.push({ name: 'Start' }); // 登录成功后跳转到 Start 页面
@@ -77,7 +82,11 @@ export default {
       } catch (error) {
         console.error('登录失败:', error);
         if (error.response) {
-            alert('登录失败: ' + error.response.data.message);
+          ElMessage({
+            duration:1000,
+            message: '登录失败'+error.response.data.message,
+            type: 'error',
+          })
         }
       }
     },

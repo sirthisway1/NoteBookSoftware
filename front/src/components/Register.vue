@@ -29,6 +29,7 @@
 import axios from 'axios';
 import { onMounted, onUnmounted } from 'vue';
 import effect from '@/assets/effect.js';
+import { ElMessage } from 'element-plus'
 
 export default {
   setup() {
@@ -79,13 +80,21 @@ export default {
         console.log("111111111");
         const data = response.data;
         if (data.code === "200") {
-          alert('注册成功');
+          ElMessage({
+            duration:1000,
+            message: '注册成功',
+            type: 'success',
+          })
           this.$router.push('/login');
         } 
       } catch (error) {
         console.error('注册失败:', error);
         if (error.response) {
-            alert('注册失败: ' + error.response.data.message);
+          ElMessage({
+            duration:1000,
+            message: '注册失败'+error.response.data.message,
+            type: 'error',
+          })
         }
       }
     },

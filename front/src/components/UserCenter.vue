@@ -3,7 +3,7 @@
     <!-- Sidebar remains unchanged -->
     <div class="sidebar">
       <div class="sidebar-user">
-        <img :src="user.avatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+        <img :src="user.avatar" alt="User Avatar" class="sidebar-avatar">
         <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
@@ -18,7 +18,7 @@
       <div class="user-center">
         <h1>用户中心</h1>
         <div class="avatar-container">
-          <img :src="user.avatar || 'default-avatar.png'" alt="User Avatar" class="avatar-image">
+          <img :src="user.avatar" alt="User Avatar" class="avatar-image">
           <input type="file" ref="fileInput" @change="onFileSelected" accept="image/*" style="display:none">
           <button @click="$refs.fileInput.click()" class="upload-button">上传图片</button>
         </div>
@@ -70,7 +70,7 @@
 <script>
 import axios from 'axios';
 import ConfirmModal from './ConfirmModal.vue';
-
+import { ElMessage } from 'element-plus'
 export default {
   data() {
     return {

@@ -205,7 +205,8 @@ data() {
       content: this.getNoteContent(this.$route.params.noteContent),
       tags: this.$route.params.tags || [],
       type: parseInt(this.$route.params.noteType, 10),
-      isPrivate: this.$route.params.isPrivate
+      isPrivate: this.$route.params.isPrivate,
+      updatedAt: this.$route.params.updatedAt,
     },
     hasMoreNotes: false,
     searchQuery: '',
@@ -330,12 +331,27 @@ tagNote() {
       if (response.data.code === "200") {
         this.isPrivate = newPrivacyStatus; // 更新本地状态
         if (this.isPrivate) {
-          alert("已将该笔记设为私密笔记");
+          
+          ElMessage({
+            duration:1000,
+            message: '已将该笔记设为私密笔记',
+            type: 'success',
+          })
         } else {
-          alert("已将该笔记设为公开笔记");
+          
+          ElMessage({
+            duration:1000,
+            message: '已将该笔记设为公开笔记',
+            type: 'success',
+          })
         }
       } else {
-        alert(`设置笔记私密失败: ${response.data.message}`);
+        
+        ElMessage({
+            duration:1000,
+            message: '设置笔记私密失败'+response.data.message,
+            type: 'error',
+          })
       }
     } catch (error) {
       console.error('Error setting note privacy:', error);

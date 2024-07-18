@@ -49,7 +49,7 @@
 
 <script>
 import axios from 'axios';
-
+import { ElMessage } from 'element-plus'
 export default {
 data() {
   return {
@@ -114,7 +114,11 @@ methods: {
       try {
         const response = await axios.put(`/api/notebooks/${notebookId}`, { name: newTitle },{headers: { token: token }});
         if (response.data.code === "200") {
-          alert("笔记本名称修改成功");
+          ElMessage({
+            duration:1000,
+            message: '笔记本名称修改成功',
+            type: 'success',
+          })
           this.notebooks = this.notebooks.map(notebook => 
             notebook.notebookId === notebookId ? { ...notebook, name: newTitle } : notebook
           );
@@ -143,7 +147,12 @@ methods: {
       try {
         const response = await axios.put(`/api/notebooks/${notebookId}`, { summary: newSummary },{headers: { token: token }});
         if (response.data.code === "200") {
-          alert("笔记本简介修改成功");
+          
+          ElMessage({
+            duration:1000,
+            message: '笔记本简介修改成功',
+            type: 'success',
+          })
           this.notebooks = this.notebooks.map(notebook => 
             notebook.notebookId === notebookId ? { ...notebook, summary: newSummary } : notebook
           );
@@ -170,7 +179,12 @@ methods: {
       try {
         const response = await axios.delete(`/api/notebooks/${notebookId}`,{headers: { token: token }});
         if (response.data.code === "200") {
-          alert("笔记本删除成功");
+          
+          ElMessage({
+            duration:1000,
+            message: '笔记本删除成功',
+            type: 'success',
+          })
           this.notebooks = this.notebooks.filter(notebook => notebook.notebookId !== notebookId);
           this.updateTotalPages();
         } else {
