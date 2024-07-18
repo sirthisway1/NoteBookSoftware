@@ -490,7 +490,7 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         // 找出频率最高的前五个关键词，并创建KeywordFrequencyDTO对象列表
         List<KeywordFrequencyDTO> topKeywordsWithFrequency = keywordFrequencyMap.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .limit(5)
+                .limit(10)
                 .map(entry -> new KeywordFrequencyDTO(entry.getValue(),entry.getKey()))
                 .collect(Collectors.toList());
 
