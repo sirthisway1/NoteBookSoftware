@@ -94,7 +94,10 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         if (!note.getUserId().equals(userId)) {
             throw new BusinessException(ResultType.NO_PERMISSION);
         }
-
+        // 设置更新时间
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String updatedAtStr = LocalDateTime.now().format(formatter);
+        note.setUpdatedAt(updatedAtStr);
         note.setTitle(updateNoteDTO.getTitle());
         note.setContent(updateNoteDTO.getContent());
         // 更新其他字段
