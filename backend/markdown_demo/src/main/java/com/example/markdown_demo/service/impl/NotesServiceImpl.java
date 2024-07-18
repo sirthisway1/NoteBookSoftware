@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -227,6 +228,25 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
         } catch (Exception e) {
             throw new BusinessException(ResultType.INTERNAL_SERVER_ERROR.getCode(), e.getMessage());
         }
+    }
+    @Override
+    public  NoteFetchTimeDTO noteFetchTime(Integer userId){
+        LocalDate sevenDaysAgo = LocalDate.now().minusDays(6);
+        LocalDateTime startOfSevenDaysAgo = LocalDateTime.of(sevenDaysAgo, LocalTime.of(5, 0));
+        LocalDateTime endOfToday = LocalDateTime.of(LocalDate.now(), LocalTime.of(4, 59)).plusDays(1);
+
+        LambdaQueryWrapper<Notes> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Notes::getUserId, userId);
+        queryWrapper.between(Notes::getUpdatedAt, startOfSevenDaysAgo, endOfToday);
+        queryWrapper.orderByDesc(Notes::getUpdatedAt);
+
+        List<Notes> notesList = this.list(queryWrapper);
+        if (!notesList.isEmpty()) {
+            Notes latestNote = notesList.get(0); // 最晚修改时间的笔记
+            return new NoteFetchTimeDTO(latestNote.getContent(), latestNote.getUpdatedAt(), latestNote.getTitle());
+        }
+
+        return new NoteFetchTimeDTO(); // 如果没有找到笔记，返回空的DTO
     }
 
     @Override

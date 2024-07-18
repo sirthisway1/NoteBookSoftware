@@ -118,12 +118,16 @@ public class NotesController {
 
     @GetMapping("/NoteShowWithUser")
     public Result<List<NoteShowWithUserDTO>> noteShowWithUserDTO(HttpServletRequest request) {
-        Integer userId = getUserIdFromRequest(request);
         List<NoteShowWithUserDTO> noteShowWithUserDTO = notesService.noteShowWithUser();
         return Result.success(noteShowWithUserDTO);
     }
 
-
+    @GetMapping("/noteFetchTime")
+    public Result<NoteFetchTimeDTO> noteFetchTime(HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        NoteFetchTimeDTO noteFetchTimeDTO = notesService.noteFetchTime(userId);
+        return Result.success(noteFetchTimeDTO);
+    }
 
     @PostMapping("/addTags")
     public Result<Void> addTagsToNote(@RequestParam Integer noteId, @RequestParam String tags, HttpServletRequest request) {
