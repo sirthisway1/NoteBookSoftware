@@ -3,6 +3,8 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
   type-handlers-package: com.example.markdown_demo.common.typehandler
 
+
+
 spring:
   codec:
     max-in-memory-size: 10MB
@@ -18,6 +20,9 @@ spring:
     multipart:
       max-file-size: 128MB
       max-request-size: 150MB
+  web:
+    resources:
+      static-locations: "classpath:/staticFile/upload/"
 
 file:
   upload:
