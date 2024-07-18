@@ -77,6 +77,7 @@ public class ShiroConfig {
         map.put("/api/files/**", "anon");
         map.put("/WangFiles/**", "anon");
         map.put("/uploads/**", "anon");
+        map.put("/upload/**", "anon");
         map.put("/api/model/**", "anon");
 
         // 所有请求通过我们自己的JWT Filter
