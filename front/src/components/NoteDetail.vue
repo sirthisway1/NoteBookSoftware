@@ -204,7 +204,6 @@ export default {
       }
     },
 
-
     //获取笔记本详细+笔记详细
     async fetchNotebookDetails() {
       const token = localStorage.getItem('token');
@@ -439,7 +438,7 @@ export default {
         console.error("Error fetching current user:", error);
       }
     },
-
+    //关键词分析
     async analysisKeyword() {
       if (!this.selectedNote || !this.selectedNote.content) {
         console.error('No note selected or note content is empty');

@@ -113,6 +113,7 @@
 
     <div class="side-panel">
       <div class="side-button" @click="goToPrivate">查看私密列表</div>
+      <div class="side-button" @click="goToWeekly">查看周报</div>
     </div>
     <!-- 新建笔记本的模态框 -->
     <div class="modal" v-if="isModalVisible">
@@ -218,6 +219,9 @@ export default {
     },
     goToPrivate() {
       this.$router.push({ name: 'PrivateNotes' });
+    },
+    goToWeekly(){
+      this.$router.push({ name: 'Week' });
     },
     toggleSearchMode() {
       this.searchMode = this.searchMode === 'keyword' ? 'tag' : 'keyword';
@@ -509,23 +513,6 @@ export default {
   
 }
 /* 用户名以及头像 */
-
-.icon-placeholder {
-    width: 60px; /* 设置圆形宽度 */
-    height: 60px; /* 设置圆形高度 */
-    background-color: #87d37c; /* 设置圆形背景颜色 */
-    border-radius: 50%; /* 使元素为圆形 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px; /* 圆形与文字之间的间距 */
-}
-
-.icon-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 确保图片填满圆形且不变形 */
-}
 
 .sidebar-item span {
     font-size: 14px; /* 设置文字大小 */

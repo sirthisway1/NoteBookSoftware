@@ -180,6 +180,12 @@ public class NotesController {
         return Result.success(topLikedNotes);  // 返回成功结果，并传入获取到的笔记列表
     }
 
+    @GetMapping("/top-keywords")
+    public Result<List<String>> getTopKeywordsFromNotesInLastWeek(HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        List<String> topKeywords = notesService.getTopKeywordsFromNotesInLastWeek(userId);
+        return Result.success(topKeywords);
+    }
 
 
 
