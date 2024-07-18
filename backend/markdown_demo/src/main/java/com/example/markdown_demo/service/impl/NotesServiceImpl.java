@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,31 +135,41 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
 
 
     @Override
-    public List<String> noteCountTags(Integer userId){
-        // 获取一周前的日期
-        LocalDate oneWeekAgo = LocalDate.now().minus(1, ChronoUnit.WEEKS);
+    public List<Object>  noteCountTags(Integer userId){
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minus(1, ChronoUnit.WEEKS);
 
         // 查询条件
         LambdaQueryWrapper<Notes> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Notes::getUserId, userId);
-        queryWrapper.ge(Notes::getUpdatedAt, oneWeekAgo); // 假设 updatedAt 字段存储的是修改时间
+        queryWrapper.ge(Notes::getUpdatedAt, oneWeekAgo);
 
         // 查询笔记列表
-        List<Notes> notesList = this.list(queryWrapper);
+        List<Notes> notesList = notesMapper.selectList(queryWrapper);
 
-        // 统计标签频率
-        Map<String, Long> tagCounts = notesList.stream()
-                .flatMap(note -> note.getTags().stream()) // 使用 getTags() 直接获取 List<String> 类型的标签
-                .collect(Collectors.groupingBy(tag -> tag, Collectors.counting()));
+        // 统计标签出现的次数
+        Map<String, Integer> tagCounts = new HashMap<>();
+        for (Notes note : notesList) {
+            List<String> tags = note.getTags(); // 获取标签列表
+            for (String tag : tags) {
+                tagCounts.put(tag, tagCounts.getOrDefault(tag, 0) + 1);
+            }
+        }
 
-        // 按频率降序排序，并获取前三个
-        List<String> topThreeTags = tagCounts.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .limit(3)
-                .map(Map.Entry::getKey)
+        // 对标签出现次数进行排序并获取前五个标签及其次数
+        List<Map.Entry<String, Integer>> sortedTagCounts = tagCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(5)
                 .collect(Collectors.toList());
 
-        return topThreeTags;
+        // 构造标签和次数的数组
+        List<String> tags = new ArrayList<>();
+        List<Integer> counts = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : sortedTagCounts) {
+            tags.add(entry.getKey());
+            counts.add(entry.getValue());
+        }
+
+        return Arrays.asList(tags, counts);
     }
 
     @Override  public List<Integer> noteFetchActivity(Integer userId){
