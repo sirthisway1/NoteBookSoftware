@@ -399,7 +399,7 @@ export default {
         this.fetchCurrentUser();
         this.updateChartLine();
         this.fetchChartData();
-        //this.fetchTopKeywords();
+        this.fetchTopKeywords();
         this.fetchTopTags();
         this.fetchTimeActivity();
         this.updateChartPie();

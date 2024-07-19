@@ -29,7 +29,7 @@
   </div>
   
   <button class="action-button" @click="backToStart">返回首页</button>
-  <button class="action-button" @click="backToNotebook">目录</button>
+  <button class="action-button" @click="backToNotebook">笔记本目录</button>
   
   <div class="notebook-list">
     <div v-for="(note, index) in notes" :key="index" class="note-item" :class="{ selected: selectedNote && selectedNote.noteId === note.noteId }" @click="selectNote(note)">

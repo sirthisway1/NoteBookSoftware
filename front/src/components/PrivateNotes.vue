@@ -6,11 +6,11 @@
       <div class="sidebar-user">
           <img :src="useravatar" alt="User Avatar" class="sidebar-avatar">
           <div class="sidebar-username" id="username">{{ username }}</div>
-      </div>
-      <div class="sidebar-item start-button" @click="goToStart">
-        <div class="icon-placeholder"><img src="/vue图片/图片1.png" alt="开始图标" class="icon-image"></div>
-        <span>开始</span>
-      </div>
+        </div>
+        <div class="sidebar-item active" @click="goToStart">
+          <el-icon :size="40"><HomeFilled /></el-icon>
+          开始
+        </div>
       <div class="sidebar-item" @click="goToNotebook">笔记本</div>
       <div class="sidebar-item" @click="goToCommunity">发现社区</div>
       <div class="sidebar-item" @click="goToUserCenter">用户中心</div>
@@ -23,10 +23,10 @@
       
       <div class="bottom-content">
         <div class="note-list">
-          <div v-for="note in privateNotes" :key="note.noteId" class="note-item">
+          <div v-for="note in privateNotes" :key="note.noteId" class="note-item" @click="selectNote(note)">
             <h3>{{ note.title }}</h3>
             <p>标签: {{ note.tags.join(', ') }}</p>
-            <p>最后修改时间: {{ formatDate(note.lastModified) }}</p>
+            <p>最后修改时间: {{ formatDate(note.updatedAt) }}</p>
           </div>
         </div>
       </div>
@@ -69,13 +69,23 @@ export default {
       this.$router.push({ name: 'Start' });
     },
     goToNotebook() {
-      // 实现跳转到笔记本页面的逻辑
+      this.$router.push({ name: 'Notebook' });
     },
     goToCommunity() {
-      // 实现跳转到发现社区页面的逻辑
+      this.$router.push({ name: 'Community' });
     },
     goToUserCenter() {
       this.$router.push({ name: 'UserCenter' });
+    },
+    selectNote(note) {
+      this.selectedNote = note;
+      this.$router.push({ 
+        name: 'NoteDetail', 
+        params: { 
+          notebookId: note.notebookId, 
+          noteId: note.noteId 
+        } 
+      });
     },
     formatDate(dateString) {
       const date = new Date(dateString);
@@ -149,6 +159,10 @@ export default {
     background-color: #f0f0f0;
   }
   
+  .sidebar-item.active{
+    background-color: #409bf6;
+    color: white;
+  }
 /* 用户名以及头像 */
 .sidebar-user {
   display: flex;
@@ -243,7 +257,7 @@ export default {
   .search-button {
     width: 20px;
     height: 20px;
-    background-color: #4CAF50;
+    background-color: #4c87af;
     border-radius: 50%;
     margin-left: 10px;
     cursor: pointer;
@@ -271,7 +285,7 @@ export default {
   
   .note-item h3 {
     margin: 0 0 10px 0;
-    color: #4CAF50;
+    color: #4c7faf;
   }
   
   .note-item p {

@@ -28,7 +28,7 @@
       </div>
       <!-- 操作按钮 -->
       <button class="action-button" @click="backToStart">返回首页</button>
-      <button class="action-button" @click="backToNotebook">目录</button>
+      <button class="action-button" @click="backToNotebook">笔记本目录</button>
 
       <!-- 笔记列表 -->
       <!-- 笔记列表部分 -->
