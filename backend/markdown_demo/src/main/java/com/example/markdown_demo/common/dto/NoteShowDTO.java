@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoteShowDTO {
-
+    private Integer notebookId;
     private Integer noteId;
     private String title;
     private String createdAt;
