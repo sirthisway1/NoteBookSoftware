@@ -237,14 +237,13 @@ public class NotesServiceImpl extends ServiceImpl<NotesMapper, Notes> implements
     @Override
     public  NoteFetchTimeDTO noteFetchTime(Integer userId){
         LocalDate sevenDaysAgo = LocalDate.now().minusDays(6);
-        LocalDateTime startOfSevenDaysAgo = LocalDateTime.of(sevenDaysAgo, LocalTime.of(5, 0));
-        LocalDateTime endOfToday = LocalDateTime.of(LocalDate.now(), LocalTime.of(4, 59)).plusDays(1);
+        LocalDateTime startOfSevenDaysAgo = LocalDateTime.of(sevenDaysAgo, LocalTime.of(0, 0));
+        LocalDateTime endOfToday = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0)).plusDays(1);
 
         LambdaQueryWrapper<Notes> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Notes::getUserId, userId);
-        queryWrapper.between(Notes::getUpdatedAt, startOfSevenDaysAgo, endOfToday);
-        queryWrapper.orderByDesc(Notes::getUpdatedAt);
-
+        queryWrapper.between(Notes::getUpdatedAt, startOfSevenDaysAgo.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), endOfToday.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        queryWrapper.last("ORDER BY STR_TO_DATE(SUBSTRING(updated_at, 12, 8), '%H:%i:%s') DESC");
         List<Notes> notesList = this.list(queryWrapper);
         // 过滤掉思维笔记
         List<Notes> filteredNotes = notesList.stream()
