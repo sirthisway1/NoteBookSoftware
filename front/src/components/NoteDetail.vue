@@ -18,13 +18,14 @@
     
     <!-- 中间笔记本内容区 -->
     <div class="middle-section">
+      
       <div class="note-header">
-    <h2>{{ notebookName }}</h2>
-    <div class="note-count-container">
-      <p class="note-count">{{ notes.length }}条笔记</p>
-      <i class="fas fa-plus add-note" @click="showCreateNoteModal"></i>
-    </div>
-  </div>
+        <h2>{{ notebookName }}</h2>
+        <div class="note-count-container">
+          <p class="note-count">{{ notes.length }}条笔记</p>
+          <i class="fas fa-plus add-note" @click="showCreateNoteModal"></i>
+        </div>
+      </div>
       <!-- 操作按钮 -->
       <button class="action-button" @click="backToStart">返回首页</button>
       <button class="action-button" @click="backToNotebook">目录</button>
@@ -547,6 +548,7 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  border: 4px solid #409bf6;
   flex-shrink: 0; /* 防止头像被压缩 */
   position: relative; /* 添加这行 */
   top: 0px; /* 调整这个值来控制上移的距离 */

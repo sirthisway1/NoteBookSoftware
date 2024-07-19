@@ -375,6 +375,7 @@ background-color: #f0f0f0;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  border: 4px solid #409bf6;
   flex-shrink: 0; /* 防止头像被压缩 */
   position: relative; /* 添加这行 */
   top: 0px; /* 调整这个值来控制上移的距离 */
@@ -489,7 +490,7 @@ object-fit: cover; /* 确保图片填满圆形且不变形 */
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 

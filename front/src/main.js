@@ -10,7 +10,7 @@ import Register from './components/Register.vue';
 import Start from './components/Start.vue';  
 import Notebook from './components/Notebook.vue';
 import NotebookDetail from './components/NotebookDetail.vue';
-import NoteCreate from './components/NoteCreate.vue';
+// import NoteCreate from './components/NoteCreate.vue';
 import NoteDetail from './components/NoteDetail.vue';
 import NoteEdit from './components/NoteEdit.vue';
 import NoteCreateTree from './components/NoteCreateTree.vue';
@@ -20,9 +20,9 @@ import CommunityDetail from './components/CommunityDetail.vue'
 // import ChartWordCloud from './components/ChartWordCloud.vue'
 import Week from './components/Week.vue';
 import '@fortawesome/fontawesome-free/css/all.css';
-// import FavoriteNotes from './components/FavoriteNotes.vue';
+
 import PrivateNotes from './components/PrivateNotes.vue';
-// import MindnoteEdit from './components/MindnoteEdit.vue';
+
 import axios from 'axios';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'echarts-wordcloud';
@@ -39,13 +39,13 @@ const routes = [
   { path: '/week', component: Week, name: 'Week' },
 
   { path: '/notebook/:notebookId', component: NotebookDetail, name: 'NotebookDetail' }, // 添加动态路由
-  { path: '/notebook/:notebookId/create', component: NoteCreate, name: 'NoteCreate' }, // 添加“添加新笔记”界面路由
+  // { path: '/notebook/:notebookId/create', component: NoteCreate, name: 'NoteCreate' }, // 添加“添加新笔记”界面路由
   { path: '/notebook/:notebookId/note/:noteId', component: NoteDetail, name: 'NoteDetail' }, // 添加NoteDetail的动态路由
   { path: '/notebook/:notebookId/note/:noteId/edit', component: NoteEdit, name: 'NoteEdit' }, // 添加NoteEdit的动态路由
   { path: '/notebook/:notebookId/createTree', component: NoteCreateTree, name: 'NoteCreateTree' }, //思维笔记
   { path: '/community/:noteId/:username', component: CommunityDetail, name: 'CommunityDetail' }, //发现社区跳转后的页面
   { path: '/private',component: PrivateNotes  ,name: 'PrivateNotes' },
-  // { path: '/notebook/:notebookId/note/:noteId/mindnoteedit', component: MindnoteEdit, name: 'MindnoteEdit' },
+  
 
   
 ];

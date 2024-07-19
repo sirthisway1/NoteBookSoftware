@@ -10,5 +10,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/WangFiles/**")
                 .addResourceLocations("file:D:/NoteFiles/Image/");
+
+
     }
+
 }
+
+
+
+

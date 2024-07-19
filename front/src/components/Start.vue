@@ -204,6 +204,17 @@ export default {
       return this.filteredNotes.slice(start, end);
     }
   },
+  watch: {
+    // 监听searchInput的变化
+    searchInput: function(newValue, oldValue) {
+      // 如果新值为空字符串，就调用search方法
+      if (newValue === '') {
+        this.search();
+      }else{
+        this.searchTwo();
+      }
+    }
+  },
   methods: {
     goToStart() {
       this.$router.push({ name: 'Start' });
@@ -285,6 +296,8 @@ export default {
           const tags = this.searchInput.split(',').map(tag => tag.trim()).filter(tag => tag);
           params.tags = tags.join(',');
         }
+      }else{
+        await this.search();
       }
 
       // 使用 axios 发送请求
@@ -301,8 +314,8 @@ export default {
           if (error.response) {
             ElMessage({
             duration:1000,
-            message: '搜索笔记时出错'+error.response.data.message,
-            type: 'error',
+            message: '未搜索到关键词'+error.response.data.message,
+            type: 'warning',
           })
             this.search();
           }
@@ -424,12 +437,6 @@ export default {
       }
     },
 
-    // // 更新总页数的方法（如果需要的话）
-    // updateTotalPages() {
-    //   // 根据笔记总数和每页显示数量计算总页数
-    //   // 这里需要根据您的具体实现来调整
-    //   this.totalPages = Math.ceil(this.notes.length / this.pageSize);
-    // },
 
     formatDate(dateString) {
       const date = new Date(dateString);
@@ -526,6 +533,7 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  border: 4px solid #409bf6;
   flex-shrink: 0; /* 防止头像被压缩 */
   position: relative; /* 添加这行 */
   top: 0px; /* 调整这个值来控制上移的距离 */
