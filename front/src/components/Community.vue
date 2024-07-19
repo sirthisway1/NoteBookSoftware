@@ -3,7 +3,7 @@
     <div class="container">
       <div class="sidebar">
         <div class="sidebar-user">
-          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <img :src="useravatar" alt="User Avatar" class="sidebar-avatar">
           <div class="sidebar-username" id="username">{{ username }}</div>
         </div>
         <div class="sidebar-item" @click="goToStart">开始</div>
@@ -23,7 +23,7 @@
           <div class="note" v-for="note in filteredNotes" :key="note.noteId" @click="goToNoteDetail(note.noteId,note.username)">
             
             <div class="note-header">
-              <img :src="note.avatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar2">
+              <img :src="note.avatar" alt="User Avatar" class="sidebar-avatar2">
               <div class="note-user"> {{ note.username }}</div>
               
               <!-- <div class="note-noieId">笔记id: {{ note.noteId }}</div> -->

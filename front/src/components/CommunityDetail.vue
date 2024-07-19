@@ -3,7 +3,7 @@
   <div class="container">
     <div class="sidebar">
       <div class="sidebar-user">
-          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <img :src="useravatar" alt="User Avatar" class="sidebar-avatar">
           <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
@@ -18,7 +18,7 @@
     <div class="main-content">
       <div class="note-detail" v-if="note">
         <h1>{{ note.title }}</h1>
-        <img :src="writeravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+        <img :src="writeravatar" alt="User Avatar" class="sidebar-avatar">
         <div class="note-info">
           <span>作者: {{ note.username }}</span>
           <span>创建时间: {{ formatDate(note.createdAt) }}</span>
@@ -39,7 +39,7 @@
           </div>
           <div class="comment-list">
             <div v-for="comment in comments" :key="comment.commentId" class="comment-item">
-              <img :src="comment.avatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+              <img :src="comment.avatar" alt="User Avatar" class="sidebar-avatar">
               <strong>{{ comment.username }}:</strong>
               <p>{{ comment.content }}</p>
               <!-- <p>{{ comment }}</p> -->
@@ -57,7 +57,7 @@
 
 <script>
 import axios from 'axios';
-
+import { ElMessage } from 'element-plus'
 export default {
   data() {
     return {
@@ -268,7 +268,12 @@ export default {
         });
         console.log("发表");
         if (response.data && response.data.code === "200") {
-          alert("发表成功");
+          // alert("发表成功");
+          ElMessage({
+            duration:1000,
+            message: '发表成功',
+            type: 'success',
+          })
           console.log("win");
           await this.fetchComments();  // Refresh comments
           this.newComment = '';  // Clear textarea
@@ -305,7 +310,11 @@ export default {
         });
 
         if (response.data && response.data.code === "200") {
-          alert("评论删除成功");
+          ElMessage({
+            duration:1000,
+            message: '评论删除成功',
+            type: 'success',
+          })
           // 从评论列表中移除已删除的评论
           const index = this.comments.findIndex(c => c.commentId === comment.commentId);
           if (index !== -1) {
@@ -313,7 +322,11 @@ export default {
           }
           await this.fetchComments();
         } else {
-          alert("此贴已被不法分子付费拒绝删除")
+          ElMessage({
+            duration:1000,
+            message: '此评论已被不法分子付费拒绝删除'+error.response.data.message,
+            type: 'error',
+          })
           console.error("删除失败:", response.data.message);
         }
       } catch (error) {

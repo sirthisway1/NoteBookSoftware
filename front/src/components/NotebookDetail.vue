@@ -4,7 +4,7 @@
     <!-- 左侧侧边栏 -->
     <div class="sidebar">
       <div class="sidebar-user">
-          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <img :src="useravatar" alt="User Avatar" class="sidebar-avatar">
           <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>

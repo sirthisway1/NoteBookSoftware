@@ -67,13 +67,27 @@
               this.localTags.push(tag);
               this.newTag = ''; // 清空输入框
               this.$emit('update:tags', this.localTags); // 通知父组件更新标签
-              alert('标签添加成功');
+              
+              ElMessage({
+                duration:1000,
+                message: '标签添加成功',
+                type: 'success',
+              })
             } else {
-              alert(`添加标签失败: ${response.data.message}`);
+              
+              ElMessage({
+                duration:1000,
+                message: `添加标签失败: ${response.data.message}`,
+                type: 'error',
+              })
             }
           } catch (error) {
             console.error('Error adding tag:', error);
-            alert('添加标签失败');
+            ElMessage({
+                duration:1000,
+                message: '添加标签失败',
+                type: 'error',
+              })
           }
         },
     async removeTag(tag) {
@@ -100,7 +114,12 @@
               this.localTags.splice(index, 1);
             }
             this.$emit('update:tags', this.localTags);
-            alert('标签移除成功');
+            
+            ElMessage({
+                duration:1000,
+                message: '标签移除成功',
+                type: 'success',
+              })
           } else {
             alert(`移除标签失败: ${response.data.message}`);
           }

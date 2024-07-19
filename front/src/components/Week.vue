@@ -2,7 +2,7 @@
     <div class="container">
         <div class="sidebar">
             <div class="sidebar-user">
-            <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+            <img :src="useravatar" alt="User Avatar" class="sidebar-avatar">
             <div class="sidebar-username" id="username">{{ username }}</div>
             </div>
             <div class="sidebar-item active" @click="goToStart">
@@ -399,7 +399,7 @@ export default {
         this.fetchCurrentUser();
         this.updateChartLine();
         this.fetchChartData();
-        // this.fetchTopKeywords();
+        //this.fetchTopKeywords();
         this.fetchTopTags();
         this.fetchTimeActivity();
         this.updateChartPie();

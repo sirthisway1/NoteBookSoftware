@@ -213,7 +213,12 @@ export default {
       }
 
       if (Object.keys(updatedFields).length === 0) {
-        alert('没有需要更新的信息');
+        // alert('没有需要更新的信息');
+        ElMessage({
+            duration:1000,
+            message: '没有需要更新的信息',
+            type: 'warning',
+        })
         return;
       }
 
@@ -222,13 +227,21 @@ export default {
           headers: { token: localStorage.getItem('token') }
         });
         if (response.data && response.data.code === "200") {
-          alert('用户信息更新成功');
+          ElMessage({
+            duration:1000,
+            message: '用户信息更新成功',
+            type: 'success',
+          })
           this.originalUser = { ...this.user };
           this.username = this.user.username;
         }
       } catch (error) {
         console.error("Error updating user data:", error);
-        alert('用户信息更新失败');
+        ElMessage({
+            duration:1000,
+            message: '用户信息更新失败',
+            type: 'error',
+        })
       }
     }
   },

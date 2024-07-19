@@ -3,7 +3,7 @@
     <div class="container">
       <div class="sidebar">
         <div class="sidebar-user">
-          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <img :src="useravatar" alt="User Avatar" class="sidebar-avatar">
           <div class="sidebar-username" id="username">{{ username }}</div>
         </div>
         <div class="sidebar-item active" @click="goToStart">
@@ -57,13 +57,14 @@
         <div class="bottom-content">
           <el-row>
             <el-col :span="24" v-for="note in paginatedNotes" :key="note.noteId">
-              <el-card class="note-item" shadow="hover">
+              <el-card class="note-item" shadow="hover" @click="selectNote(note)">
                 <template #header>
                   
                   <div class="card-header">
                     <el-icon :size="20" style="margin-top: 4px;"><Tickets /></el-icon>
                     <div class="title-and-date">
                       <h3>{{ note.title }}</h3>
+                      <!-- <p>{{ note.notebookId }}</p> -->
                       <el-tag size="small" type="info" class="day">
                         最后修改: {{ formatDate(note.updatedAt) }}
                       </el-tag>
@@ -211,7 +212,7 @@ export default {
       if (newValue === '') {
         this.search();
       }else{
-        this.searchTwo();
+        // this.searchTwo();
       }
     }
   },
@@ -234,6 +235,17 @@ export default {
     goToWeekly(){
       this.$router.push({ name: 'Week' });
     },
+    selectNote(note) {
+      this.selectedNote = note;
+      this.$router.push({ 
+        name: 'NoteDetail', 
+        params: { 
+          notebookId: note.notebookId, 
+          noteId: note.noteId 
+        } 
+      });
+    },
+
     toggleSearchMode() {
       this.searchMode = this.searchMode === 'keyword' ? 'tag' : 'keyword';
       this.searchInput = '';
@@ -259,6 +271,7 @@ export default {
 
         if (response.data.code === "200") {
           this.filteredNotes = response.data.data;
+          console.log(this.filteredNotes);
           this.currentPage = 1; // 重置到第一页
         } 
       } catch (error) {

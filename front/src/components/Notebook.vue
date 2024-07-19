@@ -3,7 +3,7 @@
   <div class="container">
     <div class="sidebar">
       <div class="sidebar-user">
-          <img :src="useravatar || 'default-avatar.png'" alt="User Avatar" class="sidebar-avatar">
+          <img :src="useravatar" alt="User Avatar" class="sidebar-avatar">
           <div class="sidebar-username" id="username">{{ username }}</div>
       </div>
       <div class="sidebar-item" @click="goToStart">开始</div>
@@ -91,14 +91,6 @@ methods: {
   goToNotebookDetails(notebook) {
     const notebookPath = `/notebook/${notebook.notebookId}`;
     this.$router.push({ path: notebookPath });
-
-    // this.$router.push({
-    //     name: 'NotebookDetail',
-    //     params: {
-    //       notebookId: notebook.notebookId,
-          
-    //     }
-    //   });
   },
   //编辑笔记本名称
   async editNotebookName(notebookId) {
